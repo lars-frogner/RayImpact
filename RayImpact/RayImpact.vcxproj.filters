@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{d8217dc8-86a3-44ff-b300-dfe53529ae5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shapes">
+      <UniqueIdentifier>{5b090f3d-676a-4f5e-a4e7-d89ca26149d8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Ray.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Transformation.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shape.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ray_impact.cpp" />
+    <ClCompile Include="src\ScatteringEvent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\BoundingBox.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BoundingRectangle.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Normal3.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Point2.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Point3.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ray.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Transformation.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vector2.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vector3.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shape.hpp">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScatteringEvent.hpp" />
+  </ItemGroup>
+</Project>

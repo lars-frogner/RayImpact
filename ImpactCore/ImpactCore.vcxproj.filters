@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Linear algebra">
+      <UniqueIdentifier>{6c0ad61e-d3ed-4aff-8ecd-700f5a8684f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{e0e70cb7-7ad6-466d-b9da-e2ba475770ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precision">
+      <UniqueIdentifier>{326366eb-4db4-44c9-8eab-236d1d5d60e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{60d33487-2249-4219-8316-9ac394e19f34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\precision.hpp">
+      <Filter>Precision</Filter>
+    </ClInclude>
+    <ClInclude Include="include\math.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\random.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Matrix4x4.hpp">
+      <Filter>Linear algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="include\image_util.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="include\string_util.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Matrix4x4.cpp">
+      <Filter>Linear algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\random.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\string_util.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\image_util.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
