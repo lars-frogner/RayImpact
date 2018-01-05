@@ -55,6 +55,8 @@ public:
 	Point2<T> operator+(const Point2<T>& other) const;
 	Point2<T> operator*(T weight) const;
 
+	bool operator>=(const Point2<T>& other) const;
+
 	T minComponent() const;
 	T maxComponent() const;
 
@@ -226,6 +228,12 @@ template <typename T>
 inline Point2<T> Point2<T>::operator*(T weight) const
 {
 	return Point2<T>(x*weight, y*weight);
+}
+
+template <typename T>
+inline bool Point2<T>::operator>=(const Point2<T>& other) const
+{
+	return x >= other.x && y >= other.y;
 }
 
 template <typename T>
