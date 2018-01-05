@@ -23,6 +23,7 @@
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
     <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +35,7 @@
     <ClInclude Include="include\Ray.hpp" />
     <ClInclude Include="include\ScatteringEvent.hpp" />
     <ClInclude Include="include\Shape.hpp" />
+    <ClInclude Include="include\Sphere.hpp" />
     <ClInclude Include="include\Transformation.hpp" />
     <ClInclude Include="include\Vector2.hpp" />
     <ClInclude Include="include\Vector3.hpp" />

@@ -20,6 +20,9 @@
     </ClCompile>
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
+    <ClCompile Include="src\Sphere.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -53,5 +56,8 @@
       <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="include\ScatteringEvent.hpp" />
+    <ClInclude Include="include\Sphere.hpp">
+      <Filter>Shapes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

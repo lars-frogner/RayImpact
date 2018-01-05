@@ -33,6 +33,12 @@
     <ClInclude Include="include\string_util.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="include\FloatWithError.hpp">
+      <Filter>Precision</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImpFloatWithError.hpp">
+      <Filter>Precision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Matrix4x4.cpp">
