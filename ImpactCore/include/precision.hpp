@@ -4,8 +4,12 @@
 
 namespace Impact {
 
+// Typedefs for precision
+
+// Single precision
 typedef float imp_float;
-typedef int imp_int;
-typedef unsigned long imp_uint;
+
+// Double precision
+//typedef double imp_float;
 
 } // Impact

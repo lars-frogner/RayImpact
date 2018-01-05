@@ -7,19 +7,19 @@ namespace Impact {
 
 imp_ppm_data* readPPM(const std::string& filename,
 					  imp_float*& data,
-					  imp_uint& width, imp_uint& height, imp_uint& n_components,
-					  imp_uint range_type,
+					  unsigned int& width, unsigned int& height, unsigned int& n_components,
+					  unsigned int range_type,
 					  bool is_texture /* = true */,
 					  imp_ppm_data* input_buffer /* = nullptr */,
 					  bool keep_input_buffer /* = false */)
 {
 	std::ifstream file;
 	std::string line;
-	imp_uint added_header_entries = 0;
-	imp_uint n_header_entries = added_header_entries;
+	unsigned int added_header_entries = 0;
+	unsigned int n_header_entries = added_header_entries;
 	std::vector<std::string> header_entries(4);
 
-	imp_uint current_size = (data || input_buffer)? width*height*n_components : 0;
+	unsigned long current_size = (data || input_buffer)? width*height*n_components : 0;
 
 	// Open file for input
     file.open(filename.c_str(), std::ios::binary);
@@ -32,7 +32,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 		std::getline(file, line);
 		const std::vector<std::string>& splitted = split(line);
 
-		n_header_entries += static_cast<imp_uint>(splitted.size());
+		n_header_entries += static_cast<unsigned int>(splitted.size());
 
 		assert(n_header_entries <= 4);
 
@@ -57,18 +57,18 @@ imp_ppm_data* readPPM(const std::string& filename,
 	}
 
 	// Read image dimensions
-	width = static_cast<imp_uint>(atoi(header_entries[1].c_str()));
-	height = static_cast<imp_uint>(atoi(header_entries[2].c_str()));
+	width = static_cast<unsigned int>(atoi(header_entries[1].c_str()));
+	height = static_cast<unsigned int>(atoi(header_entries[2].c_str()));
 
 	// Make sure dimensions are powers of 2
 	assert(!is_texture || (width & (width - 1)) == 0);
 	assert(!is_texture || (height & (height - 1)) == 0);
 	
 	// Read color scale
-    imp_uint max_color_value = static_cast<imp_uint>(atoi(header_entries[3].c_str()));
+    unsigned int max_color_value = static_cast<unsigned int>(atoi(header_entries[3].c_str()));
 	assert(max_color_value == 255);
 
-	imp_int color_offset;
+	int color_offset;
 	imp_float color_norm;
 
 	assert(range_type == 0 || range_type == 1);
@@ -102,8 +102,8 @@ imp_ppm_data* readPPM(const std::string& filename,
 
 	// Read pixels
 
-	imp_uint n_pixels = width*height;
-	imp_uint size = n_components*n_pixels;
+	unsigned long n_pixels = width*height;
+	unsigned long size = n_components*n_pixels;
 
 	if (!(input_buffer && current_size == size))
 		input_buffer = new imp_ppm_data[size];
@@ -138,7 +138,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 				idx_in = j + offset_in;
 				idx_out = j + offset_out;
 
-				data[idx_in] = color_norm*(color_offset + static_cast<imp_int>(input_buffer[idx_out]));
+				data[idx_in] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out]));
 			}
 		}
 	}
@@ -158,9 +158,9 @@ imp_ppm_data* readPPM(const std::string& filename,
 				idx_in = 3*(j + offset_in);
 				idx_out = 3*(j + offset_out);
 
-				data[idx_in]     = color_norm*(color_offset + static_cast<imp_int>(input_buffer[idx_out]    ));
-				data[idx_in + 1] = color_norm*(color_offset + static_cast<imp_int>(input_buffer[idx_out + 1]));
-				data[idx_in + 2] = color_norm*(color_offset + static_cast<imp_int>(input_buffer[idx_out + 2]));
+				data[idx_in]     = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out]    ));
+				data[idx_in + 1] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out + 1]));
+				data[idx_in + 2] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out + 2]));
 			}
 		}
 	}
@@ -173,15 +173,15 @@ imp_ppm_data* readPPM(const std::string& filename,
 
 imp_ppm_data* writePPM(const std::string& filename,
 					   const imp_float* data,
-					   imp_uint width, imp_uint height, imp_uint n_components,
-					   imp_uint range_type,
+					   unsigned int width, unsigned int height, unsigned int n_components,
+					   unsigned int range_type,
 					   imp_ppm_data* output_buffer /* = nullptr */,
 					   bool keep_output_buffer /* = false */)
 {
 	assert(data);
 	assert(n_components == 1 || n_components == 3);
 
-	imp_uint size = width*height*n_components;
+	unsigned long size = width*height*n_components;
 
 	imp_float color_offset, color_norm;
 
