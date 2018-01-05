@@ -21,10 +21,13 @@ public:
 
 	BoundingBox();
 	
-	BoundingBox(const Point3<T>& point_1,
-				const Point3<T>& point_2);
+	BoundingBox(const Point3<T>& lower_corner,
+				const Point3<T>& upper_corner);
 	
 	BoundingBox(const Point3<T>& point);
+
+	static BoundingBox<T> aroundPoints(const Point3<T>& point_1,
+									   const Point3<T>& point_2);
 
 	const Point3<T>& operator[](unsigned int point_idx) const;
 	Point3<T>& operator[](unsigned int point_idx);
@@ -73,12 +76,8 @@ template <typename T>
 inline BoundingBox<T> unionOf(const BoundingBox<T>& bounding_box,
 							  const Point3<T>& point)
 {
-	return BoundingBox<T>(Point3<T>(std::min(bounding_box.lower_corner.x, point.x),
-									std::min(bounding_box.lower_corner.y, point.y),
-									std::min(bounding_box.lower_corner.z, point.z)),
-						  Point3<T>(std::max(bounding_box.upper_corner.x, point.x),
-									std::max(bounding_box.upper_corner.y, point.y),
-									std::max(bounding_box.upper_corner.z, point.z)));
+	return BoundingBox<T>(min(bounding_box.lower_corner, point),
+						  max(bounding_box.upper_corner, point));
 }
 
 // Creates bounding box encompassing both the given bounding boxes
@@ -86,12 +85,8 @@ template <typename T>
 inline BoundingBox<T> unionOf(const BoundingBox<T>& bounding_box_1,
 							  const BoundingBox<T>& bounding_box_2)
 {
-	return BoundingBox<T>(Point3<T>(std::min(bounding_box_1.lower_corner.x, bounding_box_2.lower_corner.x),
-									std::min(bounding_box_1.lower_corner.y, bounding_box_2.lower_corner.y),
-									std::min(bounding_box_1.lower_corner.z, bounding_box_2.lower_corner.z)),
-						  Point3<T>(std::max(bounding_box_1.upper_corner.x, bounding_box_2.upper_corner.x),
-									std::max(bounding_box_1.upper_corner.y, bounding_box_2.upper_corner.y),
-									std::max(bounding_box_1.upper_corner.z, bounding_box_2.upper_corner.z)));
+	return BoundingBox<T>(min(bounding_box_1.lower_corner, bounding_box_2.lower_corner),
+						  max(bounding_box_1.upper_corner, bounding_box_2.upper_corner));
 }
 
 // Creates bounding box contained inside both the given bounding boxes
@@ -99,12 +94,8 @@ template <typename T>
 inline BoundingBox<T> intersectionOf(const BoundingBox<T>& bounding_box_1,
 									 const BoundingBox<T>& bounding_box_2)
 {
-	return BoundingBox<T>(Point3<T>(std::max(bounding_box_1.lower_corner.x, bounding_box_2.lower_corner.x),
-									std::max(bounding_box_1.lower_corner.y, bounding_box_2.lower_corner.y),
-									std::max(bounding_box_1.lower_corner.z, bounding_box_2.lower_corner.z)),
-						  Point3<T>(std::min(bounding_box_1.upper_corner.x, bounding_box_2.upper_corner.x),
-									std::min(bounding_box_1.upper_corner.y, bounding_box_2.upper_corner.y),
-									std::min(bounding_box_1.upper_corner.z, bounding_box_2.upper_corner.z)));
+	return BoundingBox<T>(max(bounding_box_1.lower_corner, bounding_box_2.lower_corner),
+						  min(bounding_box_1.upper_corner, bounding_box_2.upper_corner));
 }
 
 // BoundingBox method implementations
@@ -116,17 +107,26 @@ inline BoundingBox<T>::BoundingBox()
 {}
 
 template <typename T>
-inline BoundingBox<T>::BoundingBox(const Point3<T>& point_1,
-								   const Point3<T>& point_2)
-	: lower_corner(std::min(point_1.x, point_2.x), std::min(point_1.y, point_2.y), std::min(point_1.z, point_2.z)),
-	  upper_corner(std::max(point_1.x, point_2.x), std::max(point_1.y, point_2.y), std::max(point_1.z, point_2.z))
-{}
+inline BoundingBox<T>::BoundingBox(const Point3<T>& lower_corner,
+								   const Point3<T>& upper_corner)
+	: lower_corner(lower_corner),
+	  upper_corner(upper_corner)
+{
+	assert(upper_corner >= lower_corner);
+}
 
 template <typename T>
 inline BoundingBox<T>::BoundingBox(const Point3<T>& point)
 	: lower_corner(point),
 	  upper_corner(point)
 {}
+
+template <typename T>
+inline BoundingBox<T> BoundingBox<T>::aroundPoints(const Point3<T>& point_1,
+												   const Point3<T>& point_2)
+{
+	return BoundingBox<T>(min(point_1, point_2), max(point_1, point_2));
+}
 
 template <typename T>
 inline const Point3<T>& BoundingBox<T>::operator[](unsigned int point_idx) const

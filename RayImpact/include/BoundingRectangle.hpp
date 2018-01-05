@@ -20,10 +20,13 @@ public:
 
 	BoundingRectangle();
 	
-	BoundingRectangle(const Point2<T>& point_1,
-					  const Point2<T>& point_2);
+	BoundingRectangle(const Point2<T>& lower_corner,
+					  const Point2<T>& upper_corner);
 	
 	BoundingRectangle(const Point2<T>& point);
+
+	static BoundingRectangle<T> aroundPoints(const Point2<T>& point_1,
+											 const Point2<T>& point_2);
 
 	const Point2<T>& operator[](unsigned int point_idx) const;
 	Point2<T>& operator[](unsigned int point_idx);
@@ -62,10 +65,8 @@ template <typename T>
 inline BoundingRectangle<T> unionOf(const BoundingRectangle<T>& bounding_rectangle,
 									const Point2<T>& point)
 {
-	return BoundingRectangle<T>(Point2<T>(std::min(bounding_rectangle.lower_corner.x, point.x),
-										  std::min(bounding_rectangle.lower_corner.y, point.y)),
-								Point2<T>(std::max(bounding_rectangle.upper_corner.x, point.x),
-										  std::max(bounding_rectangle.upper_corner.y, point.y)));
+	return BoundingRectangle<T>(min(bounding_rectangle.lower_corner, point),
+								max(bounding_rectangle.upper_corner, point));
 }
 
 // Creates bounding rectangle encompassing both the given bounding rectangles
@@ -73,10 +74,8 @@ template <typename T>
 inline BoundingRectangle<T> unionOf(const BoundingRectangle<T>& bounding_rectangle_1,
 									const BoundingRectangle<T>& bounding_rectangle_2)
 {
-	return BoundingRectangle<T>(Point2<T>(std::min(bounding_rectangle_1.lower_corner.x, bounding_rectangle_2.lower_corner.x),
-										  std::min(bounding_rectangle_1.lower_corner.y, bounding_rectangle_2.lower_corner.y)),
-								Point2<T>(std::max(bounding_rectangle_1.upper_corner.x, bounding_rectangle_2.upper_corner.x),
-										  std::max(bounding_rectangle_1.upper_corner.y, bounding_rectangle_2.upper_corner.y)));
+	return BoundingRectangle<T>(min(bounding_rectangle_1.lower_corner, bounding_rectangle_2.lower_corner),
+								max(bounding_rectangle_1.upper_corner, bounding_rectangle_2.upper_corner));
 }
 
 // Creates bounding rectangle contained inside both the given bounding rectangles
@@ -84,10 +83,8 @@ template <typename T>
 inline BoundingRectangle<T> intersectionOf(const BoundingRectangle<T>& bounding_rectangle_1,
 										   const BoundingRectangle<T>& bounding_rectangle_2)
 {
-	return BoundingRectangle<T>(Point2<T>(std::max(bounding_rectangle_1.lower_corner.x, bounding_rectangle_2.lower_corner.x),
-										  std::max(bounding_rectangle_1.lower_corner.y, bounding_rectangle_2.lower_corner.y)),
-								Point2<T>(std::min(bounding_rectangle_1.upper_corner.x, bounding_rectangle_2.upper_corner.x),
-										  std::min(bounding_rectangle_1.upper_corner.y, bounding_rectangle_2.upper_corner.y)));
+	return BoundingRectangle<T>(max(bounding_rectangle_1.lower_corner.x, bounding_rectangle_2.lower_corner.x),
+								min(bounding_rectangle_1.upper_corner.x, bounding_rectangle_2.upper_corner.x));
 }
 
 // BoundingRectangle method implementations
@@ -99,17 +96,26 @@ inline BoundingRectangle<T>::BoundingRectangle()
 {}
 
 template <typename T>
-inline BoundingRectangle<T>::BoundingRectangle(const Point2<T>& point_1,
-											   const Point2<T>& point_2)
-	: lower_corner(std::min(point_1.x, point_2.x), std::min(point_1.y, point_2.y)),
-	  upper_corner(std::max(point_1.x, point_2.x), std::max(point_1.y, point_2.y))
-{}
+inline BoundingRectangle<T>::BoundingRectangle(const Point2<T>& lower_corner,
+											   const Point2<T>& upper_corner)
+	: lower_corner(lower_corner),
+	  upper_corner(upper_corner)
+{
+	assert(upper_corner >= lower_corner);
+}
 
 template <typename T>
 inline BoundingRectangle<T>::BoundingRectangle(const Point2<T>& point)
 	: lower_corner(point),
 	  upper_corner(point)
 {}
+
+template <typename T>
+inline BoundingRectangle<T> BoundingRectangle<T>::aroundPoints(const Point2<T>& point_1,
+															   const Point2<T>& point_2)
+{
+	return BoundingRectangle<T>(min(point_1, point_2), max(point_1, point_2));
+}
 
 template <typename T>
 inline const Point2<T>& BoundingRectangle<T>::operator[](unsigned int point_idx) const
