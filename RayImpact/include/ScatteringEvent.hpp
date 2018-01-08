@@ -13,8 +13,10 @@ namespace RayImpact {
 constexpr imp_float IMP_SHADOW_EPS = 0.0001f;
 
 // Forward declarations
-
 class Shape;
+class Model;
+class BSDF;
+class BSSRDF;
 
 class MediumInterface;
 
@@ -62,6 +64,9 @@ public:
 	Normal3F normal_u_deriv; // Derivative of surface normal with respect to u
 	Normal3F normal_v_deriv; // Derivative of surface normal with respect to v
 	const Shape* shape; // Shape representing the surface
+	const Model* model; // The model the surface belongs to
+	BSDF* bsdf; // The BSDF associated with the surface
+	BSSRDF* bssrdf; // The BSSRDF associated with the surface
 
 	// Versions of surface normal and derivatives for lighting calculations
 	struct 

@@ -67,6 +67,9 @@ SurfaceScatteringEvent::SurfaceScatteringEvent()
 	  normal_u_deriv(),
 	  normal_v_deriv(),
 	  shape(nullptr),
+	  model(nullptr),
+	  bsdf(nullptr),
+	  bssrdf(nullptr),
 	  shading()
 {}
 
@@ -91,7 +94,10 @@ SurfaceScatteringEvent::SurfaceScatteringEvent(const Point3F& position,
 	  position_v_deriv(position_v_deriv),
 	  normal_u_deriv(normal_u_deriv),
 	  normal_v_deriv(normal_v_deriv),
-	  shape(shape)
+	  shape(shape),
+	  model(nullptr),
+	  bsdf(nullptr),
+	  bssrdf(nullptr)
 {
 	shading.surface_normal = surface_normal;
 	shading.position_u_deriv = position_u_deriv;
