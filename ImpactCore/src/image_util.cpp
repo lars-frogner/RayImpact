@@ -32,7 +32,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 		std::getline(file, line);
 		const std::vector<std::string>& splitted = split(line);
 
-		n_header_entries += static_cast<unsigned int>(splitted.size());
+		n_header_entries += (unsigned int)(splitted.size());
 
 		assert(n_header_entries <= 4);
 
@@ -57,15 +57,15 @@ imp_ppm_data* readPPM(const std::string& filename,
 	}
 
 	// Read image dimensions
-	width = static_cast<unsigned int>(atoi(header_entries[1].c_str()));
-	height = static_cast<unsigned int>(atoi(header_entries[2].c_str()));
+	width = (unsigned int)(atoi(header_entries[1].c_str()));
+	height = (unsigned int)(atoi(header_entries[2].c_str()));
 
 	// Make sure dimensions are powers of 2
 	assert(!is_texture || (width & (width - 1)) == 0);
 	assert(!is_texture || (height & (height - 1)) == 0);
 	
 	// Read color scale
-    unsigned int max_color_value = static_cast<unsigned int>(atoi(header_entries[3].c_str()));
+    unsigned int max_color_value = (unsigned int)(atoi(header_entries[3].c_str()));
 	assert(max_color_value == 255);
 
 	int color_offset;
@@ -119,8 +119,8 @@ imp_ppm_data* readPPM(const std::string& filename,
 	int i, j;
 	int offset_in, offset_out;
 	int idx_in, idx_out;
-	int width_i = static_cast<int>(width);
-	int height_i = static_cast<int>(height);
+	int width_i = (int)(width);
+	int height_i = (int)(height);
 
 	if (n_components == 1)
 	{
@@ -138,7 +138,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 				idx_in = j + offset_in;
 				idx_out = j + offset_out;
 
-				data[idx_in] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out]));
+				data[idx_in] = color_norm*(color_offset + (int)(input_buffer[idx_out]));
 			}
 		}
 	}
@@ -158,9 +158,9 @@ imp_ppm_data* readPPM(const std::string& filename,
 				idx_in = 3*(j + offset_in);
 				idx_out = 3*(j + offset_out);
 
-				data[idx_in]     = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out]    ));
-				data[idx_in + 1] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out + 1]));
-				data[idx_in + 2] = color_norm*(color_offset + static_cast<int>(input_buffer[idx_out + 2]));
+				data[idx_in]     = color_norm*(color_offset + (int)(input_buffer[idx_out]    ));
+				data[idx_in + 1] = color_norm*(color_offset + (int)(input_buffer[idx_out + 1]));
+				data[idx_in + 2] = color_norm*(color_offset + (int)(input_buffer[idx_out + 2]));
 			}
 		}
 	}
@@ -206,8 +206,8 @@ imp_ppm_data* writePPM(const std::string& filename,
 	int i, j;
 	int offset_in, offset_out;
 	int idx_in, idx_out;
-	int width_i = static_cast<int>(width);
-	int height_i = static_cast<int>(height);
+	int width_i = (int)(width);
+	int height_i = (int)(height);
 
 	if (n_components == 1)
 	{
