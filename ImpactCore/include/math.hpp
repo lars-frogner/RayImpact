@@ -35,12 +35,14 @@ inline imp_float lerp(imp_float value_1, imp_float value_2, imp_float weight)
 }
 
 // Truncates the given value to keep it inside the given range
-inline imp_float clamp(imp_float value, imp_float lower_limit, imp_float upper_limit)
+template <typename T, typename U>
+inline T clamp(T value, U lower_limit, U upper_limit)
 {
 	if (value < lower_limit)
-		value = lower_limit;
-	else if (value > upper_limit)
-		value = upper_limit;
+		return lower_limit;
+
+	if (value > upper_limit)
+		return upper_limit;
 
 	return value;
 }
