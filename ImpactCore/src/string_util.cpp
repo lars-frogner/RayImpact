@@ -5,16 +5,18 @@
 #include <cctype>
 #include <locale>
 #include <iterator>
+#include <sstream>
+#include <cstdio>
 
 namespace Impact {
 
 void trim(std::string& s)
 {
-    ltrim(s);
-    rtrim(s);
+    trimLeft(s);
+    trimRight(s);
 }
 
-void ltrim(std::string& s)
+void trimLeft(std::string& s)
 {
     s.erase(s.begin(),
             std::find_if(s.begin(),
@@ -22,7 +24,7 @@ void ltrim(std::string& s)
                          [](int ch){ return !std::isspace(ch); }));
 }
 
-void rtrim(std::string& s)
+void trimRight(std::string& s)
 {
     s.erase(std::find_if(s.rbegin(),
                          s.rend(),
@@ -52,9 +54,9 @@ std::vector<std::string> split(const std::string& s, char delim /* = ' '*/)
 
 std::string join(const std::vector<std::string>& sequence,
 				 const std::string& separator,
-				 imp_int start /* = 0 */, imp_int end /* = -1 */)
+				 int start /* = 0 */, int end /* = -1 */)
 {
-	imp_int sequence_length = static_cast<imp_int>(sequence.size());
+	int sequence_length = (int)(sequence.size());
 
 	if (end < 0)
 		end += sequence_length;
@@ -66,12 +68,26 @@ std::string join(const std::vector<std::string>& sequence,
 
 	std::string concatenated = sequence[start];
 
-	for (imp_int idx = start + 1; idx <= end; idx++)
+	for (int idx = start + 1; idx <= end; idx++)
 	{
 		concatenated += separator + sequence[idx];
 	}
 
 	return concatenated;
+}
+
+inline std::string formatString(const char* format, ...)
+{
+	va_list arguments;
+	char buffer[256];
+
+	va_start(arguments, format);
+	int n_chars_written = vsprintf_s(buffer, 256, format, arguments);
+	va_end(arguments);
+
+	assert(n_chars_written < 256);
+
+	return std::string(buffer);
 }
 
 } // Impact
