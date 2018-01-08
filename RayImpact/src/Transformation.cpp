@@ -1,5 +1,6 @@
 #include "Transformation.hpp"
 #include "math.hpp"
+#include "ErrorFloat.hpp"
 #include <cassert>
 #include <cmath>
 
@@ -190,8 +191,70 @@ Point3F Transformation::operator()(const Point3F& point) const
 	return (w == 1.0f)? Point3F(x, y, z) : Point3F(x, y, z)*(1.0f/w);
 }
 
+Point3F Transformation::operator()(const Point3F& point, Vector3F* transformed_point_error) const
+{
+	// The error is incorrect if w != 1, i.e. for projective transformations
+	assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+
+	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
+										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
+										std::abs(matrix.a31*point.x) + std::abs(matrix.a32*point.y) + std::abs(matrix.a33*point.z) + std::abs(matrix.a34))
+							   *errorPowerBound(3);
+
+	return Point3F(matrix.a11*point.x + matrix.a12*point.y + matrix.a13*point.z + matrix.a14,
+				   matrix.a21*point.x + matrix.a22*point.y + matrix.a23*point.z + matrix.a24,
+				   matrix.a31*point.x + matrix.a32*point.y + matrix.a33*point.z + matrix.a34);
+}
+
+Point3F Transformation::operator()(const Point3F& point, const Vector3F& point_error, Vector3F* transformed_point_error) const
+{
+	// The error is incorrect if w != 1, i.e. for projective transformations
+	assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+
+	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
+										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
+										std::abs(matrix.a31*point.x) + std::abs(matrix.a32*point.y) + std::abs(matrix.a33*point.z) + std::abs(matrix.a34))
+							   *errorPowerBound(3) + 
+							   Vector3F(std::abs(matrix.a11)*point_error.x + std::abs(matrix.a12)*point_error.y + std::abs(matrix.a13)*point_error.z + std::abs(matrix.a14),
+										std::abs(matrix.a21)*point_error.x + std::abs(matrix.a22)*point_error.y + std::abs(matrix.a23)*point_error.z + std::abs(matrix.a24),
+										std::abs(matrix.a31)*point_error.x + std::abs(matrix.a32)*point_error.y + std::abs(matrix.a33)*point_error.z + std::abs(matrix.a34))
+							   *(errorPowerBound(3) + 1);
+	
+	return Point3F(matrix.a11*point.x + matrix.a12*point.y + matrix.a13*point.z + matrix.a14,
+				   matrix.a21*point.x + matrix.a22*point.y + matrix.a23*point.z + matrix.a24,
+				   matrix.a31*point.x + matrix.a32*point.y + matrix.a33*point.z + matrix.a34);
+}
+
 Vector3F Transformation::operator()(const Vector3F& vector) const
 {
+	return Vector3F(matrix.a11*vector.x + matrix.a12*vector.y + matrix.a13*vector.z,
+					matrix.a21*vector.x + matrix.a22*vector.y + matrix.a23*vector.z,
+					matrix.a31*vector.x + matrix.a32*vector.y + matrix.a33*vector.z);
+}
+
+Vector3F Transformation::operator()(const Vector3F& vector, Vector3F* transformed_vector_error) const
+{
+	*transformed_vector_error = Vector3F(std::abs(matrix.a11*vector.x) + std::abs(matrix.a12*vector.y) + std::abs(matrix.a13*vector.z),
+										 std::abs(matrix.a21*vector.x) + std::abs(matrix.a22*vector.y) + std::abs(matrix.a23*vector.z),
+										 std::abs(matrix.a31*vector.x) + std::abs(matrix.a32*vector.y) + std::abs(matrix.a33*vector.z))
+								*errorPowerBound(3);
+
+	return Vector3F(matrix.a11*vector.x + matrix.a12*vector.y + matrix.a13*vector.z,
+					matrix.a21*vector.x + matrix.a22*vector.y + matrix.a23*vector.z,
+					matrix.a31*vector.x + matrix.a32*vector.y + matrix.a33*vector.z);
+}
+
+Vector3F Transformation::operator()(const Vector3F& vector, const Vector3F& vector_error, Vector3F* transformed_vector_error) const
+{
+	*transformed_vector_error = Vector3F(std::abs(matrix.a11*vector.x) + std::abs(matrix.a12*vector.y) + std::abs(matrix.a13*vector.z),
+										 std::abs(matrix.a21*vector.x) + std::abs(matrix.a22*vector.y) + std::abs(matrix.a23*vector.z),
+										 std::abs(matrix.a31*vector.x) + std::abs(matrix.a32*vector.y) + std::abs(matrix.a33*vector.z))
+								*errorPowerBound(3) +
+								Vector3F(std::abs(matrix.a11)*vector_error.x + std::abs(matrix.a12)*vector_error.y + std::abs(matrix.a13)*vector_error.z,
+			 							 std::abs(matrix.a21)*vector_error.x + std::abs(matrix.a22)*vector_error.y + std::abs(matrix.a23)*vector_error.z,
+										 std::abs(matrix.a31)*vector_error.x + std::abs(matrix.a32)*vector_error.y + std::abs(matrix.a33)*vector_error.z)
+								*(errorPowerBound(3) + 1);
+
 	return Vector3F(matrix.a11*vector.x + matrix.a12*vector.y + matrix.a13*vector.z,
 					matrix.a21*vector.x + matrix.a22*vector.y + matrix.a23*vector.z,
 					matrix.a31*vector.x + matrix.a32*vector.y + matrix.a33*vector.z);
@@ -208,33 +271,72 @@ Ray Transformation::operator()(const Ray& ray) const
 {
 	const Transformation& transformation = *this;
 
-	const Point3F& origin = transformation(ray.origin);
+	Vector3F origin_error;
+
+	Point3F& origin = transformation(ray.origin, &origin_error);
 	const Vector3F& direction = transformation(ray.direction);
 
-	return Ray(origin, direction, ray.max_distance, ray.time, ray.medium);
+	// Offset the transformed origin in the direction of the transformed ray
+	// by an amount equal to the size of the origin error
+
+	imp_float direction_length_squared = direction.squaredLength();
+	imp_float max_distance = ray.max_distance;
+
+	if (direction_length_squared > 0.0f)
+	{
+		imp_float offset_distance = origin_error.dot(abs(direction))/direction_length_squared;
+
+		origin += direction*offset_distance;
+		max_distance -= offset_distance;
+	}
+
+	return Ray(origin, direction, max_distance, ray.time, ray.medium);
+}
+
+Ray Transformation::operator()(const Ray& ray, Vector3F* transformed_origin_error, Vector3F* transformed_direction_error) const
+{
+	const Transformation& transformation = *this;
+
+	Point3F& origin = transformation(ray.origin, transformed_origin_error);
+	const Vector3F& direction = transformation(ray.direction, transformed_direction_error);
+
+	// Offset the transformed origin in the direction of the transformed ray
+	// by an amount equal to the size of the origin error
+
+	imp_float direction_length_squared = direction.squaredLength();
+	imp_float max_distance = ray.max_distance;
+
+	if (direction_length_squared > 0.0f)
+	{
+		imp_float offset_distance = transformed_origin_error->dot(abs(direction))/direction_length_squared;
+
+		origin += direction*offset_distance;
+		max_distance -= offset_distance;
+	}
+
+	return Ray(origin, direction, max_distance, ray.time, ray.medium);
 }
 
 RayWithOffsets Transformation::operator()(const RayWithOffsets& ray) const
 {
 	const Transformation& transformation = *this;
 
-	const Point3F& origin = transformation(ray.origin);
-	const Vector3F& direction = transformation(ray.direction);
+	const Ray& transformed_ray = transformation(Ray(ray.origin, ray.direction, ray.max_distance, ray.time, ray.medium));
 
-	RayWithOffsets transformed_ray(origin, direction, ray.max_distance, ray.time, ray.medium);
+	RayWithOffsets transformed_ray_with_offsets(transformed_ray);
 
 	if (ray.has_offsets)
 	{
-		transformed_ray.x_offset_ray_origin = transformation(ray.x_offset_ray_origin);
-		transformed_ray.x_offset_ray_direction = transformation(ray.x_offset_ray_direction);
+		transformed_ray_with_offsets.x_offset_ray_origin = transformation(ray.x_offset_ray_origin);
+		transformed_ray_with_offsets.x_offset_ray_direction = transformation(ray.x_offset_ray_direction);
 
-		transformed_ray.y_offset_ray_origin = transformation(ray.y_offset_ray_origin);
-		transformed_ray.y_offset_ray_direction = transformation(ray.y_offset_ray_direction);
+		transformed_ray_with_offsets.y_offset_ray_origin = transformation(ray.y_offset_ray_origin);
+		transformed_ray_with_offsets.y_offset_ray_direction = transformation(ray.y_offset_ray_direction);
 
-		transformed_ray.has_offsets = true;
+		transformed_ray_with_offsets.has_offsets = true;
 	}
 
-	return transformed_ray;
+	return transformed_ray_with_offsets;
 }
 
 BoundingBoxF Transformation::operator()(const BoundingBoxF& box) const
@@ -274,14 +376,24 @@ SurfaceScatteringEvent Transformation::operator()(const SurfaceScatteringEvent& 
 	
 	const Transformation& transformation = *this;
 
-	// position, position_error
+	transformed_event.position = transformation(scattering_event.position, scattering_event.position_error, &(transformed_event.position_error));
 
-	transformed_event.outgoing_direction = transformation(transformed_event.outgoing_direction);
-	transformed_event.surface_normal = transformation(transformed_event.surface_normal).normalized();
+	transformed_event.outgoing_direction = transformation(scattering_event.outgoing_direction).normalized();
+	transformed_event.surface_normal = transformation(scattering_event.surface_normal).normalized();
 
-	transformed_event.shading.surface_normal = transformation(transformed_event.shading.surface_normal).normalized();
+	transformed_event.position_u_deriv = transformation(scattering_event.position_u_deriv);
+	transformed_event.position_v_deriv = transformation(scattering_event.position_v_deriv);
+	transformed_event.normal_u_deriv = transformation(scattering_event.normal_u_deriv);
+	transformed_event.normal_v_deriv = transformation(scattering_event.normal_v_deriv);
+	
+	transformed_event.shading.surface_normal = transformation(scattering_event.shading.surface_normal).normalized();
+	
+	transformed_event.shading.position_u_deriv = transformation(scattering_event.shading.position_u_deriv);
+	transformed_event.shading.position_v_deriv = transformation(scattering_event.shading.position_v_deriv);
+	transformed_event.shading.normal_u_deriv = transformation(scattering_event.shading.normal_u_deriv);
+	transformed_event.shading.normal_v_deriv = transformation(scattering_event.shading.normal_v_deriv);
 
-	// derivatives?
+	transformed_event.shading.surface_normal.flipToSameHemisphereAs(transformed_event.surface_normal);
 
 	return transformed_event;
 }

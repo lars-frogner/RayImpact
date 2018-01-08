@@ -52,10 +52,19 @@ public:
 	Transformation& operator*=(const Transformation& other);
 
 	Point3F operator()(const Point3F& point) const;
+	Point3F operator()(const Point3F& point, Vector3F* transformed_point_error) const;
+	Point3F operator()(const Point3F& point, const Vector3F& point_error, Vector3F* transformed_point_error) const;
+
 	Vector3F operator()(const Vector3F& vector) const;
+	Vector3F operator()(const Vector3F& vector, Vector3F* transformed_vector_error) const;
+	Vector3F operator()(const Vector3F& vector, const Vector3F& vector_error, Vector3F* transformed_vector_error) const;
+
 	Normal3F operator()(const Normal3F& normal) const;
+
 	Ray operator()(const Ray& normal) const;
+	Ray operator()(const Ray& ray, Vector3F* transformed_origin_error, Vector3F* transformed_direction_error) const;
 	RayWithOffsets operator()(const RayWithOffsets& normal) const;
+
 	BoundingBoxF operator()(const BoundingBoxF& box) const;
 	SurfaceScatteringEvent operator()(const SurfaceScatteringEvent& scattering_event) const;
 
