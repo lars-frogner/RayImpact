@@ -42,7 +42,7 @@ BoundingBoxF Sphere::objectSpaceBoundingBox() const
 	}
 	else if (phi_max >= IMP_PI_OVER_TWO)
 	{
-		return BoundingBoxF(Point3F(0.0f,					  y_min, std::cos(phi_max)*radius),
+		return BoundingBoxF(Point3F(					0.0f, y_min, std::cos(phi_max)*radius),
 							Point3F(std::sin(phi_max)*radius, y_max,				   radius));
 	}
 	else
@@ -176,36 +176,28 @@ bool Sphere::intersect(const Ray& ray,
 	// Compute u and v derivatives of the intersection point
 
 	imp_float inverse_zx_radius = 1.0f/std::sqrt(intersection_point.z*intersection_point.z + intersection_point.x*intersection_point.x);
-	imp_float cos_phi = intersection_point.z/inverse_zx_radius;
-	imp_float sin_phi = intersection_point.x/inverse_zx_radius;
+	imp_float cos_phi = intersection_point.z*inverse_zx_radius;
+	imp_float sin_phi = intersection_point.x*inverse_zx_radius;
 
-	const Vector3F& position_u_deriv = Vector3F(intersection_point.z*phi_max, 0.0f, -intersection_point.x*phi_max);
+	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0.0f, intersection_point.x*phi_max);
 
-	const Vector3F& position_v_deriv = Vector3F(intersection_point.y*sin_phi, -radius*std::sin(intersection_theta), intersection_point.y*cos_phi)*theta_range;
+	const Vector3F& position_v_deriv = Vector3F(intersection_point.y*cos_phi, -radius*std::sin(intersection_theta), intersection_point.y*sin_phi)*theta_range;
 
 	// Compute u and v derivatives of the surface normal
 
 	const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0.0f, intersection_point.z)*(-phi_max*phi_max);
-	const Vector3F& position_uv_deriv = Vector3F(cos_phi, 0.0f, -sin_phi)*(theta_range*phi_max*intersection_point.y);
+	const Vector3F& position_uv_deriv = Vector3F(-sin_phi, 0.0f, cos_phi)*(theta_range*phi_max*intersection_point.y);
 	const Vector3F& position_v2_deriv = Vector3F(intersection_point.x, intersection_point.y, intersection_point.z)*(-theta_range*theta_range);
 
-	imp_float E = position_u_deriv.squaredLength();
-	imp_float F = position_u_deriv.dot(position_v_deriv);
-	imp_float G = position_v_deriv.squaredLength();
+	Normal3F normal_u_deriv, normal_v_deriv;
 
-	const Vector3F& surface_normal = position_u_deriv.cross(position_v_deriv).normalized();
-
-	imp_float e = surface_normal.dot(position_u2_deriv);
-	imp_float f = surface_normal.dot(position_uv_deriv);
-	imp_float g = surface_normal.dot(position_v2_deriv);
-
-	imp_float normal_deriv_norm = 1.0f/(E*G - F*F);
-
-	const Normal3F& normal_u_deriv = Normal3F(position_u_deriv*((f*F - e*G)*normal_deriv_norm) +
-											  position_v_deriv*((e*F - f*E)*normal_deriv_norm));
-
-	const Normal3F& normal_v_deriv = Normal3F(position_u_deriv*((g*F - f*G)*normal_deriv_norm) +
-											  position_v_deriv*((f*F - g*E)*normal_deriv_norm));
+	computeNormalDerivatives(position_u_deriv,
+							 position_v_deriv,
+							 position_u2_deriv,
+							 position_uv_deriv,
+							 position_v2_deriv,
+							 &normal_u_deriv,
+							 &normal_v_deriv);
 
 	// Compute error for intersection point
 	const Vector3F& intersection_point_error = abs(static_cast<Vector3F>(intersection_point))*errorPowerBound(5);
