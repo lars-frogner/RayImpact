@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -58,7 +59,7 @@ public:
 // Vector2 typedefs
 
 typedef Vector2<imp_float> Vector2F;
-typedef Vector2<imp_int> Vector2I;
+typedef Vector2<int> Vector2I;
 
 // Functions on Vector2 objects
 
@@ -88,6 +89,13 @@ inline Vector2<T> max(const Vector2<T>& vector_1, const Vector2<T>& vector_2)
 {
 	return Vector2<T>(std::max(vector_1.x, vector_2.x),
 					  std::max(vector_1.y, vector_2.y));
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Vector2<T>& vector)
+{
+	stream << "[" << vector.x << ", " << vector.y << "]";
+	return stream;
 }
 
 // Vector2 method implementations

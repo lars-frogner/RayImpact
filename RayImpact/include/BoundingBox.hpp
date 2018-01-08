@@ -1,14 +1,19 @@
 #pragma once
 #include "precision.hpp"
 #include "math.hpp"
+#include "ErrorFloat.hpp"
 #include "Vector3.hpp"
 #include "Point3.hpp"
 #include "Ray.hpp"
 #include <cassert>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
+	
+// Constant used in ray-box intersection testing
+constexpr imp_float maxDistanceSafetyFactor = 1 + 2*errorPowerBound(3);
 
 // BoundingBox declarations
 
@@ -67,7 +72,7 @@ public:
 // BoundingBox typedefs
 
 typedef BoundingBox<imp_float> BoundingBoxF;
-typedef BoundingBox<imp_int> BoundingBoxI;
+typedef BoundingBox<int> BoundingBoxI;
 
 // Functions on BoundingBox objects
 
@@ -96,6 +101,13 @@ inline BoundingBox<T> intersectionOf(const BoundingBox<T>& bounding_box_1,
 {
 	return BoundingBox<T>(max(bounding_box_1.lower_corner, bounding_box_2.lower_corner),
 						  min(bounding_box_1.upper_corner, bounding_box_2.upper_corner));
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const BoundingBox<T>& box)
+{
+	stream << "{lower corner = " << box.lower_corner << ", upper corner = " << box.upper_corner << "}";
+	return stream;
 }
 
 // BoundingBox method implementations
@@ -271,24 +283,38 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
 										    imp_float* first_intersection_distance,
 											imp_float* second_intersection_distance) const
 {
-	imp_float min_dist, max_dist, min_dist_temp, max_dist_temp;
+	imp_float min_dist_temp, max_dist_temp;
+
+	imp_float min_dist = 0.0f;
+	imp_float max_dist = ray.max_distance;
 
 	imp_float inverse_ray_direction_x = 1.0f/ray.direction.x;
 
-    if (inverse_ray_direction_x >= 0)
+    if (inverse_ray_direction_x >= 0.0f)
     {
-        min_dist = (lower_corner.x - ray.origin.x)*inverse_ray_direction_x;
-        max_dist = (upper_corner.x - ray.origin.x)*inverse_ray_direction_x;
+        min_dist_temp = (lower_corner.x - ray.origin.x)*inverse_ray_direction_x;
+        max_dist_temp = (upper_corner.x - ray.origin.x)*inverse_ray_direction_x;
     }
     else
     {
-        min_dist = (upper_corner.x - ray.origin.x)*inverse_ray_direction_x;
-        max_dist = (lower_corner.x - ray.origin.x)*inverse_ray_direction_x;
+        min_dist_temp = (upper_corner.x - ray.origin.x)*inverse_ray_direction_x;
+        max_dist_temp = (lower_corner.x - ray.origin.x)*inverse_ray_direction_x;
     }
+
+	max_dist_temp *= maxDistanceSafetyFactor;
+
+    if (min_dist_temp > min_dist)
+        min_dist = min_dist_temp;
+
+    if (max_dist_temp < max_dist)
+        max_dist = max_dist_temp;
+
+    if (min_dist > max_dist)
+        return false;
 
 	imp_float inverse_ray_direction_y = 1.0f/ray.direction.y;
 
-    if (inverse_ray_direction_y >= 0)
+    if (inverse_ray_direction_y >= 0.0f)
     {
         min_dist_temp = (lower_corner.y - ray.origin.y)*inverse_ray_direction_y;
         max_dist_temp = (upper_corner.y - ray.origin.y)*inverse_ray_direction_y;
@@ -299,14 +325,16 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         max_dist_temp = (lower_corner.y - ray.origin.y)*inverse_ray_direction_y;
     }
 
-    if (min_dist > max_dist_temp || min_dist_temp > max_dist)
-        return false;
+	max_dist_temp *= maxDistanceSafetyFactor;
 
     if (min_dist_temp > min_dist)
         min_dist = min_dist_temp;
 
     if (max_dist_temp < max_dist)
         max_dist = max_dist_temp;
+
+    if (min_dist > max_dist)
+        return false;
 
 	imp_float inverse_ray_direction_z = 1.0f/ray.direction.z;
 
@@ -321,8 +349,7 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         max_dist_temp = (lower_corner.z - ray.origin.z)*inverse_ray_direction_z;
     }
 
-    if (min_dist > max_dist_temp || min_dist_temp > max_dist)
-        return false;
+	max_dist_temp *= maxDistanceSafetyFactor;
 
     if (min_dist_temp > min_dist)
         min_dist = min_dist_temp;
@@ -330,16 +357,13 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
     if (max_dist_temp < max_dist)
         max_dist = max_dist_temp;
 
-    if (max_dist >= 0 && min_dist < ray.max_distance)
-	{
-		if (first_intersection_distance) *first_intersection_distance = min_dist;
-		if (second_intersection_distance) *second_intersection_distance = max_dist;
-        return true;
-	}
-    else
-	{
+    if (min_dist > max_dist)
         return false;
-	}
+
+	if (first_intersection_distance) *first_intersection_distance = min_dist;
+	if (second_intersection_distance) *second_intersection_distance = max_dist;
+
+    return true;
 }
 
 template <typename T>
@@ -370,6 +394,9 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         max_dist_temp = (lower_corner.y - ray.origin.y)*inverse_direction.y;
     }
 
+	max_dist *= maxDistanceSafetyFactor;
+	max_dist_temp *= maxDistanceSafetyFactor;
+
     if (min_dist > max_dist_temp || min_dist_temp > max_dist)
         return false;
 
@@ -389,6 +416,8 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         min_dist_temp = (upper_corner.z - ray.origin.z)*inverse_direction.z;
         max_dist_temp = (lower_corner.z - ray.origin.z)*inverse_direction.z;
     }
+	
+	max_dist_temp *= maxDistanceSafetyFactor;
 
     if (min_dist > max_dist_temp || min_dist_temp > max_dist)
         return false;
@@ -399,7 +428,7 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
     if (max_dist_temp < max_dist)
         max_dist = max_dist_temp;
 
-    return (max_dist >= 0 && min_dist < ray.max_distance);
+    return (min_dist < ray.max_distance && max_dist > 0);
 }
 
 } // RayImpact

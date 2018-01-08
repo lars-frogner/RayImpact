@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -81,7 +82,7 @@ public:
 // Vector3 typedefs
 
 typedef Vector3<imp_float> Vector3F;
-typedef Vector3<imp_int> Vector3I;
+typedef Vector3<int> Vector3I;
 
 // Functions on Vector3 objects
 
@@ -126,6 +127,13 @@ inline void coordinateSystem(const Vector3<T>& axis_1,
 			  Vector3<T>(		 0, axis_1.z, -axis_1.y)/std::sqrt(axis_1.z*axis_1.z + axis_1.y*axis_1.y);
 
 	*axis_3 = axis_1.cross(*axis_2);
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Vector3<T>& vector)
+{
+	stream << "[" << vector.x << ", " << vector.y <<  ", " << vector.z << "]";
+	return stream;
 }
 
 // Vector3 method implementations
@@ -264,12 +272,12 @@ inline Vector3<T> Vector3<T>::cross(const Vector3<T>& other) const
 {
 	// Convert components to double precision before subtracting
 	// in order to avoid catastrophic cancellation
-	double x1 = static_cast<double>(x);
-	double y1 = static_cast<double>(y);
-	double z1 = static_cast<double>(z);
-	double x2 = static_cast<double>(other.x);
-	double y2 = static_cast<double>(other.y);
-	double z2 = static_cast<double>(other.z);
+	double x1 = (double)(x);
+	double y1 = (double)(y);
+	double z1 = (double)(z);
+	double x2 = (double)(other.x);
+	double y2 = (double)(other.y);
+	double z2 = (double)(other.z);
 
 	return Vector3<T>(static_cast<T>(y1*z2 - z1*y2),
 					  static_cast<T>(z1*x2 - x1*z2),

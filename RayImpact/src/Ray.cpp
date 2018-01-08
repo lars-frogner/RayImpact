@@ -60,5 +60,19 @@ void RayWithOffsets::scaleOffsets(imp_float scale)
 	y_offset_ray_direction = direction + (y_offset_ray_direction - direction)*scale;
 }
 
+// Printing functions
+
+std::ostream& operator<<(std::ostream& stream, const Ray& ray)
+{
+	stream << "{origin = " << ray.origin << ", direction = " << ray.direction << ", max = " << ray.max_distance << ", time = " << ray.time << "}";
+	return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const RayWithOffsets& ray)
+{
+	stream << "{origin = " << ray.origin << ", direction = " << ray.direction << ", max = " << ray.max_distance << ", time = " << ray.time << "}";
+	return stream;
+}
+
 } // RayImpact
 } // Impact

@@ -3,6 +3,7 @@
 #include "math.hpp"
 #include "Vector3.hpp"
 #include "Point3.hpp"
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -60,6 +61,10 @@ public:
 
 	void scaleOffsets(imp_float scale);
 };
+
+// Printing functions
+std::ostream& operator<<(std::ostream& stream, const Ray& ray);
+std::ostream& operator<<(std::ostream& stream, const RayWithOffsets& ray);
 
 } // RayImpact
 } // Impact

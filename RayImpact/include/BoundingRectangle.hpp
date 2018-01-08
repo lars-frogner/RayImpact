@@ -5,6 +5,7 @@
 #include "Point2.hpp"
 #include <cassert>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -56,7 +57,7 @@ public:
 // BoundingRectangle typedefs
 
 typedef BoundingRectangle<imp_float> BoundingRectangleF;
-typedef BoundingRectangle<imp_int> BoundingRectangleI;
+typedef BoundingRectangle<int> BoundingRectangleI;
 
 // Functions on BoundingRectangle objects
 
@@ -85,6 +86,13 @@ inline BoundingRectangle<T> intersectionOf(const BoundingRectangle<T>& bounding_
 {
 	return BoundingRectangle<T>(max(bounding_rectangle_1.lower_corner.x, bounding_rectangle_2.lower_corner.x),
 								min(bounding_rectangle_1.upper_corner.x, bounding_rectangle_2.upper_corner.x));
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const BoundingRectangle<T>& rectangle)
+{
+	stream << "{lower corner = " << rectangle.lower_corner << ", upper corner = " << rectangle.upper_corner << "}";
+	return stream;
 }
 
 // BoundingRectangle method implementations

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -66,7 +67,7 @@ public:
 // Point3 typedefs
 
 typedef Point3<imp_float> Point3F;
-typedef Point3<imp_int> Point3I;
+typedef Point3<int> Point3I;
 
 // Functions on Point3 objects
 
@@ -129,6 +130,13 @@ template <typename T>
 inline Point3<T> lerp(const Point3<T>& point_1, const Point3<T>& point_2, T weight)
 {
 	return point_1*(1 - weight) + point_2*weight;
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Point3<T>& point)
+{
+	stream << "(" << point.x << ", " << point.y <<  ", " << point.z << ")";
+	return stream;
 }
 
 // Point3 method implementations

@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <algorithm>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -106,6 +107,13 @@ inline Normal3<T> max(const Normal3<T>& normal_1, const Normal3<T>& normal_2)
 	return Normal3<T>(std::max(normal_1.x, normal_2.x),
 					  std::max(normal_1.y, normal_2.y),
 					  std::max(normal_1.z, normal_2.z));
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Normal3<T>& normal)
+{
+	stream << "<" << normal.x << ", " << normal.y <<  ", " << normal.z << ">";
+	return stream;
 }
 
 // Normal3 method implementations
