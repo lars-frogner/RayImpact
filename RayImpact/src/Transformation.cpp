@@ -1,7 +1,7 @@
 #include "Transformation.hpp"
+#include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
-#include <cassert>
 #include <cmath>
 
 namespace Impact {

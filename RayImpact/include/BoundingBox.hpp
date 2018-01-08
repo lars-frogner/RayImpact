@@ -1,11 +1,11 @@
 #pragma once
 #include "precision.hpp"
+#include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
 #include "Vector3.hpp"
 #include "Point3.hpp"
 #include "Ray.hpp"
-#include <cassert>
 #include <algorithm>
 #include <ostream>
 

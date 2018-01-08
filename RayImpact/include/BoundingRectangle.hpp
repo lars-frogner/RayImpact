@@ -1,9 +1,9 @@
 #pragma once
 #include "precision.hpp"
+#include "error.hpp"
 #include "math.hpp"
 #include "Vector2.hpp"
 #include "Point2.hpp"
-#include <cassert>
 #include <algorithm>
 #include <ostream>
 

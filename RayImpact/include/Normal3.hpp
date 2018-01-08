@@ -1,7 +1,7 @@
 #pragma once
 #include "precision.hpp"
+#include "error.hpp"
 #include "Vector3.hpp"
-#include <cassert>
 #include <cmath>
 #include <algorithm>
 #include <ostream>

@@ -1,6 +1,6 @@
 #include "image_util.hpp"
 #include "string_util.hpp"
-#include <cassert>
+#include "error.hpp"
 #include <fstream>
 
 namespace Impact {
@@ -24,7 +24,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 	// Open file for input
     file.open(filename.c_str(), std::ios::binary);
 	
-	assert(file.is_open());
+	impAssert(file.is_open());
 
 	// Read header entries
 	while (true)
@@ -34,7 +34,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 
 		n_header_entries += (unsigned int)(splitted.size());
 
-		assert(n_header_entries <= 4);
+		impAssert(n_header_entries <= 4);
 
 		header_entries.insert(header_entries.begin() + added_header_entries, splitted.begin(), splitted.end());
 
@@ -45,7 +45,7 @@ imp_ppm_data* readPPM(const std::string& filename,
 	}
 
 	// Read format identifier
-	assert(header_entries[0] == "P5" || header_entries[0] == "P6");
+	impAssert(header_entries[0] == "P5" || header_entries[0] == "P6");
 
 	if (header_entries[0] == "P5")
 	{
@@ -61,17 +61,17 @@ imp_ppm_data* readPPM(const std::string& filename,
 	height = (unsigned int)(atoi(header_entries[2].c_str()));
 
 	// Make sure dimensions are powers of 2
-	assert(!is_texture || (width & (width - 1)) == 0);
-	assert(!is_texture || (height & (height - 1)) == 0);
+	impAssert(!is_texture || (width & (width - 1)) == 0);
+	impAssert(!is_texture || (height & (height - 1)) == 0);
 	
 	// Read color scale
     unsigned int max_color_value = (unsigned int)(atoi(header_entries[3].c_str()));
-	assert(max_color_value == 255);
+	impAssert(max_color_value == 255);
 
 	int color_offset;
 	imp_float color_norm;
 
-	assert(range_type == 0 || range_type == 1);
+	impAssert(range_type == 0 || range_type == 1);
 
 	if (max_color_value == 255) // Values are stored as unsigned bytes with range [0, 255]
 	{
@@ -178,14 +178,14 @@ imp_ppm_data* writePPM(const std::string& filename,
 					   imp_ppm_data* output_buffer /* = nullptr */,
 					   bool keep_output_buffer /* = false */)
 {
-	assert(data);
-	assert(n_components == 1 || n_components == 3);
+	impAssert(data);
+	impAssert(n_components == 1 || n_components == 3);
 
 	unsigned long size = width*height*n_components;
 
 	imp_float color_offset, color_norm;
 
-	assert(range_type == 0 || range_type == 1);
+	impAssert(range_type == 0 || range_type == 1);
 
 	if (range_type == 0) // Scale from range [0, 1]
 	{
@@ -256,7 +256,7 @@ imp_ppm_data* writePPM(const std::string& filename,
 	std::ofstream file;
     file.open(filename.c_str(), std::ios::binary);
 
-	assert(file.is_open());
+	impAssert(file.is_open());
 	
 	// Write header
 	file << ((n_components == 1)? "P5" : "P6") << std::endl;

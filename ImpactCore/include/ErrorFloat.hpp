@@ -2,7 +2,7 @@
 #include "precision.hpp"
 #include "math.hpp"
 #include "string_util.hpp"
-#include <cassert>
+#include "error.hpp"
 #include <cstring>
 #include <cmath>
 #include <algorithm>

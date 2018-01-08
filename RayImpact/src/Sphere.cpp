@@ -1,8 +1,8 @@
 #include "Sphere.hpp"
+#include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
 #include "Point3.hpp"
-#include <cassert>
 #include <cmath>
 
 namespace Impact {
