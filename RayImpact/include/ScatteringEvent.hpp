@@ -4,9 +4,13 @@
 #include "Point3.hpp"
 #include "Normal3.hpp"
 #include "Point2.hpp"
+#include "Ray.hpp"
 
 namespace Impact {
 namespace RayImpact {
+
+// Offset from the end of a shadow ray to the area light the ray points towards
+constexpr imp_float IMP_SHADOW_EPS = 0.0001f;
 
 // Forward declarations
 
@@ -34,6 +38,14 @@ public:
 					const Normal3F& surface_normal,
 					const MediumInterface* medium_interface,
 					imp_float time);
+
+	Ray spawnRay(const Vector3F& direction) const;
+	
+	Ray spawnRayTo(const Point3F& end_point) const;
+	
+	Ray spawnRayTo(const ScatteringEvent& other) const;
+
+	const Medium* getMediumInDirection(const Vector3F& direction) const;
 
 	bool isOnSurface() const;
 };
@@ -81,6 +93,13 @@ public:
 						    const Normal3F& normal_v_deriv,
 							bool shading_normal_determines_orientation);
 };
+
+// Utility functions
+
+Point3F offsetRayOrigin(const Point3F& ray_origin,
+						const Vector3F& ray_origin_error,
+						const Normal3F& surface_normal,
+						const Vector3F& ray_direction);
 
 } // RayImpact
 } // Impact

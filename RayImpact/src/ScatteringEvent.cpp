@@ -1,5 +1,7 @@
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
+#include "math.hpp"
+#include "ErrorFloat.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -28,6 +30,27 @@ ScatteringEvent::ScatteringEvent(const Point3F& position,
 	  medium_interface(medium_interface),
 	  time(time)
 {}
+
+Ray ScatteringEvent::spawnRay(const Vector3F& direction) const
+{
+	const Point3F& origin = offsetRayOrigin(position, position_error, surface_normal, direction);
+
+	return Ray(origin, direction, IMP_INFINITY, time, getMediumInDirection(direction));
+}
+
+Ray ScatteringEvent::spawnRayTo(const Point3F& end_point) const
+{
+	const Point3F& origin = offsetRayOrigin(position, position_error, surface_normal, end_point - position);
+
+	const Vector3F& direction = end_point - origin;
+
+	return Ray(origin, direction, 1.0f - IMP_SHADOW_EPS, time, getMediumInDirection(direction));
+}
+
+Ray ScatteringEvent::spawnRayTo(const ScatteringEvent& other) const
+{
+	return spawnRayTo(other.position);
+}
 
 bool ScatteringEvent::isOnSurface() const
 {
@@ -112,6 +135,41 @@ void SurfaceScatteringEvent::setShadingGeometry(const Vector3F& position_u_deriv
 	{
 		shading.surface_normal.flipToSameHemisphereAs(surface_normal);
 	}
+}
+
+// Utility functions
+
+// Returns the position of a new ray origin that is guaranteed to not result in a false
+// re-intersection of the surface while still being as close to the original position as possible
+Point3F offsetRayOrigin(const Point3F& ray_origin,
+						const Vector3F& ray_origin_error,
+						const Normal3F& surface_normal,
+						const Vector3F& ray_direction)
+{
+	imp_float normal_offset_distance = ray_origin_error.dot(abs(surface_normal));
+	Vector3F normal_offset = Vector3F(surface_normal)*normal_offset_distance;
+
+	if (ray_direction.dot(surface_normal) < 0.0f)
+		normal_offset.reverse();
+
+	Point3F offset_ray_origin = ray_origin + normal_offset;
+
+	if (normal_offset.x > 0.0f)
+		offset_ray_origin.x = closestHigherFloat(offset_ray_origin.x);
+	else if (normal_offset.x < 0.0f)
+		offset_ray_origin.x = closestLowerFloat(offset_ray_origin.x);
+
+	if (normal_offset.y > 0.0f)
+		offset_ray_origin.y = closestHigherFloat(offset_ray_origin.y);
+	else if (normal_offset.y < 0.0f)
+		offset_ray_origin.y = closestLowerFloat(offset_ray_origin.y);
+
+	if (normal_offset.z > 0.0f)
+		offset_ray_origin.z = closestHigherFloat(offset_ray_origin.z);
+	else if (normal_offset.z < 0.0f)
+		offset_ray_origin.z = closestLowerFloat(offset_ray_origin.z);
+
+	return offset_ray_origin;
 }
 
 } // RayImpact
