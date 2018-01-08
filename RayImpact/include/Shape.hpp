@@ -1,5 +1,6 @@
 #pragma once
 #include "precision.hpp"
+#include "Ray.hpp"
 #include "Transformation.hpp"
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
@@ -36,6 +37,38 @@ public:
 
 	virtual imp_float surfaceArea() const = 0;
 };
+
+// Utility function for shapes
+
+// Computes parametric derivatives of the surface normal
+inline void computeNormalDerivatives(const Vector3F& position_u_deriv,
+									 const Vector3F& position_v_deriv,
+									 const Vector3F& position_u2_deriv,
+									 const Vector3F& position_uv_deriv,
+									 const Vector3F& position_v2_deriv,
+									 Normal3F* normal_u_deriv,
+									 Normal3F* normal_v_deriv)
+{
+	// Uses the Weingarten equations
+
+	imp_float E = position_u_deriv.squaredLength();
+	imp_float F = position_u_deriv.dot(position_v_deriv);
+	imp_float G = position_v_deriv.squaredLength();
+
+	const Vector3F& surface_normal = position_u_deriv.cross(position_v_deriv).normalized();
+
+	imp_float e = surface_normal.dot(position_u2_deriv);
+	imp_float f = surface_normal.dot(position_uv_deriv);
+	imp_float g = surface_normal.dot(position_v2_deriv);
+
+	imp_float normal_deriv_norm = 1.0f/(E*G - F*F);
+
+	*normal_u_deriv = Normal3F(position_u_deriv*((f*F - e*G)*normal_deriv_norm) +
+							   position_v_deriv*((e*F - f*E)*normal_deriv_norm));
+
+	*normal_v_deriv = Normal3F(position_u_deriv*((g*F - f*G)*normal_deriv_norm) +
+							   position_v_deriv*((f*F - g*E)*normal_deriv_norm));
+}
 
 } // RayImpact
 } // Impact
