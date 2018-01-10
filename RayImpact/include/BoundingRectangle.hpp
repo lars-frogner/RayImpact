@@ -16,42 +16,42 @@ template <typename T>
 class BoundingRectangle {
 
 public:
-	Point2<T> lower_corner; // Corner with the lowest coordinate values
-	Point2<T> upper_corner; // Corner with the highest coordinate values
+	Point2 lower_corner; // Corner with the lowest coordinate values
+	Point2 upper_corner; // Corner with the highest coordinate values
 
 	BoundingRectangle();
 	
-	BoundingRectangle(const Point2<T>& lower_corner,
-					  const Point2<T>& upper_corner);
+	BoundingRectangle(const Point2& lower_corner,
+					  const Point2& upper_corner);
 	
-	BoundingRectangle(const Point2<T>& point);
+	BoundingRectangle(const Point2& point);
 
-	static BoundingRectangle<T> aroundPoints(const Point2<T>& point_1,
-											 const Point2<T>& point_2);
+	static BoundingRectangle aroundPoints(const Point2& point_1,
+										  const Point2& point_2);
 
-	const Point2<T>& operator[](unsigned int point_idx) const;
-	Point2<T>& operator[](unsigned int point_idx);
+	const Point2& operator[](unsigned int point_idx) const;
+	Point2& operator[](unsigned int point_idx);
 
-	Point2<T> corner(unsigned int corner_idx) const;
+	Point2 corner(unsigned int corner_idx) const;
 
-	bool overlaps(const BoundingRectangle<T>& other) const;
+	bool overlaps(const BoundingRectangle& other) const;
 
-	bool contains(const Point2<T>& point) const;
-	bool containsExclusive(const Point2<T>& point) const;
+	bool contains(const Point2& point) const;
+	bool containsExclusive(const Point2& point) const;
 
 	template <typename U>
-	BoundingRectangle<T> expanded(U amount) const;
+	BoundingRectangle expanded(U amount) const;
 
-	Vector2<T> diagonal() const;
+	Vector2 diagonal() const;
 
 	T area() const;
 
 	unsigned int maxDimension() const;
 	
-	Vector2<T> getLocalCoordinate(const Point2<T>& global_coord) const;
-	Point2<T> getGlobalCoordinate(const Vector2<T>& local_coord) const;
+	Vector2 getLocalCoordinate(const Point2& global_coord) const;
+	Point2 getGlobalCoordinate(const Vector2& local_coord) const;
 	
-	void enclose(const Point2<T>& point);
+	void enclose(const Point2& point);
 };
 
 // BoundingRectangle typedefs
@@ -122,7 +122,7 @@ template <typename T>
 inline BoundingRectangle<T> BoundingRectangle<T>::aroundPoints(const Point2<T>& point_1,
 															   const Point2<T>& point_2)
 {
-	return BoundingRectangle<T>(min(point_1, point_2), max(point_1, point_2));
+	return BoundingRectangle(min(point_1, point_2), max(point_1, point_2));
 }
 
 template <typename T>
@@ -149,7 +149,7 @@ inline Point2<T> BoundingRectangle<T>::corner(unsigned int corner_idx) const
 }
 
 template <typename T>
-inline bool BoundingRectangle<T>::overlaps(const BoundingRectangle<T>& other) const
+inline bool BoundingRectangle<T>::overlaps(const BoundingRectangle& other) const
 {
 	return (upper_corner.x >= other.lower_corner.x && lower_corner.x <= other.upper_corner.x) &&
 		   (upper_corner.y >= other.lower_corner.y && lower_corner.y <= other.upper_corner.y);
@@ -177,8 +177,8 @@ inline BoundingRectangle<T> BoundingRectangle<T>::expanded(U amount) const
 {
 	Vector2<T> expansion(static_cast<T>(amount), static_cast<T>(amount));
 
-	return BoundingRectangle<T>(lower_corner - expansion,
-								upper_corner + expansion);
+	return BoundingRectangle(lower_corner - expansion,
+							 upper_corner + expansion);
 }
 
 // Returns vector going from the lower corner to the upper corner

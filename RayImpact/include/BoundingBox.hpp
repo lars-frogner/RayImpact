@@ -20,45 +20,45 @@ template <typename T>
 class BoundingBox {
 
 public:
-	Point3<T> lower_corner; // Corner with the lowest coordinate values
-	Point3<T> upper_corner; // Corner with the highest coordinate values
+	Point3 lower_corner; // Corner with the lowest coordinate values
+	Point3 upper_corner; // Corner with the highest coordinate values
 
 	BoundingBox();
 	
-	BoundingBox(const Point3<T>& lower_corner,
-				const Point3<T>& upper_corner);
+	BoundingBox(const Point3& lower_corner,
+				const Point3& upper_corner);
 	
-	BoundingBox(const Point3<T>& point);
+	BoundingBox(const Point3& point);
 
-	static BoundingBox<T> aroundPoints(const Point3<T>& point_1,
-									   const Point3<T>& point_2);
+	static BoundingBox aroundPoints(const Point3& point_1,
+									const Point3& point_2);
 
-	const Point3<T>& operator[](unsigned int point_idx) const;
-	Point3<T>& operator[](unsigned int point_idx);
+	const Point3& operator[](unsigned int point_idx) const;
+	Point3& operator[](unsigned int point_idx);
 
-	Point3<T> corner(unsigned int corner_idx) const;
+	Point3 corner(unsigned int corner_idx) const;
 
-	bool overlaps(const BoundingBox<T>& other) const;
+	bool overlaps(const BoundingBox& other) const;
 
-	bool contains(const Point3<T>& point) const;
-	bool containsExclusive(const Point3<T>& point) const;
+	bool contains(const Point3& point) const;
+	bool containsExclusive(const Point3& point) const;
 
 	template <typename U>
-	BoundingBox<T> expanded(U amount) const;
+	BoundingBox expanded(U amount) const;
 
-	Vector3<T> diagonal() const;
+	Vector3 diagonal() const;
 
 	T surfaceArea() const;
 	T volume() const;
 
 	unsigned int maxDimension() const;
 
-	Vector3<T> getLocalCoordinate(const Point3<T>& global_coord) const;
-	Point3<T> getGlobalCoordinate(const Vector3<T>& local_coord) const;
+	Vector3 getLocalCoordinate(const Point3& global_coord) const;
+	Point3 getGlobalCoordinate(const Vector3& local_coord) const;
 
-	void boundingSphere(Point3<T>* center, T* radius) const;
+	void boundingSphere(Point3* center, T* radius) const;
 
-	void enclose(const Point3<T>& point);
+	void enclose(const Point3& point);
 
 	bool hasIntersection(const Ray& ray,
 					     imp_float* first_intersection_distance,
@@ -136,7 +136,7 @@ template <typename T>
 inline BoundingBox<T> BoundingBox<T>::aroundPoints(const Point3<T>& point_1,
 												   const Point3<T>& point_2)
 {
-	return BoundingBox<T>(min(point_1, point_2), max(point_1, point_2));
+	return BoundingBox(min(point_1, point_2), max(point_1, point_2));
 }
 
 template <typename T>
@@ -164,7 +164,7 @@ inline Point3<T> BoundingBox<T>::corner(unsigned int corner_idx) const
 }
 
 template <typename T>
-inline bool BoundingBox<T>::overlaps(const BoundingBox<T>& other) const
+inline bool BoundingBox<T>::overlaps(const BoundingBox& other) const
 {
 	return (upper_corner.x >= other.lower_corner.x && lower_corner.x <= other.upper_corner.x) &&
 		   (upper_corner.y >= other.lower_corner.y && lower_corner.y <= other.upper_corner.y) &&
@@ -195,8 +195,8 @@ inline BoundingBox<T> BoundingBox<T>::expanded(U amount) const
 {
 	Vector3<T> expansion(static_cast<T>(amount), static_cast<T>(amount), static_cast<T>(amount));
 
-	return BoundingBox<T>(lower_corner - expansion,
-						  upper_corner + expansion);
+	return BoundingBox(lower_corner - expansion,
+					   upper_corner + expansion);
 }
 
 // Returns vector going from the lower corner to the upper corner

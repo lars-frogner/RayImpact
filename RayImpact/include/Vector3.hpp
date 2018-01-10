@@ -29,30 +29,30 @@ public:
 	Vector3();
 	Vector3(T x, T y, T z);
 
-	explicit Vector3(const Normal3<T>& normal);
+	explicit Vector3(const Normal3& normal);
 
 	T operator[](unsigned int dimension) const;
 	T& operator[](unsigned int dimension);
 
-	Vector3<T> operator+(const Vector3<T>& other) const;
-	Vector3<T> operator-(const Vector3<T>& other) const;
-	Vector3<T> operator*(T factor) const;
-	Vector3<T> operator/(T divisor) const;
+	Vector3 operator+(const Vector3& other) const;
+	Vector3 operator-(const Vector3& other) const;
+	Vector3 operator*(T factor) const;
+	Vector3 operator/(T divisor) const;
 	
-	Vector3<T> operator-() const;
+	Vector3 operator-() const;
 
-	Vector3<T>& operator+=(const Vector3<T>& other);
-	Vector3<T>& operator-=(const Vector3<T>& other);
-	Vector3<T>& operator*=(T factor);
-	Vector3<T>& operator/=(T divisor);
+	Vector3& operator+=(const Vector3& other);
+	Vector3& operator-=(const Vector3& other);
+	Vector3& operator*=(T factor);
+	Vector3& operator/=(T divisor);
 
-	T dot(const Vector3<T>& other) const;
-	T dot(const Normal3<T>& normal) const;
+	T dot(const Vector3& other) const;
+	T dot(const Normal3& normal) const;
 
-	T absDot(const Vector3<T>& other) const;
-	T absDot(const Normal3<T>& normal) const;
+	T absDot(const Vector3& other) const;
+	T absDot(const Normal3& normal) const;
 	
-	Vector3<T> cross(const Vector3<T>& other) const;
+	Vector3 cross(const Vector3& other) const;
 
 	T squaredLength() const;
 	T length() const;
@@ -65,18 +65,18 @@ public:
 
 	bool nonZero() const;
 
-	Vector3<T> normalized() const;
+	Vector3 normalized() const;
 
-	Vector3<T> permuted(unsigned int i,
-						unsigned int j,
-						unsigned int k) const;
+	Vector3 permuted(unsigned int i,
+					 unsigned int j,
+					 unsigned int k) const;
 
 	void normalize();
 
 	void reverse();
 	
-	void flipToSameHemisphereAs(const Vector3<T>& other);
-	void flipToSameHemisphereAs(const Normal3<T>& normal);
+	void flipToSameHemisphereAs(const Vector3& other);
+	void flipToSameHemisphereAs(const Normal3& normal);
 };
 
 // Vector3 typedefs
@@ -178,21 +178,21 @@ inline T& Vector3<T>::operator[](unsigned int dimension)
 }
 
 template <typename T>
-inline Vector3<T> Vector3<T>::operator+(const Vector3<T>& other) const
+inline Vector3<T> Vector3<T>::operator+(const Vector3& other) const
 {
-	return Vector3<T>(x + other.x, y + other.y, z + other.z);
+	return Vector3(x + other.x, y + other.y, z + other.z);
 }
 
 template <typename T>
-inline Vector3<T> Vector3<T>::operator-(const Vector3<T>& other) const
+inline Vector3<T> Vector3<T>::operator-(const Vector3& other) const
 {
-	return Vector3<T>(x - other.x, y - other.y, z - other.z);
+	return Vector3(x - other.x, y - other.y, z - other.z);
 }
 
 template <typename T>
 inline Vector3<T> Vector3<T>::operator*(T factor) const
 {
-	return Vector3<T>(x*factor, y*factor, z*factor);
+	return Vector3(x*factor, y*factor, z*factor);
 }
 
 template <typename T>
@@ -201,24 +201,24 @@ inline Vector3<T> Vector3<T>::operator/(T divisor) const
 	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
-	return Vector3<T>(x*factor, y*factor, z*factor);
+	return Vector3(x*factor, y*factor, z*factor);
 }
 
 template <typename T>
 inline Vector3<T> Vector3<T>::operator-() const
 {
-	return Vector3<T>(-x, -y, -z);
+	return Vector3(-x, -y, -z);
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator+=(const Vector3<T>& other)
+inline Vector3<T>& Vector3<T>::operator+=(const Vector3& other)
 {
 	x += other.x; y += other.y; z += other.z;
 	return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator-=(const Vector3<T>& other)
+inline Vector3<T>& Vector3<T>::operator-=(const Vector3& other)
 {
 	x -= other.x; y -= other.y; z -= other.z;
 	return *this;
@@ -242,7 +242,7 @@ inline Vector3<T>& Vector3<T>::operator/=(T divisor)
 }
 
 template <typename T>
-inline T Vector3<T>::dot(const Vector3<T>& other) const
+inline T Vector3<T>::dot(const Vector3& other) const
 {
 	return x*other.x + y*other.y + z*other.z;
 }
@@ -255,7 +255,7 @@ inline T Vector3<T>::dot(const Normal3<T>& normal) const
 
 // Absoulte value of dot product
 template <typename T>
-inline T Vector3<T>::absDot(const Vector3<T>& other) const
+inline T Vector3<T>::absDot(const Vector3& other) const
 {
 	return std::abs(dot(other));
 }
@@ -268,7 +268,7 @@ inline T Vector3<T>::absDot(const Normal3<T>& normal) const
 }
 
 template <typename T>
-inline Vector3<T> Vector3<T>::cross(const Vector3<T>& other) const
+inline Vector3<T> Vector3<T>::cross(const Vector3& other) const
 {
 	// Convert components to double precision before subtracting
 	// in order to avoid catastrophic cancellation
@@ -279,9 +279,9 @@ inline Vector3<T> Vector3<T>::cross(const Vector3<T>& other) const
 	double y2 = (double)(other.y);
 	double z2 = (double)(other.z);
 
-	return Vector3<T>(static_cast<T>(y1*z2 - z1*y2),
-					  static_cast<T>(z1*x2 - x1*z2),
-					  static_cast<T>(x1*y2 - y1*x2));
+	return Vector3(static_cast<T>(y1*z2 - z1*y2),
+				   static_cast<T>(z1*x2 - x1*z2),
+			 	   static_cast<T>(x1*y2 - y1*x2));
 }
 
 template <typename T>
@@ -337,7 +337,7 @@ inline Vector3<T> Vector3<T>::permuted(unsigned int i,
 									   unsigned int j,
 									   unsigned int k) const
 {
-	return Vector3<T>(operator[](i), operator[](j), operator[](k));
+	return Vector3(operator[](i), operator[](j), operator[](k));
 }
 
 template <typename T>
@@ -353,7 +353,7 @@ inline void Vector3<T>::reverse()
 }
 
 template <typename T>
-inline void Vector3<T>::flipToSameHemisphereAs(const Vector3<T>& other)
+inline void Vector3<T>::flipToSameHemisphereAs(const Vector3& other)
 {
 	if (dot(other) < 0.0f)
 		reverse();

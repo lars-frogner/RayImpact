@@ -27,20 +27,20 @@ public:
 	T operator[](unsigned int dimension) const;
 	T& operator[](unsigned int dimension);
 
-	Vector2<T> operator+(const Vector2<T>& other) const;
-	Vector2<T> operator-(const Vector2<T>& other) const;
-	Vector2<T> operator*(T factor) const;
-	Vector2<T> operator/(T divisor) const;
+	Vector2 operator+(const Vector2& other) const;
+	Vector2 operator-(const Vector2& other) const;
+	Vector2 operator*(T factor) const;
+	Vector2 operator/(T divisor) const;
 	
-	Vector2<T> operator-() const;
+	Vector2 operator-() const;
 
-	Vector2<T>& operator+=(const Vector2<T>& other);
-	Vector2<T>& operator-=(const Vector2<T>& other);
-	Vector2<T>& operator*=(T factor);
-	Vector2<T>& operator/=(T divisor);
+	Vector2& operator+=(const Vector2& other);
+	Vector2& operator-=(const Vector2& other);
+	Vector2& operator*=(T factor);
+	Vector2& operator/=(T divisor);
 
-	T dot(const Vector2<T>& other) const;
-	T absDot(const Vector2<T>& other) const;
+	T dot(const Vector2& other) const;
+	T absDot(const Vector2& other) const;
 
 	T squaredLength() const;
 	T length() const;
@@ -51,7 +51,7 @@ public:
 	unsigned int minDimension() const;
 	unsigned int maxDimension() const;
 
-	Vector2<T> normalized() const;
+	Vector2 normalized() const;
 
 	void normalize();
 };
@@ -133,21 +133,21 @@ inline T& Vector2<T>::operator[](unsigned int dimension)
 }
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const
+inline Vector2<T> Vector2<T>::operator+(const Vector2& other) const
 {
-	return Vector2<T>(x + other.x, y + other.y);
+	return Vector2(x + other.x, y + other.y);
 }
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const
+inline Vector2<T> Vector2<T>::operator-(const Vector2& other) const
 {
-	return Vector2<T>(x - other.x, y - other.y);
+	return Vector2(x - other.x, y - other.y);
 }
 
 template <typename T>
 inline Vector2<T> Vector2<T>::operator*(T factor) const
 {
-	return Vector2<T>(x*factor, y*factor);
+	return Vector2(x*factor, y*factor);
 }
 
 template <typename T>
@@ -156,24 +156,24 @@ inline Vector2<T> Vector2<T>::operator/(T divisor) const
 	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
-	return Vector2<T>(x*factor, y*factor);
+	return Vector2(x*factor, y*factor);
 }
 
 template <typename T>
 inline Vector2<T> Vector2<T>::operator-() const
 {
-	return Vector2<T>(-x, -y);
+	return Vector2(-x, -y);
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other)
+inline Vector2<T>& Vector2<T>::operator+=(const Vector2& other)
 {
 	x += other.x; y += other.y;
 	return *this;
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other)
+inline Vector2<T>& Vector2<T>::operator-=(const Vector2& other)
 {
 	x -= other.x; y -= other.y;
 	return *this;
@@ -197,14 +197,14 @@ inline Vector2<T>& Vector2<T>::operator/=(T divisor)
 }
 
 template <typename T>
-inline T Vector2<T>::dot(const Vector2<T>& other) const
+inline T Vector2<T>::dot(const Vector2& other) const
 {
 	return x*other.x + y*other.y;
 }
 
 // Absoulte value of dot product
 template <typename T>
-inline T Vector2<T>::absDot(const Vector2<T>& other) const
+inline T Vector2<T>::absDot(const Vector2& other) const
 {
 	return std::abs(dot(other));
 }

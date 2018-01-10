@@ -3,6 +3,8 @@
 
 namespace Impact {
 
+// BlockedArray declarations
+
 template <typename T, unsigned int log2_block_extent>
 class BlockedArray {
 
@@ -32,9 +34,9 @@ public:
 
 	~BlockedArray();
 
-	BlockedArray(const BlockedArray<T, log2_block_extent>& other) = delete;
+	BlockedArray(const BlockedArray& other) = delete;
 
-	BlockedArray<T, log2_block_extent>& operator=(const BlockedArray<T, log2_block_extent>& other) = delete;
+	BlockedArray& operator=(const BlockedArray& other) = delete;
 
 	unsigned int width() const;
 	
@@ -44,6 +46,8 @@ public:
 
 	const T& operator()(unsigned int x, unsigned int y) const;
 };
+
+// BlockedArray method implementations
 
 template <typename T, unsigned int log2_block_extent>
 inline BlockedArray<T, log2_block_extent>::BlockedArray(unsigned int width, unsigned int height,

@@ -38,20 +38,20 @@ public:
 	T operator[](unsigned int dimension) const;
 	T& operator[](unsigned int dimension);
 	
-	Point3<T> operator+(const Vector3<T>& vector) const;
-	Point3<T> operator-(const Vector3<T>& vector) const;
+	Point3 operator+(const Vector3& vector) const;
+	Point3 operator-(const Vector3& vector) const;
 
-	Point3<T>& operator+=(const Vector3<T>& vector);
-	Point3<T>& operator-=(const Vector3<T>& vector);
+	Point3& operator+=(const Vector3& vector);
+	Point3& operator-=(const Vector3& vector);
 	
-	Vector3<T> operator-(const Point3<T>& other) const;
+	Vector3 operator-(const Point3& other) const;
 	
 	// Addition of points and multiplication of points with scalars
 	// is only geometrically correct if the weights sum to one.
-	Point3<T> operator+(const Point3<T>& other) const;
-	Point3<T> operator*(T weight) const;
+	Point3 operator+(const Point3& other) const;
+	Point3 operator*(T weight) const;
 
-	bool operator>=(const Point3<T>& other) const;
+	bool operator>=(const Point3& other) const;
 
 	T minComponent() const;
 	T maxComponent() const;
@@ -59,9 +59,9 @@ public:
 	unsigned int minDimension() const;
 	unsigned int maxDimension() const;
 
-	Point3<T> permuted(unsigned int i,
-					   unsigned int j,
-					   unsigned int k) const;
+	Point3 permuted(unsigned int i,
+					unsigned int j,
+					unsigned int k) const;
 };
 
 // Point3 typedefs
@@ -191,13 +191,13 @@ inline T& Point3<T>::operator[](unsigned int dimension)
 template <typename T>
 inline Point3<T> Point3<T>::operator+(const Vector3<T>& vector) const
 {
-	return Point3<T>(x + vector.x, y + vector.y, z + vector.z);
+	return Point3(x + vector.x, y + vector.y, z + vector.z);
 }
 
 template <typename T>
 inline Point3<T> Point3<T>::operator-(const Vector3<T>& vector) const
 {
-	return Point3<T>(x - vector.x, y - vector.y, z - vector.z);
+	return Point3(x - vector.x, y - vector.y, z - vector.z);
 }
 
 template <typename T>
@@ -215,25 +215,25 @@ inline Point3<T>& Point3<T>::operator-=(const Vector3<T>& vector)
 }
 
 template <typename T>
-inline Vector3<T> Point3<T>::operator-(const Point3<T>& other) const
+inline Vector3<T> Point3<T>::operator-(const Point3& other) const
 {
 	return Vector3<T>(x - other.x, y - other.y, z - other.z);
 }
 
 template <typename T>
-inline Point3<T> Point3<T>::operator+(const Point3<T>& other) const
+inline Point3<T> Point3<T>::operator+(const Point3& other) const
 {
-	return Point3<T>(x + other.x, y + other.y, z + other.z);
+	return Point3(x + other.x, y + other.y, z + other.z);
 }
 
 template <typename T>
 inline Point3<T> Point3<T>::operator*(T weight) const
 {
-	return Point3<T>(x*weight, y*weight, z*weight);
+	return Point3(x*weight, y*weight, z*weight);
 }
 
 template <typename T>
-inline bool Point3<T>::operator>=(const Point3<T>& other) const
+inline bool Point3<T>::operator>=(const Point3& other) const
 {
 	return x >= other.x && y >= other.y && z >= other.z;
 }
@@ -267,7 +267,7 @@ inline Point3<T> Point3<T>::permuted(unsigned int i,
 									 unsigned int j,
 									 unsigned int k) const
 {
-	return Point3<T>(operator[](i), operator[](j), operator[](k));
+	return Point3(operator[](i), operator[](j), operator[](k));
 }
 
 } // RayImpact

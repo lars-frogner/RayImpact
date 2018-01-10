@@ -32,7 +32,7 @@ public:
 	Point2();
 	Point2(T x, T y);
 
-	explicit Point2(const Point3<T>& point3);
+	explicit Point2(const Point3& point3);
 
 	template <typename U>
 	explicit Point2(const Point2<U>& other);
@@ -43,20 +43,20 @@ public:
 	T operator[](unsigned int dimension) const;
 	T& operator[](unsigned int dimension);
 	
-	Point2<T> operator+(const Vector2<T>& vector) const;
-	Point2<T> operator-(const Vector2<T>& vector) const;
+	Point2 operator+(const Vector2& vector) const;
+	Point2 operator-(const Vector2& vector) const;
 
-	Point2<T>& operator+=(const Vector2<T>& vector);
-	Point2<T>& operator-=(const Vector2<T>& vector);
+	Point2& operator+=(const Vector2& vector);
+	Point2& operator-=(const Vector2& vector);
 	
-	Vector2<T> operator-(const Point2<T>& other) const;
+	Vector2 operator-(const Point2& other) const;
 	
 	// Addition of points and multiplication of points with scalars
 	// is only geometrically correct if the weights sum to one.
-	Point2<T> operator+(const Point2<T>& other) const;
-	Point2<T> operator*(T weight) const;
+	Point2 operator+(const Point2& other) const;
+	Point2 operator*(T weight) const;
 
-	bool operator>=(const Point2<T>& other) const;
+	bool operator>=(const Point2& other) const;
 
 	T minComponent() const;
 	T maxComponent() const;
@@ -197,13 +197,13 @@ inline T& Point2<T>::operator[](unsigned int dimension)
 template <typename T>
 inline Point2<T> Point2<T>::operator+(const Vector2<T>& vector) const
 {
-	return Point2<T>(x + vector.x, y + vector.y);
+	return Point2(x + vector.x, y + vector.y);
 }
 
 template <typename T>
 inline Point2<T> Point2<T>::operator-(const Vector2<T>& vector) const
 {
-	return Point2<T>(x - vector.x, y - vector.y);
+	return Point2(x - vector.x, y - vector.y);
 }
 
 template <typename T>
@@ -221,25 +221,25 @@ inline Point2<T>& Point2<T>::operator-=(const Vector2<T>& vector)
 }
 
 template <typename T>
-inline Vector2<T> Point2<T>::operator-(const Point2<T>& other) const
+inline Vector2<T> Point2<T>::operator-(const Point2& other) const
 {
 	return Vector2<T>(x - other.x, y - other.y);
 }
 
 template <typename T>
-inline Point2<T> Point2<T>::operator+(const Point2<T>& other) const
+inline Point2<T> Point2<T>::operator+(const Point2& other) const
 {
-	return Point2<T>(x + other.x, y + other.y);
+	return Point2(x + other.x, y + other.y);
 }
 
 template <typename T>
 inline Point2<T> Point2<T>::operator*(T weight) const
 {
-	return Point2<T>(x*weight, y*weight);
+	return Point2(x*weight, y*weight);
 }
 
 template <typename T>
-inline bool Point2<T>::operator>=(const Point2<T>& other) const
+inline bool Point2<T>::operator>=(const Point2& other) const
 {
 	return x >= other.x && y >= other.y;
 }
