@@ -1,7 +1,6 @@
 #include "Transformation.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "ErrorFloat.hpp"
 #include <cmath>
 
 namespace Impact {
@@ -45,7 +44,7 @@ Transformation Transformation::scaling(imp_float scale_x,
 									   imp_float scale_y,
 									   imp_float scale_z)
 {
-	assert(scale_x != 0 && scale_y != 0 && scale_z != 0);
+	imp_assert(scale_x != 0 && scale_y != 0 && scale_z != 0);
 
 	Matrix4x4 matrix(scale_x,		0,		 0, 0,
 						   0, scale_y,		 0, 0,
@@ -194,7 +193,7 @@ Point3F Transformation::operator()(const Point3F& point) const
 Point3F Transformation::operator()(const Point3F& point, Vector3F* transformed_point_error) const
 {
 	// The error is incorrect if w != 1, i.e. for projective transformations
-	assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
 
 	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
 										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
@@ -209,7 +208,7 @@ Point3F Transformation::operator()(const Point3F& point, Vector3F* transformed_p
 Point3F Transformation::operator()(const Point3F& point, const Vector3F& point_error, Vector3F* transformed_point_error) const
 {
 	// The error is incorrect if w != 1, i.e. for projective transformations
-	assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
 
 	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
 										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),

@@ -1,5 +1,5 @@
 #include "Matrix4x4.hpp"
-#include <cassert>
+#include "error.hpp"
 
 namespace Impact {
 
@@ -213,7 +213,7 @@ Matrix4x4 Matrix4x4::inverted() const
 	imp_float inv_det = a11*b11 + a12*b21 + a13*b31 + a14*b41;
 	
 	// Make sure matrix is invertible (non-zero determinant)
-    assert(inv_det != 0);
+    imp_assert(inv_det != 0);
 	
     inv_det = 1.0f/inv_det;
 

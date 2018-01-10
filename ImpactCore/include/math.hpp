@@ -1,6 +1,6 @@
 #pragma once
 #include "precision.hpp"
-#include <cassert>
+#include "error.hpp"
 #include <limits>
 #include <utility>
 
@@ -62,8 +62,8 @@ inline imp_float radiansToDegrees(imp_float angle_rad)
 // Solves the quadratic equation a*x^2 + b*x + c = 0 for the solutions x1 (smallest) and x2 (largest) if they exist
 inline bool solveQuadraticEquation(imp_float a, imp_float b, imp_float c, imp_float* x1, imp_float* x2)
 {
-	assert(x1 && x2);
-	assert(a != 0);
+	imp_assert(x1 && x2);
+	imp_assert(a != 0);
 
 	double discriminant = (double)(b)*(double)(b) - 4.0*(double)(a)*(double)(c);
 

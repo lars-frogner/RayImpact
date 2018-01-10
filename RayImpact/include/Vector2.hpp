@@ -1,6 +1,6 @@
 #pragma once
 #include "precision.hpp"
-#include <cassert>
+#include "error.hpp"
 #include <cmath>
 #include <algorithm>
 #include <ostream>
@@ -109,7 +109,7 @@ template <typename T>
 inline Vector2<T>::Vector2(T x, T y)
 	: x(x), y(y)
 {
-	assert(!hasNaNs());
+	imp_assert(!hasNaNs());
 }
 
 template <typename T>
@@ -121,14 +121,14 @@ inline bool Vector2<T>::hasNaNs() const
 template <typename T>
 inline T Vector2<T>::operator[](unsigned int dimension) const
 {
-	assert(dimension < 2);
+	imp_assert(dimension < 2);
 	return (dimension == 0)? x : y;
 }
 
 template <typename T>
 inline T& Vector2<T>::operator[](unsigned int dimension)
 {
-	assert(dimension < 2);
+	imp_assert(dimension < 2);
 	return (dimension == 0)? x : y;
 }
 
@@ -153,7 +153,7 @@ inline Vector2<T> Vector2<T>::operator*(T factor) const
 template <typename T>
 inline Vector2<T> Vector2<T>::operator/(T divisor) const
 {
-	assert(divisor != 0);
+	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
 	return Vector2<T>(x*factor, y*factor);
@@ -189,7 +189,7 @@ inline Vector2<T>& Vector2<T>::operator*=(T factor)
 template <typename T>
 inline Vector2<T>& Vector2<T>::operator/=(T divisor)
 {
-	assert(divisor != 0);
+	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
 	x *= factor; y *= factor;

@@ -1,7 +1,6 @@
 #include "Disk.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "ErrorFloat.hpp"
 #include "Point3.hpp"
 #include <cmath>
 
@@ -22,8 +21,8 @@ Disk::Disk(const Transformation* object_to_world,
 	  y(y),
 	  phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
 {
-	assert(inner_radius >= 0);
-	assert(radius >= inner_radius);
+	imp_assert(inner_radius >= 0);
+	imp_assert(radius >= inner_radius);
 }
 
 BoundingBoxF Disk::objectSpaceBoundingBox() const

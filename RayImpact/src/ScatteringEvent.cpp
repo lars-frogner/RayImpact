@@ -1,7 +1,6 @@
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
 #include "math.hpp"
-#include "ErrorFloat.hpp"
 
 namespace Impact {
 namespace RayImpact {

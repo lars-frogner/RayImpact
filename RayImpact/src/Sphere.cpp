@@ -24,8 +24,8 @@ Sphere::Sphere(const Transformation* object_to_world,
 	  theta_max(std::acos(clamp(y_min/radius, -1.0f, 1.0f))),
 	  phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
 {
-	assert(radius >= 0);
-	assert(y_max >= y_min);
+	imp_assert(radius >= 0);
+	imp_assert(y_max >= y_min);
 }
 
 BoundingBoxF Sphere::objectSpaceBoundingBox() const

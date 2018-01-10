@@ -22,8 +22,8 @@ Cylinder::Cylinder(const Transformation* object_to_world,
 	  y_max(y_max),
 	  phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
 {
-	assert(radius >= 0);
-	assert(y_max >= y_min);
+	imp_assert(radius >= 0);
+	imp_assert(y_max >= y_min);
 }
 
 BoundingBoxF Cylinder::objectSpaceBoundingBox() const

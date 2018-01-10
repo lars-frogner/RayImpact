@@ -1,6 +1,6 @@
 #pragma once
 #include "precision.hpp"
-#include <cassert>
+#include "error.hpp"
 #include <cmath>
 #include <algorithm>
 #include <ostream>
@@ -150,7 +150,7 @@ template <typename T>
 inline Point3<T>::Point3(T x, T y, T z)
 	: x(x), y(y), z(z)
 {
-	assert(!hasNaNs());
+	imp_assert(!hasNaNs());
 }
 
 template<typename T>
@@ -158,7 +158,7 @@ template<typename U>
 inline Point3<T>::Point3(const Point3<U>& other)
 	: x(static_cast<T>(other.x)), y(static_cast<T>(other.y)), z(static_cast<T>(other.z))
 {
-	assert(!hasNaNs());
+	imp_assert(!hasNaNs());
 }
 
 template <typename T>
@@ -177,14 +177,14 @@ inline Point3<T>::operator Vector3<U>() const
 template <typename T>
 inline T Point3<T>::operator[](unsigned int dimension) const
 {
-	assert(dimension < 3);
+	imp_assert(dimension < 3);
 	return (dimension == 0)? x : ((dimension == 1)? y : z);
 }
 
 template <typename T>
 inline T& Point3<T>::operator[](unsigned int dimension)
 {
-	assert(dimension < 3);
+	imp_assert(dimension < 3);
 	return (dimension == 0)? x : ((dimension == 1)? y : z);
 }
 

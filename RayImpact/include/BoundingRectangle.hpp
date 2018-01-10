@@ -109,7 +109,7 @@ inline BoundingRectangle<T>::BoundingRectangle(const Point2<T>& lower_corner,
 	: lower_corner(lower_corner),
 	  upper_corner(upper_corner)
 {
-	assert(upper_corner >= lower_corner);
+	imp_assert(upper_corner >= lower_corner);
 }
 
 template <typename T>
@@ -128,14 +128,14 @@ inline BoundingRectangle<T> BoundingRectangle<T>::aroundPoints(const Point2<T>& 
 template <typename T>
 inline const Point2<T>& BoundingRectangle<T>::operator[](unsigned int point_idx) const
 {
-	assert(point_idx < 2);
+	imp_assert(point_idx < 2);
 	return (point_idx == 0)? lower_corner : upper_corner;
 }
 
 template <typename T>
 inline Point2<T>& BoundingRectangle<T>::operator[](unsigned int point_idx)
 {
-	assert(point_idx < 2);
+	imp_assert(point_idx < 2);
 	return (point_idx == 0)? lower_corner : upper_corner;
 }
 
@@ -143,7 +143,7 @@ inline Point2<T>& BoundingRectangle<T>::operator[](unsigned int point_idx)
 template <typename T>
 inline Point2<T> BoundingRectangle<T>::corner(unsigned int corner_idx) const
 {
-	assert(corner_idx < 4);
+	imp_assert(corner_idx < 4);
 	return Point2<T>(operator[]( corner_idx & 1        ).x,  // lower_corner.x for 0, 2 and upper_corner.x for 1, 3
 					 operator[]((corner_idx & 2)? 1 : 0).y); // lower_corner.y for 0, 1 and upper_corner.y for 2, 3
 }

@@ -2,7 +2,6 @@
 #include "precision.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "ErrorFloat.hpp"
 #include "Vector3.hpp"
 #include "Point3.hpp"
 #include "Ray.hpp"
@@ -124,7 +123,7 @@ inline BoundingBox<T>::BoundingBox(const Point3<T>& lower_corner,
 	: lower_corner(lower_corner),
 	  upper_corner(upper_corner)
 {
-	assert(upper_corner >= lower_corner);
+	imp_assert(upper_corner >= lower_corner);
 }
 
 template <typename T>
@@ -143,14 +142,14 @@ inline BoundingBox<T> BoundingBox<T>::aroundPoints(const Point3<T>& point_1,
 template <typename T>
 inline const Point3<T>& BoundingBox<T>::operator[](unsigned int point_idx) const
 {
-	assert(point_idx < 2);
+	imp_assert(point_idx < 2);
 	return (point_idx == 0)? lower_corner : upper_corner;
 }
 
 template <typename T>
 inline Point3<T>& BoundingBox<T>::operator[](unsigned int point_idx)
 {
-	assert(point_idx < 2);
+	imp_assert(point_idx < 2);
 	return (point_idx == 0)? lower_corner : upper_corner;
 }
 
@@ -158,7 +157,7 @@ inline Point3<T>& BoundingBox<T>::operator[](unsigned int point_idx)
 template <typename T>
 inline Point3<T> BoundingBox<T>::corner(unsigned int corner_idx) const
 {
-	assert(corner_idx < 8);
+	imp_assert(corner_idx < 8);
 	return Point3<T>(operator[]( corner_idx & 1        ).x,  // lower_corner.x for 0, 2, 4, 6 and upper_corner.x for 1, 3, 5, 7
 					 operator[]((corner_idx & 2)? 1 : 0).y,  // lower_corner.y for 0, 1, 4, 5 and upper_corner.y for 2, 3, 6, 7
 					 operator[]((corner_idx & 4)? 1 : 0).z); // lower_corner.z for 0, 1, 2, 3 and upper_corner.z for 4, 5, 6, 7

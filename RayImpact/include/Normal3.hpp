@@ -127,14 +127,14 @@ template <typename T>
 inline Normal3<T>::Normal3(T x, T y, T z)
 	: x(x), y(y), z(z)
 {
-	assert(!hasNaNs());
+	imp_assert(!hasNaNs());
 }
 
 template <typename T>
 inline Normal3<T>::Normal3(const Vector3<T>& vector)
 	: x(vector.x), y(vector.y), z(vector.z)
 {
-	assert(!hasNaNs());
+	imp_assert(!hasNaNs());
 }
 
 template <typename T>
@@ -146,14 +146,14 @@ inline bool Normal3<T>::hasNaNs() const
 template <typename T>
 inline T Normal3<T>::operator[](unsigned int dimension) const
 {
-	assert(dimension < 3);
+	imp_assert(dimension < 3);
 	return (dimension == 0)? x : ((dimension == 1)? y : z);
 }
 
 template <typename T>
 inline T& Normal3<T>::operator[](unsigned int dimension)
 {
-	assert(dimension < 3);
+	imp_assert(dimension < 3);
 	return (dimension == 0)? x : ((dimension == 1)? y : z);
 }
 
@@ -178,7 +178,7 @@ inline Normal3<T> Normal3<T>::operator*(T factor) const
 template <typename T>
 inline Normal3<T> Normal3<T>::operator/(T divisor) const
 {
-	assert(divisor != 0);
+	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
 	return Normal3<T>(x*factor, y*factor, z*factor);
@@ -214,7 +214,7 @@ inline Normal3<T>& Normal3<T>::operator*=(T factor)
 template <typename T>
 inline Normal3<T>& Normal3<T>::operator/=(T divisor)
 {
-	assert(divisor != 0);
+	imp_assert(divisor != 0);
 
 	imp_float factor = 1.0f/divisor;
 	x *= factor; y *= factor; z *= factor;

@@ -61,7 +61,7 @@ std::string join(const std::vector<std::string>& sequence,
 	if (end < 0)
 		end += sequence_length;
 
-	impAssert(end >= start && start >= 0 && end < sequence_length);
+	imp_assert(end >= start && start >= 0 && end < sequence_length);
 
 	if (sequence_length == 0)
 		return std::string();
@@ -85,7 +85,7 @@ inline std::string formatString(const char* format, ...)
 	int n_chars_written = vsprintf_s(buffer, 256, format, arguments);
 	va_end(arguments);
 
-	impAssert(n_chars_written < 256);
+	imp_assert(n_chars_written < 256);
 
 	return std::string(buffer);
 }
