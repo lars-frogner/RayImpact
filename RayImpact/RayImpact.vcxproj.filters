@@ -15,14 +15,18 @@
     <ClCompile Include="src\Transformation.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shape.cpp">
-      <Filter>Shapes</Filter>
-    </ClCompile>
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
     <ClCompile Include="src\Sphere.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="src\Cylinder.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Disk.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -52,12 +56,17 @@
     <ClInclude Include="include\Vector3.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="include\Shape.hpp">
-      <Filter>Shapes</Filter>
-    </ClInclude>
     <ClInclude Include="include\ScatteringEvent.hpp" />
     <ClInclude Include="include\Sphere.hpp">
       <Filter>Shapes</Filter>
     </ClInclude>
+    <ClInclude Include="include\Cylinder.hpp">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Disk.hpp">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shape.hpp" />
+    <ClInclude Include="include\Model.hpp" />
   </ItemGroup>
 </Project>

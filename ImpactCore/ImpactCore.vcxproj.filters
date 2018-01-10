@@ -13,15 +13,21 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{60d33487-2249-4219-8316-9ac394e19f34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Error">
+      <UniqueIdentifier>{7035f643-11dc-44af-949f-ffbe3eb5c4af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{cfb59168-2c03-47f2-b801-c209f17e182c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parallel">
+      <UniqueIdentifier>{2c208a8a-a667-4b29-9167-23e5e3a7ff0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\precision.hpp">
       <Filter>Precision</Filter>
     </ClInclude>
     <ClInclude Include="include\math.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="include\random.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Matrix4x4.hpp">
@@ -33,19 +39,34 @@
     <ClInclude Include="include\string_util.hpp">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\FloatWithError.hpp">
+    <ClInclude Include="include\ErrorFloat.hpp">
       <Filter>Precision</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImpFloatWithError.hpp">
-      <Filter>Precision</Filter>
+    <ClInclude Include="include\error.hpp">
+      <Filter>Error</Filter>
+    </ClInclude>
+    <ClInclude Include="include\memory.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RegionAllocator.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockedArray.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RandomNumberGenerator.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AtomicFloat.hpp">
+      <Filter>Parallel</Filter>
+    </ClInclude>
+    <ClInclude Include="include\parallel.hpp">
+      <Filter>Parallel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Matrix4x4.cpp">
       <Filter>Linear algebra</Filter>
-    </ClCompile>
-    <ClCompile Include="src\random.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="src\math.cpp">
       <Filter>Math</Filter>
@@ -55,6 +76,18 @@
     </ClCompile>
     <ClCompile Include="src\image_util.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RegionAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RandomNumberGenerator.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AtomicFloat.cpp">
+      <Filter>Parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parallel.cpp">
+      <Filter>Parallel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
