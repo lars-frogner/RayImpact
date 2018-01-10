@@ -1,29 +1,33 @@
 #pragma once
 #include "precision.hpp"
 #include <random>
+#include <cstdint>
 
 namespace Impact {
+
+// RandomNumberGenerator declarations
+
+class RandomNumberGenerator {
+
+private:
+
+	std::mt19937 generator; // Mersienne-Twister pseudo-random number generator
+	const std::uniform_real_distribution<imp_float> uniform_continuous_distribution;
+	const std::uniform_int_distribution<uint32_t> uniform_discrete_distribution;
+
+public:
+
+	RandomNumberGenerator();
 	
-extern std::mt19937 IMP_RANDOM_GENERATOR; // Mersienne-Twister pseudo-random number generator
+	RandomNumberGenerator(unsigned int seed);
+
+	void setSeed(unsigned int seed);
 	
-// Note: The functions using IMP_RANDOM_GENERATOR are not thread-safe,
-// since the generator object is shared among all threads.
+	void setRandomSeed();
 
-extern const std::uniform_real_distribution<imp_float> IMP_UNIFORM_DISTRIBUTION;
-
-inline void set_random_seed(unsigned int new_seed)
-{
-	IMP_RANDOM_GENERATOR.seed(new_seed);
-}
-
-inline imp_float random()
-{
-	return IMP_UNIFORM_DISTRIBUTION(IMP_RANDOM_GENERATOR);
-}
-
-inline imp_float random_range(imp_float start, imp_float end)
-{
-	return start + random()*(end - start);
-}
+	imp_float uniformFloat();
+	
+	uint32_t uniformUInt32();
+};
 
 } // Impact
