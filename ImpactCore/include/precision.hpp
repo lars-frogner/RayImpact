@@ -13,10 +13,12 @@ namespace Impact {
 // Single precision
 typedef float imp_float;
 typedef uint32_t imp_float_bits;
+static constexpr imp_float IMP_ONE_MINUS_EPS = 0.99999994f;
 #else
 // Double precision
 typedef double imp_float;
 typedef uint64_t imp_float_bits;
+static constexpr imp_float IMP_ONE_MINUS_EPS = 0.99999999999999989;
 #endif
 
 constexpr imp_float IMP_FLOAT_MAHCINE_EPS = std::numeric_limits<imp_float>::epsilon()/2;
