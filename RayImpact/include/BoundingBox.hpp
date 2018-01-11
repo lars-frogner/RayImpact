@@ -251,9 +251,9 @@ inline Vector3<T> BoundingBox<T>::getLocalCoordinate(const Point3<T>& global_coo
 template <typename T>
 inline Point3<T> BoundingBox<T>::getGlobalCoordinate(const Vector3<T>& local_coord) const
 {
-	return Point3<T>(lerp(lower_corner.x, upper_corner.x, local_coord.x),
-					 lerp(lower_corner.y, upper_corner.y, local_coord.y),
-					 lerp(lower_corner.z, upper_corner.z, local_coord.z));
+	return Point3<T>(::Impact::lerp(lower_corner.x, upper_corner.x, local_coord.x),
+					 ::Impact::lerp(lower_corner.y, upper_corner.y, local_coord.y),
+					 ::Impact::lerp(lower_corner.z, upper_corner.z, local_coord.z));
 }
 
 // Gives the center and radius of a sphere encompassing the bounding box

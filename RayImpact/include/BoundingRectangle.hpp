@@ -223,8 +223,8 @@ inline Vector2<T> BoundingRectangle<T>::getLocalCoordinate(const Point2<T>& glob
 template <typename T>
 inline Point2<T> BoundingRectangle<T>::getGlobalCoordinate(const Vector2<T>& local_coord) const
 {
-	return Point2<T>(lerp(lower_corner.x, upper_corner.x, local_coord.x),
-					 lerp(lower_corner.y, upper_corner.y, local_coord.y));
+	return Point2<T>(::Impact::lerp(lower_corner.x, upper_corner.x, local_coord.x),
+					 ::Impact::lerp(lower_corner.y, upper_corner.y, local_coord.y));
 }
 
 // Expands the bounding rectangle to contain the given point
