@@ -45,6 +45,13 @@ public:
 										const Vector3F& up_vector,
 										const Point3F& look_point);
 
+	static Transformation orthographic(imp_float near_plane_distance,
+									   imp_float far_plane_distance);
+
+	static Transformation perspective(imp_float field_of_view,
+									  imp_float near_plane_distance,
+									  imp_float far_plane_distance);
+
 	bool operator==(const Transformation& other) const;
 	bool operator!=(const Transformation& other) const;
 
