@@ -3,6 +3,7 @@
 #include "error.hpp"
 #include <limits>
 #include <utility>
+#include <functional>
 
 namespace Impact {
 
@@ -81,6 +82,34 @@ inline bool solveQuadraticEquation(imp_float a, imp_float b, imp_float c, imp_fl
 	if (*x1 > *x2) std::swap(*x1, *x2);
 
 	return true;
+}
+
+// Returns the last index in an array of size n_values where the given condition returns true
+inline unsigned int findLastIndexWhere(const std::function<bool (unsigned int)>& condition, unsigned int n_values)
+{
+	unsigned int first_idx;
+	unsigned int length = n_values;
+
+	while (length > 0)
+	{
+		// Compute midpoint
+		unsigned int half_length = length >> 1;
+		unsigned int middle_idx = first_idx + half_length;
+
+		if (condition(middle_idx)) // Does the condition still hold at the midpoint?
+		{
+			// Continue search in the second half
+			first_idx = middle_idx + 1;
+			length -= half_length + 1;
+		}
+		else
+		{
+			// Continue search in the first half
+			length = half_length;
+		}
+	}
+
+	return clamp(first_idx-1, 0u, n_values-2);
 }
 
 } // Impact
