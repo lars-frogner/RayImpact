@@ -1,0 +1,126 @@
+#pragma once
+#include "precision.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "Point2.hpp"
+#include "Camera.hpp"
+#include <vector>
+#include <memory>
+
+namespace Impact {
+namespace RayImpact {
+
+// Sampler declarations
+
+class Sampler {
+
+private:
+
+	size_t current_1D_array_component; // Index of the current 1D component array
+	size_t current_2D_array_component; // Index of the current 2D component array
+
+protected:
+
+	Point2I current_pixel; // Current pixel being sampled
+	uint64_t current_pixel_sample_idx; // Index of the sample currently being generated for the pixel
+
+	std::vector<unsigned int> sizes_of_1D_component_arrays; // Number of values per sample in each 1D component array
+	std::vector<unsigned int> sizes_of_2D_component_arrays; // Number of values per sample in each 2D component array
+	std::vector< std::vector<imp_float> > sample_component_arrays_1D; // 1D sample component arrays
+	std::vector< std::vector<Point2F> > sample_component_arrays_2D; // 1D sample component arrays
+
+public:
+
+	const uint64_t n_samples_per_pixel; // Total number of samples that will be generated for each pixel
+
+	Sampler(uint64_t n_samples_per_pixel);
+
+	virtual void setPixel(const Point2I& pixel);
+
+	virtual bool beginNextSample();
+
+	virtual bool beginSampleIndex(uint64_t pixel_sample_idx);
+
+	CameraSample generateCameraSample(const Point2I& pixel);
+
+	virtual imp_float next1DSampleComponent() = 0;
+
+	virtual Point2F next2DSampleComponent() = 0;
+
+	virtual unsigned int roundedArraySize(unsigned int n_values) const;
+
+	void createArraysForNext1DSampleComponent(unsigned int n_values);
+	
+	void createArraysForNext2DSampleComponent(unsigned int n_values);
+
+	const imp_float* arrayOfNext1DSampleComponent(unsigned int n_values);
+
+	const Point2F* arrayOfNext2DSampleComponent(unsigned int n_values);
+
+	virtual std::unique_ptr<Sampler> cloned(unsigned int seed) = 0;
+};
+
+// PixelSampler declarations
+
+class PixelSampler : public Sampler {
+
+protected:
+
+	unsigned int current_1D_component; // Current 1D sample component to provide
+	unsigned int current_2D_component; // Current 2D sample component to provide
+
+	std::vector< std::vector<imp_float> > sample_components_1D; // 1D sample components
+	std::vector< std::vector<Point2F> > sample_components_2D; // 2D sample components
+
+	RandomNumberGenerator rng; // Random number generator for sampling
+
+public:
+
+	PixelSampler(uint64_t n_samples_per_pixel,
+				 unsigned int n_sampled_dimensions);
+
+	bool beginNextSample();
+
+	bool beginSampleIndex(uint64_t pixel_sample_idx);
+
+	imp_float next1DSampleComponent();
+
+	Point2F next2DSampleComponent();
+};
+
+// GlobalSampler declarations
+
+class GlobalSampler : public Sampler {
+
+private:
+
+	unsigned int next_sample_dimension; // Next dimension of the sample to provide value for
+	uint64_t current_global_sample_idx; // Total number of samples taken across all pixels
+
+	static const unsigned int array_start_dimension = 5; // First component to put into sample component arrays
+	unsigned int array_end_dimension; // Last component to put into sample component arrays
+
+public:
+
+	GlobalSampler(uint64_t n_samples_per_pixel);
+
+	void setPixel(const Point2I& pixel);
+
+	bool beginNextSample();
+
+	bool beginSampleIndex(uint64_t pixel_sample_idx);
+
+	imp_float next1DSampleComponent();
+
+	Point2F next2DSampleComponent();
+
+	virtual uint64_t pixelToGlobalSampleIndex(uint64_t pixel_sample_index) = 0;
+
+	virtual imp_float valueOfGlobalSampleDimension(uint64_t global_sample_index, unsigned int dimension) = 0;
+};
+
+// Sampling utility functions
+
+
+
+} // RayImpact
+} // Impact
