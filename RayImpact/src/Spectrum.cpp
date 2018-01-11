@@ -3,7 +3,138 @@
 namespace Impact {
 namespace RayImpact {
 
-// CoefficientSpectrum method implementations
+// RGBSpectrum method implementations
+
+RGBSpectrum::RGBSpectrum()
+	: CoefficientSpectrum<3>::CoefficientSpectrum()
+{}
+
+RGBSpectrum::RGBSpectrum(imp_float initial_value)
+	: CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
+{}
+	
+RGBSpectrum::RGBSpectrum(const imp_float* wavelengths,
+						 const imp_float* values,
+						 unsigned int n_samples)
+{
+	*this = RGBSpectrum::fromSamples(wavelengths, values, n_samples);
+}
+
+RGBSpectrum::RGBSpectrum(const imp_float rgb[3],
+						 SpectrumType type /* = SpectrumType::Reflectance */)
+{
+	*this = RGBSpectrum::fromRGBValues(rgb, type);
+}
+	
+RGBSpectrum::RGBSpectrum(const CoefficientSpectrum& other)
+	: CoefficientSpectrum<3>::CoefficientSpectrum(other)
+{}
+	
+RGBSpectrum::RGBSpectrum(const SampledSpectrum& other,
+						 SpectrumType type /* = SpectrumType::Reflectance */)
+{
+	imp_float rgb[3];
+
+	other.computeRGBValues(rgb);
+
+	*this = RGBSpectrum::fromRGBValues(rgb, type);
+}
+
+// Creates an RGBSpectrum object from the given array of sample wavelengths and values
+RGBSpectrum RGBSpectrum::fromSamples(const imp_float* wavelengths,
+								     const imp_float* values,
+								     unsigned int n_samples)
+{
+	imp_check(wavelengths);
+	imp_check(values);
+
+	RGBSpectrum result;
+
+	if (!samplesAreSorted(wavelengths, n_samples))
+	{
+		std::vector<imp_float> wavelengths_vec(wavelengths, wavelengths + n_samples);
+		std::vector<imp_float> values_vec(values, values + n_samples);
+
+		sortSamples(wavelengths_vec, values_vec);
+
+		return RGBSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
+	}
+
+	imp_float xyz[3] = {0.0f, 0.0f, 0.0f};
+
+	for (unsigned int i = 0; i < n_CIE_samples; i++)
+	{
+		imp_float sample_value = interpolateSamples(wavelengths, values, n_samples, CIE_wavelengths[i]);
+
+		xyz[0] += sample_value*CIE_X_values[i];
+		xyz[1] += sample_value*CIE_Y_values[i];
+		xyz[2] += sample_value*CIE_Z_values[i];
+	}
+
+	imp_float norm = static_cast<imp_float>(CIE_wavelengths[n_CIE_samples-1] - CIE_wavelengths[0])/(CIE_Y_integral*n_CIE_samples);
+
+	xyz[0] *= norm;
+	xyz[1] *= norm;
+	xyz[2] *= norm;
+
+	return RGBSpectrum::fromTristimulusValues(xyz);
+}
+
+// Creates an RGBSpectrum object from the given RGB color values
+RGBSpectrum RGBSpectrum::fromRGBValues(const imp_float rgb[3],
+									   SpectrumType type /* = SpectrumType::Reflectance */)
+{
+	RGBSpectrum result;
+
+	result.coefficients[0] = rgb[0];
+	result.coefficients[1] = rgb[1];
+	result.coefficients[2] = rgb[2];
+
+	return result;
+}
+
+// Creates an RGBSpectrum object from the given tristimulus X, Y and Z values
+RGBSpectrum RGBSpectrum::fromTristimulusValues(const imp_float xyz[3],
+											   SpectrumType type /* = SpectrumType::Reflectance */)
+{
+	imp_float rgb[3];
+
+	tristimulusToRGB(xyz, rgb);
+
+	return RGBSpectrum::fromRGBValues(rgb);
+}
+
+// Computes the RGB values for the spectrum
+void RGBSpectrum::computeRGBValues(imp_float rgb[3]) const
+{
+	rgb[0] = coefficients[0];
+	rgb[1] = coefficients[1];
+	rgb[2] = coefficients[2];
+}
+
+// Computes the tristimulus values X, Y and Z for the spectrum
+void RGBSpectrum::computeTristimulusValues(imp_float xyz[3]) const
+{
+	RGBToTristimulus(coefficients, xyz);
+}
+
+// Returns the tristimulus value Y for the spectrum
+imp_float RGBSpectrum::tristimulusY() const
+{
+	return RGBToTristimulusY(coefficients);
+}
+
+const RGBSpectrum& RGBSpectrum::toRGBSpectrum() const
+{
+	return *this;
+}
+
+SampledSpectrum RGBSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
+{
+	return SampledSpectrum(*this, type);
+}
+
+// SampledSpectrum method implementations
 
 SampledSpectrum::SampledSpectrum()
 	: CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum()
@@ -17,7 +148,14 @@ SampledSpectrum::SampledSpectrum(const imp_float* wavelengths,
 								 const imp_float* values,
 								 unsigned int n_samples)
 {
-	*this = fromSamples(wavelengths, values, n_samples);
+	*this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
+}
+
+	
+SampledSpectrum::SampledSpectrum(const imp_float rgb[3],
+								 SpectrumType type /* = SpectrumType::Reflectance */)
+{
+	*this = SampledSpectrum::fromRGBValues(rgb, type);
 }
 	
 SampledSpectrum::SampledSpectrum(const CoefficientSpectrum& other)
@@ -51,12 +189,12 @@ SampledSpectrum SampledSpectrum::fromSamples(const imp_float* wavelengths,
 
 		sortSamples(wavelengths_vec, values_vec);
 
-		return fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
+		return SampledSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
 	}
 
 	for (unsigned int i = 0; i < n_spectral_samples; i++)
 	{
-		result.coefficients[i] = averageOfSamples(wavelengths, values, n_samples,
+		result.coefficients[i] = averageSamples(wavelengths, values, n_samples,
 												  sampleWavelength(i), sampleWavelength(i + 1));
 	}
 
@@ -195,7 +333,16 @@ SampledSpectrum SampledSpectrum::fromTristimulusValues(const imp_float xyz[3],
 
 	tristimulusToRGB(xyz, rgb);
 
-	return fromRGBValues(rgb);
+	return SampledSpectrum::fromRGBValues(rgb);
+}
+
+// Computes the RGB values for the spectrum
+void SampledSpectrum::computeRGBValues(imp_float rgb[3]) const
+{
+	imp_float xyz[3];
+
+	SampledSpectrum::computeTristimulusValues(xyz);
+	tristimulusToRGB(xyz, rgb);
 }
 
 // Computes the tristimulus values X, Y and Z for the spectrum
@@ -230,13 +377,14 @@ imp_float SampledSpectrum::tristimulusY() const
 	return Y*static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
 }
 
-// Computes the RGB values for the spectrum
-void SampledSpectrum::computeRGBValues(imp_float rgb[3]) const
+RGBSpectrum SampledSpectrum::toRGBSpectrum() const
 {
-	imp_float xyz[3];
+	return RGBSpectrum(*this);
+}
 
-	computeTristimulusValues(xyz);
-	tristimulusToRGB(xyz, rgb);
+const SampledSpectrum& SampledSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
+{
+	return *this;
 }
 
 // Initializes the SampledSpectrum objects representing the CIE X, Y and Z spectral matching curves
@@ -247,14 +395,14 @@ void SampledSpectrum::initializeSpectralMatchingCurves()
 		imp_float sample_start_wavelength = sampleWavelength(i);
 		imp_float sample_end_wavelength = sampleWavelength(i + 1);
 
-		CIE_X.coefficients[i] = averageOfSamples(CIE_wavelengths, CIE_X_values, n_CIE_samples,
-												 sample_start_wavelength, sample_end_wavelength);
+		CIE_X.coefficients[i] = averageSamples(CIE_wavelengths, CIE_X_values, n_CIE_samples,
+											   sample_start_wavelength, sample_end_wavelength);
 
-		CIE_Y.coefficients[i] = averageOfSamples(CIE_wavelengths, CIE_Y_values, n_CIE_samples,
-												 sample_start_wavelength, sample_end_wavelength);
+		CIE_Y.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Y_values, n_CIE_samples,
+											   sample_start_wavelength, sample_end_wavelength);
 
-		CIE_Z.coefficients[i] = averageOfSamples(CIE_wavelengths, CIE_Z_values, n_CIE_samples,
-												 sample_start_wavelength, sample_end_wavelength);
+		CIE_Z.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Z_values, n_CIE_samples,
+											   sample_start_wavelength, sample_end_wavelength);
 	}
 }
 
@@ -266,48 +414,180 @@ void SampledSpectrum::initializeBaseColorSPDs()
 		imp_float sample_start_wavelength = sampleWavelength(i);
 		imp_float sample_end_wavelength = sampleWavelength(i + 1);
 
-		reflectance_white_SPD.coefficients[i]   = averageOfSamples(SPD_wavelengths, reflectance_white_SPD_values, n_SPD_samples,
-															  	   sample_start_wavelength, sample_end_wavelength);
+		reflectance_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_white_SPD_values, n_SPD_samples,
+															     sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_red_SPD.coefficients[i]     = averageOfSamples(SPD_wavelengths, reflectance_red_SPD_values, n_SPD_samples,
-															       sample_start_wavelength, sample_end_wavelength);
+		reflectance_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, reflectance_red_SPD_values, n_SPD_samples,
+															     sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_green_SPD.coefficients[i]   = averageOfSamples(SPD_wavelengths, reflectance_green_SPD_values, n_SPD_samples,
-																   sample_start_wavelength, sample_end_wavelength);
+		reflectance_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_green_SPD_values, n_SPD_samples,
+																 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_blue_SPD.coefficients[i]    = averageOfSamples(SPD_wavelengths, reflectance_blue_SPD_values, n_SPD_samples,
-																   sample_start_wavelength, sample_end_wavelength);
+		reflectance_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_blue_SPD_values, n_SPD_samples,
+																 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_cyan_SPD.coefficients[i]    = averageOfSamples(SPD_wavelengths, reflectance_cyan_SPD_values, n_SPD_samples,
-																   sample_start_wavelength, sample_end_wavelength);
+		reflectance_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_cyan_SPD_values, n_SPD_samples,
+																 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_magenta_SPD.coefficients[i] = averageOfSamples(SPD_wavelengths, reflectance_magenta_SPD_values, n_SPD_samples,
-																   sample_start_wavelength, sample_end_wavelength);
+		reflectance_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, reflectance_magenta_SPD_values, n_SPD_samples,
+																 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_yellow_SPD.coefficients[i]  = averageOfSamples(SPD_wavelengths, reflectance_yellow_SPD_values, n_SPD_samples,
-																   sample_start_wavelength, sample_end_wavelength);
+		reflectance_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, reflectance_yellow_SPD_values, n_SPD_samples,
+																 sample_start_wavelength, sample_end_wavelength);
 
-		illumination_white_SPD.coefficients[i]   = averageOfSamples(SPD_wavelengths, illumination_white_SPD_values, n_SPD_samples,
-															  	    sample_start_wavelength, sample_end_wavelength);
+		illumination_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_white_SPD_values, n_SPD_samples,
+															  	  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_red_SPD.coefficients[i]     = averageOfSamples(SPD_wavelengths, illumination_red_SPD_values, n_SPD_samples,
-															        sample_start_wavelength, sample_end_wavelength);
+		illumination_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, illumination_red_SPD_values, n_SPD_samples,
+															      sample_start_wavelength, sample_end_wavelength);
 
-		illumination_green_SPD.coefficients[i]   = averageOfSamples(SPD_wavelengths, illumination_green_SPD_values, n_SPD_samples,
-																    sample_start_wavelength, sample_end_wavelength);
+		illumination_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_green_SPD_values, n_SPD_samples,
+																  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_blue_SPD.coefficients[i]    = averageOfSamples(SPD_wavelengths, illumination_blue_SPD_values, n_SPD_samples,
-																    sample_start_wavelength, sample_end_wavelength);
+		illumination_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_blue_SPD_values, n_SPD_samples,
+																  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_cyan_SPD.coefficients[i]    = averageOfSamples(SPD_wavelengths, illumination_cyan_SPD_values, n_SPD_samples,
-																    sample_start_wavelength, sample_end_wavelength);
+		illumination_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_cyan_SPD_values, n_SPD_samples,
+																  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_magenta_SPD.coefficients[i] = averageOfSamples(SPD_wavelengths, illumination_magenta_SPD_values, n_SPD_samples,
-																    sample_start_wavelength, sample_end_wavelength);
+		illumination_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, illumination_magenta_SPD_values, n_SPD_samples,
+																  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_yellow_SPD.coefficients[i]  = averageOfSamples(SPD_wavelengths, illumination_yellow_SPD_values, n_SPD_samples,
-																    sample_start_wavelength, sample_end_wavelength);
+		illumination_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, illumination_yellow_SPD_values, n_SPD_samples,
+																  sample_start_wavelength, sample_end_wavelength);
 	}
+}
+
+// Initializes SampledSpectrum objects required for conversion between different color representations
+void SampledSpectrum::initialize()
+{
+	initializeSpectralMatchingCurves();
+	initializeBaseColorSPDs();
+}
+
+// Utility functions
+
+// Determines whether the given wavelengths are sorted in ascending order
+bool samplesAreSorted(const imp_float* wavelengths,
+					  unsigned int n_samples)
+{
+	for (unsigned int i = 0; i < n_samples-1; i++)
+	{
+		if (wavelengths[i+1] < wavelengths[i])
+			return false;
+	}
+
+	return true;
+}
+
+// Sorts the given wavelengths and sample values by wavelength (ascending)
+void sortSamples(std::vector<imp_float>& wavelengths,
+				 std::vector<imp_float>& values)
+{
+	std::sort(wavelengths.begin(), wavelengths.end());
+
+	std::sort(values.begin(), values.end(),
+			 [wavelengths](int i, int j)
+			 {
+			     return (wavelengths[i] < wavelengths[j]);
+			 });
+}
+	
+// Computes the average of the sample values in the given wavelength range
+imp_float averageSamples(const imp_float* wavelengths,
+						 const imp_float* values,
+						 unsigned int n_samples,
+						 imp_float start_wavelength, imp_float end_wavelength)
+{
+	// Simply use endpoint values if the given wavelength range is outside the sampled range
+	if (end_wavelength <= wavelengths[0])
+		return values[0];
+	if (start_wavelength >= wavelengths[n_samples-1])
+		return values[n_samples-1];
+
+	// Return the single sample value if there is only one
+	if (n_samples == 1)
+		return values[0];
+
+	imp_float summed_value = 0.0f;
+
+	// Add endpoint contributions for wavelengths partially outside the sampled range
+	if (start_wavelength < wavelengths[0])
+		summed_value += values[0]*(wavelengths[0] - start_wavelength);
+	if (end_wavelength > wavelengths[n_samples-1])
+		summed_value += values[n_samples-1]*(end_wavelength - wavelengths[n_samples-1]);
+
+	unsigned int sample_idx = 0;
+	
+	// Advance to first sample index inside the wavelength range
+	while (start_wavelength > wavelengths[sample_idx])
+		sample_idx++;
+
+	// Add sample contributions from each segment inside the wavelength range
+	for (; (sample_idx < n_samples-1) && (wavelengths[sample_idx] <= end_wavelength); sample_idx++)
+	{
+		imp_float segment_start_wavelength = std::max(start_wavelength, wavelengths[sample_idx]);
+		imp_float segment_end_wavelength = std::min(end_wavelength, wavelengths[sample_idx+1]);
+
+		summed_value += 0.5f*(::Impact::lerp(values[sample_idx], values[sample_idx+1], (start_wavelength - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])) +
+							  ::Impact::lerp(values[sample_idx], values[sample_idx+1], (end_wavelength   - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])))*
+						(segment_end_wavelength - segment_start_wavelength);
+	}
+
+	return summed_value/(end_wavelength - start_wavelength);
+}
+	
+// Interpolates the given sample values at the given wavelength
+imp_float interpolateSamples(const imp_float* wavelengths,
+							 const imp_float* values,
+							 unsigned int n_samples,
+							 imp_float wavelength)
+{
+	// Simply use endpoint values if the given wavelength is outside the sampled range
+	if (wavelength <= wavelengths[0])
+		return values[0];
+	if (wavelength >= wavelengths[n_samples-1])
+		return values[n_samples-1];
+
+	// Find start index of the wavelengths interval containing wavelength
+	unsigned int offset = findLastIndexWhere([wavelengths, wavelength](unsigned int idx)
+										     {
+											     return wavelengths[idx] <= wavelength;
+										     },
+											 n_samples);
+
+	imp_float weight = (wavelength - wavelengths[offset])/(wavelengths[offset+1] - wavelengths[offset]);
+
+	return ::Impact::lerp(values[offset], values[offset+1], weight);
+}
+
+// Returns the wavelength [nm] corresponding to the given sample index
+imp_float sampleWavelength(unsigned int sample_idx)
+{
+	return ::Impact::lerp(wavelength_samples_start, wavelength_samples_end,
+						  static_cast<imp_float>(sample_idx)/static_cast<imp_float>(n_spectral_samples));
+}
+
+// Converts the given tristimulus X, Y and Z values to RGB values
+void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])
+{
+	rgb[0] = 3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
+    rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
+    rgb[2] = 0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
+}
+
+// Converts the given RGB values to tristimulus X, Y and Z values
+void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3])
+{
+	xyz[0] = 0.412453f*rgb[0] + 0.357580f*rgb[1] + 0.180423f*rgb[2];
+    xyz[1] = 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
+    xyz[2] = 0.019334f*rgb[0] + 0.119193f*rgb[1] + 0.950227f*rgb[2];
+}
+
+// Converts the given RGB values to a tristimulus Y value
+imp_float RGBToTristimulusY(const imp_float rgb[3])
+{
+    return 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
 }
 
 // Initializations of the CIE mathcing curve samples
