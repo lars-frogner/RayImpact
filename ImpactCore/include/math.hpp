@@ -29,7 +29,8 @@ inline int sign(imp_float val)
 }
 
 // Linear interpolation between two values
-inline imp_float lerp(imp_float value_1, imp_float value_2, imp_float weight)
+template <typename T>
+inline imp_float lerp(T value_1, T value_2, imp_float weight)
 {
     return (1.0f - weight)*value_1 + weight*value_2;
 }
