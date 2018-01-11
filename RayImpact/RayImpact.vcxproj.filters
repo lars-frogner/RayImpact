@@ -27,6 +27,8 @@
       <Filter>Shapes</Filter>
     </ClCompile>
     <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Spectrum.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -68,5 +70,6 @@
     </ClInclude>
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\Model.hpp" />
+    <ClInclude Include="include\Spectrum.hpp" />
   </ItemGroup>
 </Project>

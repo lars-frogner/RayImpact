@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\Disk.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
     <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\Spectrum.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\Transformation.cpp" />
   </ItemGroup>
@@ -40,6 +42,7 @@
     <ClInclude Include="include\Ray.hpp" />
     <ClInclude Include="include\ScatteringEvent.hpp" />
     <ClInclude Include="include\Shape.hpp" />
+    <ClInclude Include="include\Spectrum.hpp" />
     <ClInclude Include="include\Sphere.hpp" />
     <ClInclude Include="include\Transformation.hpp" />
     <ClInclude Include="include\Vector2.hpp" />
