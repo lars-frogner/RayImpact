@@ -56,6 +56,7 @@ public:
 
 	const Point2F* arrayOfNext2DSampleComponent(unsigned int n_values);
 
+	virtual std::unique_ptr<Sampler> cloned() = 0;
 	virtual std::unique_ptr<Sampler> cloned(unsigned int seed) = 0;
 };
 
@@ -120,7 +121,42 @@ public:
 
 // Sampling utility functions
 
+// Shuffles the elements in the given array into a random order
+template <typename T>
+inline void shuffleArray(T* elements,
+						 unsigned int n_elements,
+						 RandomNumberGenerator& rng)
+{
+	for (unsigned int element = 0; element < n_elements; element++)
+	{
+		// Choose random element higher up in the list
+		unsigned int element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
+	
+		// Swap the elements
+		std::swap(elements[element], elements[element_to_swap_with]);
+	}
+}
 
+// Shuffles the elements (of a given size) in the given array into a random order
+template <typename T>
+inline void shuffleArray(T* elements,
+						 unsigned int n_elements,
+						 unsigned int n_element_dimensions,
+						 RandomNumberGenerator& rng)
+{
+	for (unsigned int element = 0; element < n_elements; element++)
+	{
+		// Choose random element higher up in the list
+		unsigned int element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
+	
+		// Swap the elements
+		for (unsigned int n = 0; n < n_element_dimensions; n++)
+		{
+			std::swap(elements[				element*n_element_dimensions + n],
+					  elements[element_to_swap_with*n_element_dimensions + n]);
+		}
+	}
+}
 
 } // RayImpact
 } // Impact
