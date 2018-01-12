@@ -10,9 +10,9 @@ class StratifiedSampler : public PixelSampler {
 
 private:
 
-	const unsigned int n_horizontal_samples_per_pixel;
-	const unsigned int n_vertical_samples_per_pixel;
-	const bool jitter_samples;
+	const unsigned int n_horizontal_samples_per_pixel; // Number of samples to take horizontally for each pixel
+	const unsigned int n_vertical_samples_per_pixel; // Number of samples to take vertically for each pixel
+	const bool jitter_samples; // Whether to perturb the samples away from their regularly assigned values
 
 public:
 
