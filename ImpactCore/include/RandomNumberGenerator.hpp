@@ -28,6 +28,8 @@ public:
 	imp_float uniformFloat();
 	
 	uint32_t uniformUInt32();
+	
+	uint32_t uniformUInt32(uint32_t upper_limit);
 };
 
 } // Impact
