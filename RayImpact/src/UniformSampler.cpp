@@ -15,7 +15,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
 {
 	// Generate 1D sample components
 	for (size_t i = 0; i < sample_components_1D.size(); i++) {
-		for (uint64_t j = 0; j < n_samples_per_pixel; j++)
+		for (size_t j = 0; j < n_samples_per_pixel; j++)
 		{
 			sample_components_1D[i][j] = rng.uniformFloat();
 		}
@@ -23,7 +23,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
 	
 	// Generate 2D sample components
 	for (size_t i = 0; i < sample_components_2D.size(); i++) {
-		for (uint64_t j = 0; j < n_samples_per_pixel; j++)
+		for (size_t j = 0; j < n_samples_per_pixel; j++)
 		{
 			sample_components_2D[i][j].x = rng.uniformFloat();
 			sample_components_2D[i][j].y = rng.uniformFloat();
@@ -33,9 +33,9 @@ void UniformSampler::setPixel(const Point2I& pixel)
 	// Generate 1D sample component arrays
 	for (size_t i = 0; i < sample_component_arrays_1D.size(); i++)
 	{	
-		unsigned int array_size = sizes_of_1D_component_arrays[i];
+		size_t array_size = sizes_of_1D_component_arrays[i];
 
-		for (uint64_t j = 0; j < n_samples_per_pixel*array_size; j++)
+		for (size_t j = 0; j < n_samples_per_pixel*array_size; j++)
 		{
 			sample_component_arrays_1D[i][j] = rng.uniformFloat();
 		}
@@ -44,9 +44,9 @@ void UniformSampler::setPixel(const Point2I& pixel)
 	// Generate 2D sample component arrays
 	for (size_t i = 0; i < sample_component_arrays_2D.size(); i++)
 	{	
-		unsigned int array_size = sizes_of_2D_component_arrays[i];
+		size_t array_size = sizes_of_2D_component_arrays[i];
 
-		for (uint64_t j = 0; j < n_samples_per_pixel*array_size; j++)
+		for (size_t j = 0; j < n_samples_per_pixel*array_size; j++)
 		{
 			sample_component_arrays_2D[i][j].x = rng.uniformFloat();
 			sample_component_arrays_2D[i][j].y = rng.uniformFloat();

@@ -1,7 +1,7 @@
 #pragma once
 #include "precision.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "Point2.hpp"
+#include "geometry.hpp"
 #include "Camera.hpp"
 #include <vector>
 #include <memory>
@@ -21,24 +21,24 @@ private:
 protected:
 
 	Point2I current_pixel; // Current pixel being sampled
-	uint64_t current_pixel_sample_idx; // Index of the sample currently being generated for the pixel
+	size_t current_pixel_sample_idx; // Index of the sample currently being generated for the pixel
 
-	std::vector<unsigned int> sizes_of_1D_component_arrays; // Number of values per sample in each 1D component array
-	std::vector<unsigned int> sizes_of_2D_component_arrays; // Number of values per sample in each 2D component array
+	std::vector<size_t> sizes_of_1D_component_arrays; // Number of values per sample in each 1D component array
+	std::vector<size_t> sizes_of_2D_component_arrays; // Number of values per sample in each 2D component array
 	std::vector< std::vector<imp_float> > sample_component_arrays_1D; // 1D sample component arrays
 	std::vector< std::vector<Point2F> > sample_component_arrays_2D; // 1D sample component arrays
 
 public:
 
-	const uint64_t n_samples_per_pixel; // Total number of samples that will be generated for each pixel
+	const unsigned int n_samples_per_pixel; // Total number of samples that will be generated for each pixel
 
-	Sampler(uint64_t n_samples_per_pixel);
+	Sampler(unsigned int n_samples_per_pixel);
 
 	virtual void setPixel(const Point2I& pixel);
 
 	virtual bool beginNextSample();
 
-	virtual bool beginSampleIndex(uint64_t pixel_sample_idx);
+	virtual bool beginSampleIndex(size_t pixel_sample_idx);
 
 	CameraSample generateCameraSample(const Point2I& pixel);
 
@@ -76,12 +76,12 @@ protected:
 
 public:
 
-	PixelSampler(uint64_t n_samples_per_pixel,
+	PixelSampler(unsigned int n_samples_per_pixel,
 				 unsigned int n_sampled_dimensions);
 
 	bool beginNextSample();
 
-	bool beginSampleIndex(uint64_t pixel_sample_idx);
+	bool beginSampleIndex(size_t pixel_sample_idx);
 
 	imp_float next1DSampleComponent();
 
@@ -95,28 +95,28 @@ class GlobalSampler : public Sampler {
 private:
 
 	unsigned int next_sample_dimension; // Next dimension of the sample to provide value for
-	uint64_t current_global_sample_idx; // Total number of samples taken across all pixels
+	size_t current_global_sample_idx; // Total number of samples taken across all pixels
 
 	static const unsigned int array_start_dimension = 5; // First component to put into sample component arrays
 	unsigned int array_end_dimension; // Last component to put into sample component arrays
 
 public:
 
-	GlobalSampler(uint64_t n_samples_per_pixel);
+	GlobalSampler(unsigned int n_samples_per_pixel);
 
 	void setPixel(const Point2I& pixel);
 
 	bool beginNextSample();
 
-	bool beginSampleIndex(uint64_t pixel_sample_idx);
+	bool beginSampleIndex(size_t pixel_sample_idx);
 
 	imp_float next1DSampleComponent();
 
 	Point2F next2DSampleComponent();
 
-	virtual uint64_t pixelToGlobalSampleIndex(uint64_t pixel_sample_index) = 0;
+	virtual size_t pixelToGlobalSampleIndex(size_t pixel_sample_index) = 0;
 
-	virtual imp_float valueOfGlobalSampleDimension(uint64_t global_sample_index, unsigned int dimension) = 0;
+	virtual imp_float valueOfGlobalSampleDimension(size_t global_sample_index, unsigned int dimension) = 0;
 };
 
 // Sampling utility functions
@@ -124,13 +124,13 @@ public:
 // Shuffles the elements in the given array into a random order
 template <typename T>
 inline void shuffleArray(T* elements,
-						 unsigned int n_elements,
+						 size_t n_elements,
 						 RandomNumberGenerator& rng)
 {
-	for (unsigned int element = 0; element < n_elements; element++)
+	for (size_t element = 0; element < n_elements; element++)
 	{
 		// Choose random element higher up in the list
-		unsigned int element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
+		size_t element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
 	
 		// Swap the elements
 		std::swap(elements[element], elements[element_to_swap_with]);
@@ -140,14 +140,14 @@ inline void shuffleArray(T* elements,
 // Shuffles the elements (of a given size) in the given array into a random order
 template <typename T>
 inline void shuffleArray(T* elements,
-						 unsigned int n_elements,
+						 size_t n_elements,
 						 unsigned int n_element_dimensions,
 						 RandomNumberGenerator& rng)
 {
-	for (unsigned int element = 0; element < n_elements; element++)
+	for (size_t element = 0; element < n_elements; element++)
 	{
 		// Choose random element higher up in the list
-		unsigned int element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
+		size_t element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
 	
 		// Swap the elements
 		for (unsigned int n = 0; n < n_element_dimensions; n++)

@@ -45,9 +45,9 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 
 	// Generate 1D sample component arrays
 	for (size_t i = 0; i < sample_component_arrays_1D.size(); i++) {	
-		for (uint64_t j = 0; j < n_samples_per_pixel; j++)
+		for (size_t j = 0; j < n_samples_per_pixel; j++)
 		{
-			unsigned int array_size = sizes_of_1D_component_arrays[i];
+			size_t array_size = sizes_of_1D_component_arrays[i];
 
 			generateStratifiedSamples(&(sample_component_arrays_1D[i][j*array_size]),
 									  array_size, rng, jitter_samples);
@@ -59,9 +59,9 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 
 	// Generate 2D sample component arrays
 	for (size_t i = 0; i < sample_component_arrays_2D.size(); i++) {	
-		for (uint64_t j = 0; j < n_samples_per_pixel; j++)
+		for (size_t j = 0; j < n_samples_per_pixel; j++)
 		{
-			unsigned int array_size = sizes_of_2D_component_arrays[i];
+			size_t array_size = sizes_of_2D_component_arrays[i];
 
 			// Note: This relies on the x and y components of Point2 objects being contiguous in memory
 			generateLatinHypercubeSamples(&(sample_component_arrays_2D[i][j*array_size].x),
@@ -94,13 +94,13 @@ std::unique_ptr<Sampler> StratifiedSampler::cloned(unsigned int seed)
 
 // Fills the given array with stratified sample values covering the unit interval
 void generateStratifiedSamples(imp_float* samples,
-							   unsigned int n_samples,
+							   size_t n_samples,
 							   RandomNumberGenerator& rng,
 							   bool jitter_samples)
 {
 	imp_float sample_separation = 1.0f/n_samples;
 
-	for (unsigned int sample_idx = 0; sample_idx < n_samples; sample_idx++)
+	for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
 	{
 		imp_float local_sample_offset = (jitter_samples)? rng.uniformFloat() : 0.5f;
 
@@ -110,17 +110,17 @@ void generateStratifiedSamples(imp_float* samples,
 
 // Fills the given array with stratified sample points covering the unit square
 void generateStratifiedSamples(Point2F* samples,
-							   unsigned int n_samples_x,
-							   unsigned int n_samples_y,
+							   size_t n_samples_x,
+							   size_t n_samples_y,
 							   RandomNumberGenerator& rng,
 							   bool jitter_samples)
 {
 	imp_float sample_separation_x = 1.0f/n_samples_x;
 	imp_float sample_separation_y = 1.0f/n_samples_y;
-	unsigned int sample_idx = 0;
+	size_t sample_idx = 0;
 
-	for (unsigned int y = 0; y < n_samples_y; y++) {
-		for (unsigned int x = 0; x < n_samples_x; x++)
+	for (size_t y = 0; y < n_samples_y; y++) {
+		for (size_t x = 0; x < n_samples_x; x++)
 		{
 			imp_float local_sample_offset_x = (jitter_samples)? rng.uniformFloat() : 0.5f;
 			imp_float local_sample_offset_y = (jitter_samples)? rng.uniformFloat() : 0.5f;
@@ -135,14 +135,14 @@ void generateStratifiedSamples(Point2F* samples,
 
 // Fills the given array with Latin hypercube sample points inside the n-dimensional unit cube
 void generateLatinHypercubeSamples(imp_float* samples,
-								   unsigned int n_samples,
+								   size_t n_samples,
 								   unsigned int n_sample_dimensions,
 								   RandomNumberGenerator& rng)
 {
 	imp_float sample_separation = 1.0f/n_samples;
 
 	// Generate stratified sample values in the unit interval for all sample dimensions
-	for (unsigned int sample_idx = 0; sample_idx < n_samples; sample_idx++) {
+	for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++) {
 		for (unsigned int n = 0; n < n_sample_dimensions; n++)
 		{
 			imp_float sample_value = (sample_idx + rng.uniformFloat())*sample_separation;
@@ -153,10 +153,10 @@ void generateLatinHypercubeSamples(imp_float* samples,
 
 	// Shuffle the sample values in each dimension
 	for (unsigned int n = 0; n < n_sample_dimensions; n++) {
-		for (unsigned int sample_idx = 0; sample_idx < n_samples; sample_idx++)
+		for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
 		{
 			// Choose random sample higher up in the list
-			unsigned int sample_to_swap_with = sample_idx + rng.uniformUInt32(n_samples - sample_idx);
+			size_t sample_to_swap_with = sample_idx + rng.uniformUInt32(n_samples - sample_idx);
 	
 			// Swap the samples
 			std::swap(samples[         sample_idx*n_sample_dimensions + n],

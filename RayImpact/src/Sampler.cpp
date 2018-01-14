@@ -5,7 +5,7 @@ namespace RayImpact {
 
 // Sampler method implementations
 
-Sampler::Sampler(uint64_t n_samples_per_pixel)
+Sampler::Sampler(unsigned int n_samples_per_pixel)
 	: n_samples_per_pixel(n_samples_per_pixel)
 {}
 
@@ -28,7 +28,7 @@ bool Sampler::beginNextSample()
 	return current_pixel_sample_idx < n_samples_per_pixel;
 }
 
-bool Sampler::beginSampleIndex(uint64_t pixel_sample_idx)
+bool Sampler::beginSampleIndex(size_t pixel_sample_idx)
 {
 	current_1D_array_component = 0;
 	current_2D_array_component = 0;
@@ -88,7 +88,7 @@ const Point2F* Sampler::arrayOfNext2DSampleComponent(unsigned int n_values)
 
 // PixelSampler method implementations
 
-PixelSampler::PixelSampler(uint64_t n_samples_per_pixel,
+PixelSampler::PixelSampler(unsigned int n_samples_per_pixel,
 						   unsigned int n_sampled_dimensions)
 	: Sampler::Sampler(n_samples_per_pixel),
 	  current_1D_component(0),
@@ -110,7 +110,7 @@ bool PixelSampler::beginNextSample()
 	return Sampler::beginNextSample();
 }
 
-bool PixelSampler::beginSampleIndex(uint64_t pixel_sample_idx)
+bool PixelSampler::beginSampleIndex(size_t pixel_sample_idx)
 {
 	current_1D_component = 0;
 	current_2D_component = 0;
@@ -144,7 +144,7 @@ Point2F PixelSampler::next2DSampleComponent()
 
 // GlobalSampler method implementations
 
-GlobalSampler::GlobalSampler(uint64_t n_samples_per_pixel)
+GlobalSampler::GlobalSampler(unsigned int n_samples_per_pixel)
 	: Sampler::Sampler(n_samples_per_pixel)
 {}
 
@@ -162,11 +162,11 @@ void GlobalSampler::setPixel(const Point2I& pixel)
 
 	for (size_t array_dimension = 0; array_dimension < sample_component_arrays_1D.size(); array_dimension++)
 	{
-		unsigned int n_pixel_samples = sizes_of_1D_component_arrays[array_dimension]*n_samples_per_pixel;
+		size_t n_pixel_samples = sizes_of_1D_component_arrays[array_dimension]*n_samples_per_pixel;
 
 		for (size_t pixel_sample_idx = 0; pixel_sample_idx < n_pixel_samples; pixel_sample_idx++)
 		{
-			uint64_t global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);
+			size_t global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);
 
 			sample_component_arrays_1D[array_dimension][pixel_sample_idx] = 
 				valueOfGlobalSampleDimension(global_sample_idx, array_start_dimension + array_dimension);
@@ -179,11 +179,11 @@ void GlobalSampler::setPixel(const Point2I& pixel)
 
 	for (size_t array_dimension = 0; array_dimension < sample_component_arrays_2D.size(); array_dimension++)
 	{
-		unsigned int n_pixel_samples = sizes_of_2D_component_arrays[array_dimension]*n_samples_per_pixel;
+		size_t n_pixel_samples = sizes_of_2D_component_arrays[array_dimension]*n_samples_per_pixel;
 
 		for (size_t pixel_sample_idx = 0; pixel_sample_idx < n_pixel_samples; pixel_sample_idx++)
 		{
-			uint64_t global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);
+			size_t global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);
 
 			sample_component_arrays_2D[array_dimension][pixel_sample_idx].x = valueOfGlobalSampleDimension(global_sample_idx, dimension);
 			sample_component_arrays_2D[array_dimension][pixel_sample_idx].y = valueOfGlobalSampleDimension(global_sample_idx, dimension + 1);
@@ -201,7 +201,7 @@ bool GlobalSampler::beginNextSample()
 	return Sampler::beginNextSample();
 }
 
-bool GlobalSampler::beginSampleIndex(uint64_t pixel_sample_idx)
+bool GlobalSampler::beginSampleIndex(size_t pixel_sample_idx)
 {
 	next_sample_dimension = 0;
 	current_global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);

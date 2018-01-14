@@ -31,18 +31,18 @@ public:
 // Utility functions for stratified sampling
 
 void generateStratifiedSamples(imp_float* samples,
-						  	   unsigned int n_samples,
+						  	   size_t n_samples,
 							   RandomNumberGenerator& rng,
 							   bool jitter_samples);
 
 void generateStratifiedSamples(Point2F* samples,
-							   unsigned int n_horizontal_samples,
-							   unsigned int n_vertical_samples,
+							   size_t n_horizontal_samples,
+							   size_t n_vertical_samples,
 							   RandomNumberGenerator& rng,
 							   bool jitter_samples);
 
 void generateLatinHypercubeSamples(imp_float* samples,
-								   unsigned int n_samples,
+								   size_t n_samples,
 								   unsigned int n_sample_dimensions,
 								   RandomNumberGenerator& rng);
 
