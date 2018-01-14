@@ -75,14 +75,14 @@ ProjectiveCamera::ProjectiveCamera(const Transformation& camera_to_world,
 	  lens_radius(lens_radius),
 	  focal_distance(focal_distance)
 {
-	screen_to_raster = Transformation::scaling(sensor->full_resolution.x,
-											   sensor->full_resolution.y,
+	screen_to_raster = Transformation::scaling((imp_float)(sensor->full_resolution.x),
+											   (imp_float)(sensor->full_resolution.y),
 											   1.0f)*
 					   Transformation::scaling( 1.0f/(screen_window.upper_corner.x - screen_window.lower_corner.x),
 											   -1.0f/(screen_window.upper_corner.y - screen_window.lower_corner.y),
 											    1.0f)*
 					   Transformation::translation(Vector3F(-screen_window.lower_corner.x,
-															-screen_window.lower_corner.y,
+															-screen_window.upper_corner.y,
 															0.0f));
 
 	raster_to_screen = screen_to_raster.inverted();
