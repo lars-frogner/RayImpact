@@ -22,7 +22,7 @@ imp_float AtomicFloat::operator=(imp_float value)
 void AtomicFloat::add(imp_float value)
 {
 	imp_float_bits old_bits = bits;
-	imp_float new_bits;
+	imp_float_bits new_bits;
 
 	do {
 	
