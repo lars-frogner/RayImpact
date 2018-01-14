@@ -2,7 +2,7 @@
 #include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
-#include "Point3.hpp"
+#include "geometry.hpp"
 #include <cmath>
 
 namespace Impact {

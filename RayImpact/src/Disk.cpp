@@ -1,7 +1,7 @@
 #include "Disk.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "Point3.hpp"
+#include "geometry.hpp"
 #include <cmath>
 
 namespace Impact {
