@@ -441,12 +441,12 @@ inline void ErrorFloat::verifyBounds() const
 {
 	#ifndef NDEBUG
 	if (!std::isinf(lower_bound) && !std::isinf(upper_bound) &&
-		!std::isnan(lower_bound) && !std::isnan(upper_bound))
+		!isNaN(lower_bound) && !isNaN(upper_bound))
 	{
 		imp_assert(lower_bound <= upper_bound);
 	}
 
-	if (!std::isinf(value) && !std::isnan(value))
+	if (!std::isinf(value) && !isNaN(value))
 	{
 		imp_assert(precise_value <= upper_bound);
 		imp_assert(precise_value >= lower_bound);

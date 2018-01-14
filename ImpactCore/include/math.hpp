@@ -4,6 +4,7 @@
 #include <limits>
 #include <utility>
 #include <functional>
+#include <cmath>
 
 namespace Impact {
 
@@ -24,14 +25,26 @@ constexpr imp_float IMP_RAD_TO_DEG = 180/IMP_PI;
 
 // Utility functions
 
+template <typename T>
+inline bool isNaN(const T x)
+{
+    return std::isnan(x);
+}
+
+template <>
+inline bool isNaN(const int x)
+{
+    return false;
+}
+
 inline int sign(imp_float val)
 {
     return (imp_float(0) < val) - (val < imp_float(0));
 }
 
 // Linear interpolation between two values
-template <typename T>
-inline imp_float lerp(T value_1, T value_2, imp_float weight)
+template <typename T, typename U>
+inline T lerp(U value_1, U value_2, T weight)
 {
     return (1.0f - weight)*value_1 + weight*value_2;
 }
@@ -87,7 +100,7 @@ inline bool solveQuadraticEquation(imp_float a, imp_float b, imp_float c, imp_fl
 // Returns the last index in an array of size n_values where the given condition returns true
 inline unsigned int findLastIndexWhere(const std::function<bool (unsigned int)>& condition, unsigned int n_values)
 {
-	unsigned int first_idx;
+	unsigned int first_idx = 0;
 	unsigned int length = n_values;
 
 	while (length > 0)
