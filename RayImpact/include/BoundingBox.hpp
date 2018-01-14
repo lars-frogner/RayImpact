@@ -2,11 +2,11 @@
 #include "precision.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "Vector3.hpp"
-#include "Point3.hpp"
+#include "geometry.hpp"
 #include "Ray.hpp"
 #include <algorithm>
 #include <ostream>
+#include <limits>
 
 namespace Impact {
 namespace RayImpact {
@@ -20,45 +20,45 @@ template <typename T>
 class BoundingBox {
 
 public:
-	Point3 lower_corner; // Corner with the lowest coordinate values
-	Point3 upper_corner; // Corner with the highest coordinate values
+	Point3<T> lower_corner; // Corner with the lowest coordinate values
+	Point3<T> upper_corner; // Corner with the highest coordinate values
 
 	BoundingBox();
 	
-	BoundingBox(const Point3& lower_corner,
-				const Point3& upper_corner);
+	explicit BoundingBox(const Point3<T>& lower_corner,
+						 const Point3<T>& upper_corner);
 	
-	BoundingBox(const Point3& point);
+	explicit BoundingBox(const Point3<T>& point);
 
-	static BoundingBox aroundPoints(const Point3& point_1,
-									const Point3& point_2);
+	static BoundingBox aroundPoints(const Point3<T>& point_1,
+									const Point3<T>& point_2);
 
-	const Point3& operator[](unsigned int point_idx) const;
-	Point3& operator[](unsigned int point_idx);
+	const Point3<T>& operator[](unsigned int point_idx) const;
+	Point3<T>& operator[](unsigned int point_idx);
 
-	Point3 corner(unsigned int corner_idx) const;
+	Point3<T> corner(unsigned int corner_idx) const;
 
 	bool overlaps(const BoundingBox& other) const;
 
-	bool contains(const Point3& point) const;
-	bool containsExclusive(const Point3& point) const;
+	bool contains(const Point3<T>& point) const;
+	bool containsExclusive(const Point3<T>& point) const;
 
 	template <typename U>
 	BoundingBox expanded(U amount) const;
 
-	Vector3 diagonal() const;
+	Vector3<T> diagonal() const;
 
 	T surfaceArea() const;
 	T volume() const;
 
 	unsigned int maxDimension() const;
 
-	Vector3 getLocalCoordinate(const Point3& global_coord) const;
-	Point3 getGlobalCoordinate(const Vector3& local_coord) const;
+	Vector3<T> getLocalCoordinate(const Point3<T>& global_coord) const;
+	Point3<T> getGlobalCoordinate(const Vector3<T>& local_coord) const;
 
-	void boundingSphere(Point3* center, T* radius) const;
+	void boundingSphere(Point3<T>* center, T* radius) const;
 
-	void enclose(const Point3& point);
+	void enclose(const Point3<T>& point);
 
 	bool hasIntersection(const Ray& ray,
 					     imp_float* first_intersection_distance,
@@ -113,8 +113,8 @@ inline std::ostream& operator<<(std::ostream& stream, const BoundingBox<T>& box)
 
 template <typename T>
 inline BoundingBox<T>::BoundingBox()
-	: lower_corner(IMP_MAX, IMP_MAX, IMP_MAX),
-	  upper_corner(IMP_LOWEST, IMP_LOWEST, IMP_LOWEST)
+	: lower_corner(std::numeric_limits<T>::max(), std::numeric_limits<T>::max(), std::numeric_limits<T>::max()),
+	  upper_corner(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest())
 {}
 
 template <typename T>
