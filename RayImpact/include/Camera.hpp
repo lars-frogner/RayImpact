@@ -1,16 +1,15 @@
 #pragma once
 #include "precision.hpp"
-#include "Point2.hpp"
-#include "Vector3.hpp"
+#include "math.hpp"
+#include "geometry.hpp"
 #include "BoundingRectangle.hpp"
 #include "Ray.hpp"
 #include "Transformation.hpp"
+#include "Sensor.hpp"
+#include <cmath>
 
 namespace Impact {
 namespace RayImpact {
-
-// Forward declarations
-class Sensor;
 
 // CameraSample declarations
 
@@ -72,6 +71,14 @@ public:
 				     Sensor* sensor,
 				     const Medium* medium);
 };
+
+inline Point2F unitSquareToUnitDisk(const Point2F& sample)
+{
+	imp_float theta = sample.x*IMP_TWO_PI;
+	imp_float radius = sample.y;
+
+	return Point2F(radius*std::cos(theta), radius*std::sin(theta));
+}
 
 } // RayImpact
 } // Impact
