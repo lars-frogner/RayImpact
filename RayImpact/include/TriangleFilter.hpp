@@ -18,11 +18,11 @@ public:
 
 // TriangleFilter method implementations
 
-TriangleFilter::TriangleFilter(const Vector2F& radius)
+inline TriangleFilter::TriangleFilter(const Vector2F& radius)
 	: Filter::Filter(radius)
 {}
 
-imp_float TriangleFilter::evaluate(const Point2F& position) const
+inline imp_float TriangleFilter::evaluate(const Point2F& position) const
 {
 	return std::max(0.0f, radius.x - std::abs(position.x))*
 		   std::max(0.0f, radius.y - std::abs(position.y));

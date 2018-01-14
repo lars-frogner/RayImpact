@@ -1,7 +1,6 @@
 #pragma once
 #include "precision.hpp"
-#include "Vector2.hpp"
-#include "Point2.hpp"
+#include "geometry.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -22,7 +21,7 @@ public:
 
 // Filter method implementations
 
-Filter::Filter(const Vector2F& radius)
+inline Filter::Filter(const Vector2F& radius)
 	: radius(radius),
 	  inverse_radius(1.0f/radius.x, 1.0f/radius.y)
 {}

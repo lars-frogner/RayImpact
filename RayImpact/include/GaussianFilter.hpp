@@ -25,7 +25,7 @@ public:
 
 // GaussianFilter method implementations
 
-GaussianFilter::GaussianFilter(const Vector2F& radius,
+inline GaussianFilter::GaussianFilter(const Vector2F& radius,
 							   imp_float sharpness)
 	: Filter::Filter(radius),
 	  sharpness(sharpness),
@@ -33,10 +33,10 @@ GaussianFilter::GaussianFilter(const Vector2F& radius,
 	  edge_value_y(std::exp(-sharpness*radius.y*radius.y))
 {}
 
-imp_float GaussianFilter::evaluate(const Point2F& position) const
+inline imp_float GaussianFilter::evaluate(const Point2F& position) const
 {
-	return std::max(0.0f, std::exp(-sharpness*position.x*position.x) - edge_value_x)*
-		   std::max(0.0f, std::exp(-sharpness*position.y*position.y) - edge_value_y);
+	return std::max<imp_float>(0.0f, std::exp(-sharpness*position.x*position.x) - edge_value_x)*
+		   std::max<imp_float>(0.0f, std::exp(-sharpness*position.y*position.y) - edge_value_y);
 }
 
 } // RayImpact

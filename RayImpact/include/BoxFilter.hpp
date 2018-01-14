@@ -17,11 +17,11 @@ public:
 
 // BoxFilter method implementations
 
-BoxFilter::BoxFilter(const Vector2F& radius)
+inline BoxFilter::BoxFilter(const Vector2F& radius)
 	: Filter::Filter(radius)
 {}
 
-imp_float BoxFilter::evaluate(const Point2F& position) const
+inline imp_float BoxFilter::evaluate(const Point2F& position) const
 {
 	return 1.0f;
 }
