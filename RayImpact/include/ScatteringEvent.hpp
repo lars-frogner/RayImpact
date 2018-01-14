@@ -1,9 +1,6 @@
 #pragma once
 #include "precision.hpp"
-#include "Vector3.hpp"
-#include "Point3.hpp"
-#include "Normal3.hpp"
-#include "Point2.hpp"
+#include "geometry.hpp"
 #include "Ray.hpp"
 
 namespace Impact {
@@ -18,7 +15,7 @@ class Model;
 class BSDF;
 class BSSRDF;
 
-class MediumInterface;
+class MediumInterface {};
 
 // ScatteringEvent declarations
 
@@ -47,7 +44,7 @@ public:
 	
 	Ray spawnRayTo(const ScatteringEvent& other) const;
 
-	const Medium* getMediumInDirection(const Vector3F& direction) const;
+	const Medium* getMediumInDirection(const Vector3F& direction) const {return nullptr;}
 
 	bool isOnSurface() const;
 };

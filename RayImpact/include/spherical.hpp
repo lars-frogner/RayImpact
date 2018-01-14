@@ -1,7 +1,7 @@
 #pragma once
 #include "precision.hpp"
 #include "math.hpp"
-#include "Vector3.hpp"
+#include "geometry.hpp"
 #include <cmath>
 
 namespace Impact {

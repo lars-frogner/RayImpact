@@ -1,9 +1,7 @@
 #pragma once
 #include "precision.hpp"
 #include "Matrix4x4.hpp"
-#include "Vector3.hpp"
-#include "Point3.hpp"
-#include "Normal3.hpp"
+#include "geometry.hpp"
 #include "Ray.hpp"
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
@@ -24,7 +22,7 @@ public:
 
 	Transformation();
 	
-	Transformation(const Matrix4x4& matrix);
+	explicit Transformation(const Matrix4x4& matrix);
 	
 	Transformation(const Matrix4x4& matrix,
 				   const Matrix4x4& matrix_inverse);

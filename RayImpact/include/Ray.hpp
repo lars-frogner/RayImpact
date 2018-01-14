@@ -1,8 +1,7 @@
 #pragma once
 #include "precision.hpp"
 #include "math.hpp"
-#include "Vector3.hpp"
-#include "Point3.hpp"
+#include "geometry.hpp"
 #include <ostream>
 
 namespace Impact {
@@ -10,7 +9,7 @@ namespace RayImpact {
 
 // Forward declarations
 
-class Medium;
+class Medium {};
 
 // Ray declarations
 
