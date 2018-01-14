@@ -7,6 +7,15 @@
     <Filter Include="Shapes">
       <UniqueIdentifier>{5b090f3d-676a-4f5e-a4e7-d89ca26149d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cameras">
+      <UniqueIdentifier>{0576bcaa-6a6e-42ac-b8c4-9ea5f82da80e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Samplers">
+      <UniqueIdentifier>{b959767f-bca7-4dc8-9c73-3b2019e5ee73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Filters">
+      <UniqueIdentifier>{57f4cb36-7452-42a8-a4c5-00536b81caec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ray.cpp">
@@ -29,6 +38,21 @@
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Spectrum.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\OrthographicCamera.cpp">
+      <Filter>Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerspectiveCamera.cpp">
+      <Filter>Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sampler.cpp" />
+    <ClCompile Include="src\StratifiedSampler.cpp">
+      <Filter>Samplers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UniformSampler.cpp">
+      <Filter>Samplers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sensor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -37,25 +61,10 @@
     <ClInclude Include="include\BoundingRectangle.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
-    <ClInclude Include="include\Normal3.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Point2.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Point3.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="include\Ray.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="include\Transformation.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Vector2.hpp">
-      <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Vector3.hpp">
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="include\ScatteringEvent.hpp" />
@@ -71,5 +80,36 @@
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\Model.hpp" />
     <ClInclude Include="include\Spectrum.hpp" />
+    <ClInclude Include="include\spherical.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.hpp" />
+    <ClInclude Include="include\OrthographicCamera.hpp">
+      <Filter>Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PerspectiveCamera.hpp">
+      <Filter>Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sampler.hpp" />
+    <ClInclude Include="include\StratifiedSampler.hpp">
+      <Filter>Samplers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UniformSampler.hpp">
+      <Filter>Samplers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Filter.hpp" />
+    <ClInclude Include="include\BoxFilter.hpp">
+      <Filter>Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TriangleFilter.hpp">
+      <Filter>Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GaussianFilter.hpp">
+      <Filter>Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sensor.hpp" />
+    <ClInclude Include="include\geometry.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

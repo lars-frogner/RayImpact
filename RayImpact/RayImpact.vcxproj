@@ -19,34 +19,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\Disk.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\OrthographicCamera.cpp" />
+    <ClCompile Include="src\PerspectiveCamera.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\ray_impact.cpp" />
+    <ClCompile Include="src\Sampler.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
+    <ClCompile Include="src\Sensor.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Spectrum.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
+    <ClCompile Include="src\StratifiedSampler.cpp" />
     <ClCompile Include="src\Transformation.cpp" />
+    <ClCompile Include="src\UniformSampler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp" />
     <ClInclude Include="include\BoundingRectangle.hpp" />
+    <ClInclude Include="include\BoxFilter.hpp" />
+    <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\Cylinder.hpp" />
     <ClInclude Include="include\Disk.hpp" />
+    <ClInclude Include="include\Filter.hpp" />
+    <ClInclude Include="include\GaussianFilter.hpp" />
+    <ClInclude Include="include\geometry.hpp" />
     <ClInclude Include="include\Model.hpp" />
-    <ClInclude Include="include\Normal3.hpp" />
-    <ClInclude Include="include\Point2.hpp" />
-    <ClInclude Include="include\Point3.hpp" />
+    <ClInclude Include="include\OrthographicCamera.hpp" />
+    <ClInclude Include="include\PerspectiveCamera.hpp" />
     <ClInclude Include="include\Ray.hpp" />
+    <ClInclude Include="include\Sampler.hpp" />
     <ClInclude Include="include\ScatteringEvent.hpp" />
+    <ClInclude Include="include\Sensor.hpp" />
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\Spectrum.hpp" />
     <ClInclude Include="include\Sphere.hpp" />
+    <ClInclude Include="include\spherical.hpp" />
+    <ClInclude Include="include\StratifiedSampler.hpp" />
     <ClInclude Include="include\Transformation.hpp" />
-    <ClInclude Include="include\Vector2.hpp" />
-    <ClInclude Include="include\Vector3.hpp" />
+    <ClInclude Include="include\TriangleFilter.hpp" />
+    <ClInclude Include="include\UniformSampler.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
