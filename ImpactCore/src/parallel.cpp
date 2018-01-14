@@ -8,7 +8,7 @@
 namespace Impact {
 
 // Forward declarations
-static class ParallelForLoop;
+class ParallelForLoop;
 
 // Static global variables
 
@@ -23,7 +23,7 @@ static std::condition_variable pending_loops_condition;
 
 // ParallelForLoop declarations
 
-static class ParallelForLoop {
+class ParallelForLoop {
 
 public:
 	
