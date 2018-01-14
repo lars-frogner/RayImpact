@@ -2,10 +2,11 @@
 #include "precision.hpp"
 #include "error.hpp"
 #include "math.hpp"
-#include "Vector2.hpp"
-#include "Point2.hpp"
+#include "geometry.hpp"
 #include <algorithm>
 #include <ostream>
+#include <iterator>
+#include <limits>
 
 namespace Impact {
 namespace RayImpact {
@@ -16,48 +17,74 @@ template <typename T>
 class BoundingRectangle {
 
 public:
-	Point2 lower_corner; // Corner with the lowest coordinate values
-	Point2 upper_corner; // Corner with the highest coordinate values
+	Point2<T> lower_corner; // Corner with the lowest coordinate values
+	Point2<T> upper_corner; // Corner with the highest coordinate values
 
 	BoundingRectangle();
 	
-	BoundingRectangle(const Point2& lower_corner,
-					  const Point2& upper_corner);
+	explicit BoundingRectangle(const Point2<T>& lower_corner,
+							   const Point2<T>& upper_corner);
 	
-	BoundingRectangle(const Point2& point);
+	explicit BoundingRectangle(const Point2<T>& point);
 
-	static BoundingRectangle aroundPoints(const Point2& point_1,
-										  const Point2& point_2);
+	static BoundingRectangle aroundPoints(const Point2<T>& point_1,
+										  const Point2<T>& point_2);
 
-	const Point2& operator[](unsigned int point_idx) const;
-	Point2& operator[](unsigned int point_idx);
+	const Point2<T>& operator[](unsigned int point_idx) const;
+	Point2<T>& operator[](unsigned int point_idx);
 
-	Point2 corner(unsigned int corner_idx) const;
+	Point2<T> corner(unsigned int corner_idx) const;
 
 	bool overlaps(const BoundingRectangle& other) const;
 
-	bool contains(const Point2& point) const;
-	bool containsExclusive(const Point2& point) const;
+	bool contains(const Point2<T>& point) const;
+	bool containsExclusive(const Point2<T>& point) const;
+
+	bool isDegenerate() const;
 
 	template <typename U>
 	BoundingRectangle expanded(U amount) const;
 
-	Vector2 diagonal() const;
+	Vector2<T> diagonal() const;
 
 	T area() const;
 
 	unsigned int maxDimension() const;
 	
-	Vector2 getLocalCoordinate(const Point2& global_coord) const;
-	Point2 getGlobalCoordinate(const Vector2& local_coord) const;
+	Vector2<T> getLocalCoordinate(const Point2<T>& global_coord) const;
+	Point2<T> getGlobalCoordinate(const Vector2<T>& local_coord) const;
 	
-	void enclose(const Point2& point);
+	void enclose(const Point2<T>& point);
 };
 
 // BoundingRectangle typedefs
 
 typedef BoundingRectangle<imp_float> BoundingRectangleF;
 typedef BoundingRectangle<int> BoundingRectangleI;
+
+// BoundingRectangleIteratorI declarations
+
+class BoundingRectangleIteratorI : public std::forward_iterator_tag {
+
+private:
+	
+	const BoundingRectangleI* bounding_rectangle; // The bounding rectangle to iterate over
+	Point2I point; // The current point in the bounding rectangle
+
+	void advance();
+
+public:
+
+	BoundingRectangleIteratorI(const BoundingRectangleI& bounding_rectangle,
+							   const Point2I& point);
+
+	BoundingRectangleIteratorI operator++();
+
+	bool operator==(const BoundingRectangleIteratorI& other) const;
+	bool operator!=(const BoundingRectangleIteratorI& other) const;
+
+	const Point2I& operator*() const;
+};
 
 // Functions on BoundingRectangle objects
 
@@ -84,8 +111,8 @@ template <typename T>
 inline BoundingRectangle<T> intersectionOf(const BoundingRectangle<T>& bounding_rectangle_1,
 										   const BoundingRectangle<T>& bounding_rectangle_2)
 {
-	return BoundingRectangle<T>(max(bounding_rectangle_1.lower_corner.x, bounding_rectangle_2.lower_corner.x),
-								min(bounding_rectangle_1.upper_corner.x, bounding_rectangle_2.upper_corner.x));
+	return BoundingRectangle<T>(max(bounding_rectangle_1.lower_corner, bounding_rectangle_2.lower_corner),
+								min(bounding_rectangle_1.upper_corner, bounding_rectangle_2.upper_corner));
 }
 
 template <typename T>
@@ -99,8 +126,8 @@ inline std::ostream& operator<<(std::ostream& stream, const BoundingRectangle<T>
 
 template <typename T>
 inline BoundingRectangle<T>::BoundingRectangle()
-	: lower_corner(IMP_MAX, IMP_MAX),
-	  upper_corner(IMP_LOWEST, IMP_LOWEST)
+	: lower_corner(Point2<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::max())),
+	  upper_corner(Point2<T>(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest()))
 {}
 
 template <typename T>
@@ -170,6 +197,12 @@ inline bool BoundingRectangle<T>::containsExclusive(const Point2<T>& point) cons
 		   (point.y >= lower_corner.y && point.y < upper_corner.y);
 }
 
+template <typename T>
+inline bool BoundingRectangle<T>::isDegenerate() const
+{
+	return (lower_corner.x > upper_corner.x) || (lower_corner.y > upper_corner.y);
+}
+
 // Returns bounding rectangle expanded uniformly by twice the given amount 
 template <typename T>
 template <typename U>
@@ -191,16 +224,16 @@ inline Vector2<T> BoundingRectangle<T>::diagonal() const
 template <typename T>
 inline T BoundingRectangle<T>::area() const
 {
-	const Vector2<T>& diagonal = diagonal();
-	return diagonal.x*diagonal.y;
+	const Vector2<T>& extent = diagonal();
+	return extent.x*extent.y;
 }
 
 // Returns the dimension with largest extent
 template <typename T>
 inline unsigned int BoundingRectangle<T>::maxDimension() const
 {
-	const Vector2<T>& diagonal = diagonal();
-	return (diagonal.x >= diagonal.y)? 0 : 1;
+	const Vector2<T>& extent = diagonal();
+	return (extent.x >= extent.y)? 0 : 1;
 }
 
 // Returns the coordinate of the given point relative to the bounding rectangle,
@@ -236,6 +269,68 @@ void BoundingRectangle<T>::enclose(const Point2<T>& point)
 
 	upper_corner.x = std::max(upper_corner.x, point.x);
 	upper_corner.y = std::max(upper_corner.y, point.y);
+}
+
+// Funcions on BoundingRectangleIteratorI objects
+
+inline BoundingRectangleIteratorI begin(const BoundingRectangleI& bounding_rectangle)
+{
+	return BoundingRectangleIteratorI(bounding_rectangle, bounding_rectangle.lower_corner);
+}
+
+inline BoundingRectangleIteratorI end(const BoundingRectangleI& bounding_rectangle)
+{
+	Point2I end_point(bounding_rectangle.lower_corner.x, bounding_rectangle.upper_corner.y);
+
+	// If the bounding rectangle is degenerate, make end == begin so that iteration will terminate immediately
+	if (bounding_rectangle.lower_corner.x >= bounding_rectangle.upper_corner.x ||
+		bounding_rectangle.lower_corner.y >= bounding_rectangle.upper_corner.y)
+	{
+		end_point = bounding_rectangle.lower_corner;
+	}
+
+	return BoundingRectangleIteratorI(bounding_rectangle, end_point);
+}
+
+// BoundingRectangleIteratorI method implementations
+
+inline BoundingRectangleIteratorI::BoundingRectangleIteratorI(const BoundingRectangleI& bounding_rectangle,
+													   const Point2I& point)
+	: bounding_rectangle(&bounding_rectangle),
+	  point(point)
+{}
+
+inline void BoundingRectangleIteratorI::advance()
+{
+	point.x++;
+
+	if (point.x == bounding_rectangle->upper_corner.x)
+	{
+		point.x = bounding_rectangle->lower_corner.x;
+		point.y++;
+	}
+}
+
+inline BoundingRectangleIteratorI BoundingRectangleIteratorI::operator++()
+{
+	BoundingRectangleIteratorI old = *this;
+	advance();
+	return old;
+}
+
+inline bool BoundingRectangleIteratorI::operator==(const BoundingRectangleIteratorI& other) const
+{
+	return (point == other.point) && (bounding_rectangle == other.bounding_rectangle);
+}
+
+inline bool BoundingRectangleIteratorI::operator!=(const BoundingRectangleIteratorI& other) const
+{
+	return !(*this == other);
+}
+
+inline const Point2I& BoundingRectangleIteratorI::operator*() const
+{
+	return point;
 }
 
 } // RayImpact
