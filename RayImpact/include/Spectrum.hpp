@@ -17,6 +17,10 @@ class SampledSpectrum;
 typedef RGBSpectrum Spectrum;
 //typedef SampledSpectrum Spectrum;
 
+typedef Spectrum EnergySpectrum;
+typedef Spectrum PowerSpectrum;
+typedef Spectrum RadianceSpectrum;
+
 // Global variables
 
 static const unsigned int wavelength_samples_start = 400; // First wavelength [nm] sampled in SampledSpectrum
@@ -31,49 +35,35 @@ extern const imp_float CIE_Z_values[n_CIE_samples]; // Values of the CIE > spect
 
 static const imp_float CIE_Y_integral = 106.856895f; // Integral of the CIE Y spectral matching curve
 
-static SampledSpectrum CIE_X; // CIE X spectral matching curve
-static SampledSpectrum CIE_Y; // CIE Y spectral matching curve
-static SampledSpectrum CIE_Z; // CIE Z spectral matching curve
-
 static const unsigned int n_SPD_samples = 32; // Number of samples of the base color SPDs
-extern const imp_float SPD_wavelengths[n_SPD_samples]; // Wavelengths [nm] for samples of the base color SPDs
+extern const double SPD_wavelengths[n_SPD_samples]; // Wavelengths [nm] for samples of the base color SPDs
 
-extern const imp_float reflectance_white_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_red_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_green_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_blue_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_cyan_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_magenta_SPD_values[n_SPD_samples];
-extern const imp_float reflectance_yellow_SPD_values[n_SPD_samples];
+extern const double reflectance_white_SPD_values[n_SPD_samples];
+extern const double reflectance_red_SPD_values[n_SPD_samples];
+extern const double reflectance_green_SPD_values[n_SPD_samples];
+extern const double reflectance_blue_SPD_values[n_SPD_samples];
+extern const double reflectance_cyan_SPD_values[n_SPD_samples];
+extern const double reflectance_magenta_SPD_values[n_SPD_samples];
+extern const double reflectance_yellow_SPD_values[n_SPD_samples];
 
-extern const imp_float illumination_white_SPD_values[n_SPD_samples];
-extern const imp_float illumination_red_SPD_values[n_SPD_samples];
-extern const imp_float illumination_green_SPD_values[n_SPD_samples];
-extern const imp_float illumination_blue_SPD_values[n_SPD_samples];
-extern const imp_float illumination_cyan_SPD_values[n_SPD_samples];
-extern const imp_float illumination_magenta_SPD_values[n_SPD_samples];
-extern const imp_float illumination_yellow_SPD_values[n_SPD_samples];
-
-static SampledSpectrum reflectance_white_SPD; // White reflectance SPD
-static SampledSpectrum reflectance_red_SPD; // Red reflectance SPD
-static SampledSpectrum reflectance_green_SPD; // Green reflectance SPD
-static SampledSpectrum reflectance_blue_SPD; // Blue reflectance SPD
-static SampledSpectrum reflectance_cyan_SPD; // Cyan reflectance SPD
-static SampledSpectrum reflectance_magenta_SPD; // Magenta reflectance SPD
-static SampledSpectrum reflectance_yellow_SPD; // Yellow reflectance SPD
-
-static SampledSpectrum illumination_white_SPD; // White illumination SPD
-static SampledSpectrum illumination_red_SPD; // Red illumination SPD
-static SampledSpectrum illumination_green_SPD; // Green illumination SPD
-static SampledSpectrum illumination_blue_SPD; // Blue illumination SPD
-static SampledSpectrum illumination_cyan_SPD; // Cyan illumination SPD
-static SampledSpectrum illumination_magenta_SPD; // Magenta illumination SPD
-static SampledSpectrum illumination_yellow_SPD; // Yellow illumination SPD
+extern const double illumination_white_SPD_values[n_SPD_samples];
+extern const double illumination_red_SPD_values[n_SPD_samples];
+extern const double illumination_green_SPD_values[n_SPD_samples];
+extern const double illumination_blue_SPD_values[n_SPD_samples];
+extern const double illumination_cyan_SPD_values[n_SPD_samples];
+extern const double illumination_magenta_SPD_values[n_SPD_samples];
+extern const double illumination_yellow_SPD_values[n_SPD_samples];
 
 // Indicator for whether a spectrum is a reflectance or illumination spectrum
 enum class SpectrumType {Reflectance, Illumination};
 
 // Spectrum utility functions
+
+void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3]);
+
+void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3]);
+
+static imp_float RGBToTristimulusY(const imp_float rgb[3]);
 
 static bool samplesAreSorted(const imp_float* wavelengths,
 							 unsigned int n_samples);
@@ -81,10 +71,11 @@ static bool samplesAreSorted(const imp_float* wavelengths,
 static void sortSamples(std::vector<imp_float>& wavelengths,
 						std::vector<imp_float>& values);
 	
-static imp_float averageSamples(const imp_float* wavelengths,
-							    const imp_float* values,
+template <typename T>
+static imp_float averageSamples(const T* wavelengths,
+							    const T* values,
 								unsigned int n_samples,
-								imp_float start_wavelength, imp_float end_wavelength);
+								T start_wavelength, T end_wavelength);
 	
 static imp_float interpolateSamples(const imp_float* wavelengths,
 									const imp_float* values,
@@ -92,12 +83,6 @@ static imp_float interpolateSamples(const imp_float* wavelengths,
 									imp_float wavelength);
 
 static imp_float sampleWavelength(unsigned int sample_idx);
-
-static void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3]);
-
-static void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3]);
-
-static imp_float RGBToTristimulusY(const imp_float rgb[3]);
 
 // CoefficientSpectrum declarations
 
@@ -122,8 +107,6 @@ protected:
 
 public:
 	static const unsigned int n_coefficients = n;
-	
-	CoefficientSpectrum();
 	
 	CoefficientSpectrum(imp_float initial_value);
 	
@@ -161,9 +144,9 @@ class RGBSpectrum : public CoefficientSpectrum<3> {
 
 private:
 
-	RGBSpectrum();
-
 public:
+
+	RGBSpectrum();
 
 	RGBSpectrum(imp_float initial_value);
 	
@@ -205,14 +188,14 @@ public:
 class SampledSpectrum : public CoefficientSpectrum<n_spectral_samples> {
 
 private:
-	
-	SampledSpectrum();
 
 	static void initializeSpectralMatchingCurves();
 
 	static void initializeBaseColorSPDs();
 
 public:
+	
+	SampledSpectrum();
 
 	SampledSpectrum(imp_float inital_value);
 	
@@ -250,6 +233,28 @@ public:
 	
 	static void initialize();
 };
+
+// Global SampledSpectrum objects
+
+static SampledSpectrum CIE_X; // CIE X spectral matching curve
+static SampledSpectrum CIE_Y; // CIE Y spectral matching curve
+static SampledSpectrum CIE_Z; // CIE Z spectral matching curve
+
+static SampledSpectrum reflectance_white_SPD; // White reflectance SPD
+static SampledSpectrum reflectance_red_SPD; // Red reflectance SPD
+static SampledSpectrum reflectance_green_SPD; // Green reflectance SPD
+static SampledSpectrum reflectance_blue_SPD; // Blue reflectance SPD
+static SampledSpectrum reflectance_cyan_SPD; // Cyan reflectance SPD
+static SampledSpectrum reflectance_magenta_SPD; // Magenta reflectance SPD
+static SampledSpectrum reflectance_yellow_SPD; // Yellow reflectance SPD
+
+static SampledSpectrum illumination_white_SPD; // White illumination SPD
+static SampledSpectrum illumination_red_SPD; // Red illumination SPD
+static SampledSpectrum illumination_green_SPD; // Green illumination SPD
+static SampledSpectrum illumination_blue_SPD; // Blue illumination SPD
+static SampledSpectrum illumination_cyan_SPD; // Cyan illumination SPD
+static SampledSpectrum illumination_magenta_SPD; // Magenta illumination SPD
+static SampledSpectrum illumination_yellow_SPD; // Yellow illumination SPD
 
 // Functions on CoefficientSpectrum objects
 
@@ -512,7 +517,7 @@ inline bool CoefficientSpectrum<n>::hasNaNs() const
 {
 	for (unsigned int i = 0; i < n; i++)
 	{
-		if (std::isnan(coefficients[i]))
+		if (isNaN(coefficients[i]))
 			return true;
 	}
 

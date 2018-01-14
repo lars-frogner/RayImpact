@@ -1,4 +1,5 @@
 #include "Spectrum.hpp"
+#include <utility>
 
 namespace Impact {
 namespace RayImpact {
@@ -411,8 +412,8 @@ void SampledSpectrum::initializeBaseColorSPDs()
 {
 	for (unsigned int i = 0; i < n_spectral_samples; i++)
 	{
-		imp_float sample_start_wavelength = sampleWavelength(i);
-		imp_float sample_end_wavelength = sampleWavelength(i + 1);
+		double sample_start_wavelength = sampleWavelength(i);
+		double sample_end_wavelength = sampleWavelength(i + 1);
 
 		reflectance_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_white_SPD_values, n_SPD_samples,
 															     sample_start_wavelength, sample_end_wavelength);
@@ -467,6 +468,28 @@ void SampledSpectrum::initialize()
 
 // Utility functions
 
+// Converts the given tristimulus X, Y and Z values to RGB values
+void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])
+{
+	rgb[0] = 3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
+    rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
+    rgb[2] = 0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
+}
+
+// Converts the given RGB values to tristimulus X, Y and Z values
+void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3])
+{
+	xyz[0] = 0.412453f*rgb[0] + 0.357580f*rgb[1] + 0.180423f*rgb[2];
+    xyz[1] = 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
+    xyz[2] = 0.019334f*rgb[0] + 0.119193f*rgb[1] + 0.950227f*rgb[2];
+}
+
+// Converts the given RGB values to a tristimulus Y value
+imp_float RGBToTristimulusY(const imp_float rgb[3])
+{
+    return 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
+}
+
 // Determines whether the given wavelengths are sorted in ascending order
 bool samplesAreSorted(const imp_float* wavelengths,
 					  unsigned int n_samples)
@@ -484,32 +507,44 @@ bool samplesAreSorted(const imp_float* wavelengths,
 void sortSamples(std::vector<imp_float>& wavelengths,
 				 std::vector<imp_float>& values)
 {
-	std::sort(wavelengths.begin(), wavelengths.end());
+	unsigned int n_samples = (unsigned int)wavelengths.size();
 
-	std::sort(values.begin(), values.end(),
-			 [wavelengths](int i, int j)
-			 {
-			     return (wavelengths[i] < wavelengths[j]);
-			 });
+	std::vector< std::pair<imp_float, imp_float> > combined;
+
+    combined.reserve(n_samples);
+
+    for (unsigned int i = 0; i < n_samples; i++)
+	{
+        combined.push_back(std::make_pair(wavelengths[i], values[i]));
+	}
+
+    std::sort(combined.begin(), combined.end());
+
+    for (unsigned int i = 0; i < n_samples; i++)
+	{
+        wavelengths[i] = combined[i].first;
+        values[i] = combined[i].second;
+    }
 }
 	
 // Computes the average of the sample values in the given wavelength range
-imp_float averageSamples(const imp_float* wavelengths,
-						 const imp_float* values,
+template <typename T>
+imp_float averageSamples(const T* wavelengths,
+						 const T* values,
 						 unsigned int n_samples,
-						 imp_float start_wavelength, imp_float end_wavelength)
+						 T start_wavelength, T end_wavelength)
 {
 	// Simply use endpoint values if the given wavelength range is outside the sampled range
 	if (end_wavelength <= wavelengths[0])
-		return values[0];
+		return (imp_float)(values[0]);
 	if (start_wavelength >= wavelengths[n_samples-1])
-		return values[n_samples-1];
+		return (imp_float)(values[n_samples-1]);
 
 	// Return the single sample value if there is only one
 	if (n_samples == 1)
-		return values[0];
+		return (imp_float)(values[0]);
 
-	imp_float summed_value = 0.0f;
+	T summed_value = 0.0f;
 
 	// Add endpoint contributions for wavelengths partially outside the sampled range
 	if (start_wavelength < wavelengths[0])
@@ -526,15 +561,15 @@ imp_float averageSamples(const imp_float* wavelengths,
 	// Add sample contributions from each segment inside the wavelength range
 	for (; (sample_idx < n_samples-1) && (wavelengths[sample_idx] <= end_wavelength); sample_idx++)
 	{
-		imp_float segment_start_wavelength = std::max(start_wavelength, wavelengths[sample_idx]);
-		imp_float segment_end_wavelength = std::min(end_wavelength, wavelengths[sample_idx+1]);
+		T segment_start_wavelength = std::max(start_wavelength, wavelengths[sample_idx]);
+		T segment_end_wavelength = std::min(end_wavelength, wavelengths[sample_idx+1]);
 
 		summed_value += 0.5f*(::Impact::lerp(values[sample_idx], values[sample_idx+1], (start_wavelength - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])) +
 							  ::Impact::lerp(values[sample_idx], values[sample_idx+1], (end_wavelength   - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])))*
 						(segment_end_wavelength - segment_start_wavelength);
 	}
 
-	return summed_value/(end_wavelength - start_wavelength);
+	return (imp_float)(summed_value/(end_wavelength - start_wavelength));
 }
 	
 // Interpolates the given sample values at the given wavelength
@@ -566,28 +601,6 @@ imp_float sampleWavelength(unsigned int sample_idx)
 {
 	return ::Impact::lerp(wavelength_samples_start, wavelength_samples_end,
 						  static_cast<imp_float>(sample_idx)/static_cast<imp_float>(n_spectral_samples));
-}
-
-// Converts the given tristimulus X, Y and Z values to RGB values
-void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])
-{
-	rgb[0] = 3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
-    rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
-    rgb[2] = 0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
-}
-
-// Converts the given RGB values to tristimulus X, Y and Z values
-void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3])
-{
-	xyz[0] = 0.412453f*rgb[0] + 0.357580f*rgb[1] + 0.180423f*rgb[2];
-    xyz[1] = 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
-    xyz[2] = 0.019334f*rgb[0] + 0.119193f*rgb[1] + 0.950227f*rgb[2];
-}
-
-// Converts the given RGB values to a tristimulus Y value
-imp_float RGBToTristimulusY(const imp_float rgb[3])
-{
-    return 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
 }
 
 // Initializations of the CIE mathcing curve samples
@@ -994,7 +1007,7 @@ extern const imp_float CIE_Z_values[n_CIE_samples] =
     0.0f,			 0.0f,			  0.0f
 };
 
-extern const imp_float SPD_wavelengths[n_SPD_samples] =
+extern const double SPD_wavelengths[n_SPD_samples] =
 {
     380.000000, 390.967743, 401.935486, 412.903229, 423.870972, 434.838715,
     445.806458, 456.774200, 467.741943, 478.709686, 489.677429, 500.645172,
@@ -1004,7 +1017,7 @@ extern const imp_float SPD_wavelengths[n_SPD_samples] =
     709.031738, 720.000000
 };
 
-extern const imp_float reflectance_white_SPD_values[n_SPD_samples] =
+extern const double reflectance_white_SPD_values[n_SPD_samples] =
 {
     1.0618958571272863e+00, 1.0615019980348779e+00, 1.0614335379927147e+00,
     1.0622711654692485e+00, 1.0622036218416742e+00, 1.0625059965187085e+00,
@@ -1019,7 +1032,7 @@ extern const imp_float reflectance_white_SPD_values[n_SPD_samples] =
     1.0601263046243634e+00, 1.0606565756823634e+00
 };
 
-extern const imp_float reflectance_red_SPD_values[n_SPD_samples] =
+extern const double reflectance_red_SPD_values[n_SPD_samples] =
 {
     1.6575604867086180e-01,  1.1846442802747797e-01,  1.2408293329637447e-01,
     1.1371272058349924e-01,  7.8992434518899132e-02,  3.2205603593106549e-02,
@@ -1034,7 +1047,7 @@ extern const imp_float reflectance_red_SPD_values[n_SPD_samples] =
     9.3495763980962043e-01,  9.8713907792319400e-01
 };
 
-extern const imp_float reflectance_green_SPD_values[n_SPD_samples] =
+extern const double reflectance_green_SPD_values[n_SPD_samples] =
 {
     2.6494153587602255e-03,  -5.0175013429732242e-03, -1.2547236272489583e-02,
     -9.4554964308388671e-03, -1.2526086181600525e-02, -7.9170697760437767e-03,
@@ -1049,7 +1062,7 @@ extern const imp_float reflectance_green_SPD_values[n_SPD_samples] =
     5.4301225442817177e-03,  -2.7745589759259194e-03
 };
 
-extern const imp_float reflectance_blue_SPD_values[n_SPD_samples] =
+extern const double reflectance_blue_SPD_values[n_SPD_samples] =
 {
     9.9209771469720676e-01,  9.8876426059369127e-01,  9.9539040744505636e-01,
     9.9529317353008218e-01,  9.9181447411633950e-01,  1.0002584039673432e+00,
@@ -1064,7 +1077,7 @@ extern const imp_float reflectance_blue_SPD_values[n_SPD_samples] =
     6.9596532104356399e-03,  4.1733649330980525e-03
 };
 
-extern const imp_float reflectance_cyan_SPD_values[n_SPD_samples] =
+extern const double reflectance_cyan_SPD_values[n_SPD_samples] =
 {
     1.0414628021426751e+00,  1.0328661533771188e+00,  1.0126146228964314e+00,
     1.0350460524836209e+00,  1.0078661447098567e+00,  1.0422280385081280e+00,
@@ -1079,7 +1092,7 @@ extern const imp_float reflectance_cyan_SPD_values[n_SPD_samples] =
     5.8762925143334985e-03,  2.5259399415550079e-02
 };
 
-extern const imp_float reflectance_magenta_SPD_values[n_SPD_samples] =
+extern const double reflectance_magenta_SPD_values[n_SPD_samples] =
 {
     9.9422138151236850e-01,  9.8986937122975682e-01, 9.8293658286116958e-01,
     9.9627868399859310e-01,  1.0198955019000133e+00, 1.0166395501210359e+00,
@@ -1094,7 +1107,7 @@ extern const imp_float reflectance_magenta_SPD_values[n_SPD_samples] =
     8.9150987853523145e-01,  8.4866492652845082e-01
 };
 
-extern const imp_float reflectance_yellow_SPD_values[n_SPD_samples] =
+extern const double reflectance_yellow_SPD_values[n_SPD_samples] =
 {
     5.5740622924920873e-03,  -4.7982831631446787e-03, -5.2536564298613798e-03,
     -6.4571480044499710e-03, -5.9693514658007013e-03, -2.1836716037686721e-03,
@@ -1109,7 +1122,7 @@ extern const imp_float reflectance_yellow_SPD_values[n_SPD_samples] =
     1.0435963333422726e+00,  1.0392280772051465e+00
 };
 
-extern const imp_float illumination_white_SPD_values[n_SPD_samples] =
+extern const double illumination_white_SPD_values[n_SPD_samples] =
 {
     1.1565232050369776e+00, 1.1567225000119139e+00, 1.1566203150243823e+00,
     1.1555782088080084e+00, 1.1562175509215700e+00, 1.1567674012207332e+00,
@@ -1124,7 +1137,7 @@ extern const imp_float illumination_white_SPD_values[n_SPD_samples] =
     8.8065665428441120e-01, 8.8304706460276905e-01
 };
 
-extern const imp_float illumination_red_SPD_values[n_SPD_samples] =
+extern const double illumination_red_SPD_values[n_SPD_samples] =
 {
     5.4711187157291841e-02,  5.5609066498303397e-02,  6.0755873790918236e-02,
     5.6232948615962369e-02,  4.6169940535708678e-02,  3.8012808167818095e-02,
@@ -1139,7 +1152,7 @@ extern const imp_float illumination_red_SPD_values[n_SPD_samples] =
     9.8866287772174755e-01,  9.9713856089735531e-01
 };
 
-extern const imp_float illumination_green_SPD_values[n_SPD_samples] =
+extern const double illumination_green_SPD_values[n_SPD_samples] =
 {
     2.5168388755514630e-02,  3.9427438169423720e-02,  6.2059571596425793e-03,
     7.1120859807429554e-03,  2.1760044649139429e-04,  7.3271839984290210e-12,
@@ -1154,7 +1167,7 @@ extern const imp_float illumination_green_SPD_values[n_SPD_samples] =
     4.2387394733956134e-02,  2.1252716926861620e-02
 };
 
-extern const imp_float illumination_blue_SPD_values[n_SPD_samples] =
+extern const double illumination_blue_SPD_values[n_SPD_samples] =
 {
     1.0570490759328752e+00,  1.0538466912851301e+00,  1.0550494258140670e+00,
     1.0530407754701832e+00,  1.0579930596460185e+00,  1.0578439494812371e+00,
@@ -1169,7 +1182,7 @@ extern const imp_float illumination_blue_SPD_values[n_SPD_samples] =
     1.5769743995852967e-01,  1.9069090525482305e-01
 };
 
-extern const imp_float illumination_cyan_SPD_values[n_SPD_samples] =
+extern const double illumination_cyan_SPD_values[n_SPD_samples] =
 {
     1.1334479663682135e+00,  1.1266762330194116e+00,  1.1346827504710164e+00,
     1.1357395805744794e+00,  1.1356371830149636e+00,  1.1361152989346193e+00,
@@ -1184,7 +1197,7 @@ extern const imp_float illumination_cyan_SPD_values[n_SPD_samples] =
     -4.5428914028274488e-03, -1.2541015360921132e-02
 };
 
-extern const imp_float illumination_magenta_SPD_values[n_SPD_samples] =
+extern const double illumination_magenta_SPD_values[n_SPD_samples] =
 {
     1.0371892935878366e+00,  1.0587542891035364e+00,  1.0767271213688903e+00,
     1.0762706844110288e+00,  1.0795289105258212e+00,  1.0743644742950074e+00,
@@ -1199,7 +1212,7 @@ extern const imp_float illumination_magenta_SPD_values[n_SPD_samples] =
     1.0634247770423768e+00,  1.0150875475729566e+00
 };
 
-extern const imp_float illumination_yellow_SPD_values[n_SPD_samples] =
+extern const double illumination_yellow_SPD_values[n_SPD_samples] =
 {
     2.7756958965811972e-03,  3.9673820990646612e-03,  -1.4606936788606750e-04,
     3.6198394557748065e-04,  -2.5819258699309733e-04, -5.0133191628082274e-05,
