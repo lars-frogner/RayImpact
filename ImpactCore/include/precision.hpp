@@ -23,6 +23,18 @@ static constexpr imp_float IMP_ONE_MINUS_EPS = 0.99999999999999989;
 
 constexpr imp_float IMP_FLOAT_MAHCINE_EPS = std::numeric_limits<imp_float>::epsilon()/2;
 
+inline int machineIsBigEndian()
+{
+    union
+	{
+		uint32_t i;
+		char c[4];
+
+    } bint = {0x01020304};
+
+    return bint.c[0] == 1; 
+}
+
 // Implement precision utility functions for float and double
 
 // Returns the 32/64-bit unsigned integer representing the bit pattern of the given float/double
