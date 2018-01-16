@@ -19,12 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\api.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\Disk.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OrthographicCamera.cpp" />
+    <ClCompile Include="src\ParameterSet.cpp" />
     <ClCompile Include="src\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\RandomSampler.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\Sampler.cpp" />
@@ -49,8 +52,11 @@
     <ClInclude Include="include\geometry.hpp" />
     <ClInclude Include="include\Model.hpp" />
     <ClInclude Include="include\OrthographicCamera.hpp" />
+    <ClInclude Include="include\ParameterSet.hpp" />
     <ClInclude Include="include\PerspectiveCamera.hpp" />
+    <ClInclude Include="include\RandomSampler.hpp" />
     <ClInclude Include="include\Ray.hpp" />
+    <ClInclude Include="include\api.hpp" />
     <ClInclude Include="include\Sampler.hpp" />
     <ClInclude Include="include\ScatteringEvent.hpp" />
     <ClInclude Include="include\Sensor.hpp" />

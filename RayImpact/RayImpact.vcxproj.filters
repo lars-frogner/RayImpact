@@ -16,6 +16,9 @@
     <Filter Include="Filters">
       <UniqueIdentifier>{57f4cb36-7452-42a8-a4c5-00536b81caec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="User interface">
+      <UniqueIdentifier>{39795467-769c-40d5-b233-8da7a7fde85f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ray.cpp">
@@ -24,7 +27,6 @@
     <ClCompile Include="src\Transformation.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
     <ClCompile Include="src\Sphere.cpp">
       <Filter>Shapes</Filter>
@@ -53,6 +55,16 @@
       <Filter>Samplers</Filter>
     </ClCompile>
     <ClCompile Include="src\Sensor.cpp" />
+    <ClCompile Include="src\RandomSampler.cpp">
+      <Filter>Samplers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParameterSet.cpp">
+      <Filter>User interface</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ray_impact.cpp" />
+    <ClCompile Include="src\api.cpp">
+      <Filter>User interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -110,6 +122,15 @@
     <ClInclude Include="include\Sensor.hpp" />
     <ClInclude Include="include\geometry.hpp">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RandomSampler.hpp">
+      <Filter>Samplers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParameterSet.hpp">
+      <Filter>User interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api.hpp">
+      <Filter>User interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
