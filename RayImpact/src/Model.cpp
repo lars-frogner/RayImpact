@@ -61,10 +61,10 @@ void GeometricModel::computeScatteringFunctions(SurfaceScatteringEvent* scatteri
 {
 	if (material)
 	{
-		material->computeScatteringFunctions(scattering_event,
+		/*material->computeScatteringFunctions(scattering_event,
 											 allocator,
 											 //mode,
-											 allow_multiple_lobes);
+											 allow_multiple_lobes);*/
 	}
 }
 
@@ -106,13 +106,13 @@ bool TransformedModel::hasIntersection(const Ray& ray) const
 
 const AreaLight* TransformedModel::getAreaLight() const
 {
-	printSevereMessage("Fatal error: getAreaLight method of TransformedModel was called");
+	printSevereMessage("\"getAreaLight()\" method of TransformedModel was called");
 	return nullptr;
 }
 
 const Material* TransformedModel::getMaterial() const
 {
-	printSevereMessage("Fatal error: getMaterial method of TransformedModel was called");
+	printSevereMessage("\"getMaterial()\" method of TransformedModel was called");
 	return nullptr;
 }
 
@@ -121,7 +121,7 @@ void TransformedModel::computeScatteringFunctions(SurfaceScatteringEvent* scatte
 												//TransportMode mode,
 												bool allow_multiple_lobes) const
 {
-	printSevereMessage("Fatal error: computeScatteringFunctions method of TransformedModel was called");
+	printSevereMessage("\"computeScatteringFunctions()\" method of TransformedModel was called");
 }
 
 } // RayImpact

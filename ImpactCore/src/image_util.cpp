@@ -37,7 +37,7 @@ bool writePFM(const std::string& filename,
 
 	if (!file.is_open())
 	{
-		printErrorMessage("Cannot open file \"%s\" for output", filename);
+		printErrorMessage("cannot open file \"%s\" for output", filename);
 		return false;
 	}
 	
