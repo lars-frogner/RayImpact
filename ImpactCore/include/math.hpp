@@ -46,7 +46,7 @@ inline int sign(imp_float val)
 template <typename T, typename U>
 inline T lerp(U value_1, U value_2, T weight)
 {
-    return (1.0f - weight)*value_1 + weight*value_2;
+    return (1 - weight)*value_1 + weight*value_2;
 }
 
 // Truncates the given value to keep it inside the given range
@@ -82,12 +82,12 @@ inline bool solveQuadraticEquation(imp_float a, imp_float b, imp_float c, imp_fl
 
 	double discriminant = (double)(b)*(double)(b) - 4.0*(double)(a)*(double)(c);
 
-	if (discriminant < 0.0)
+	if (discriminant < 0)
 		return false;
 
 	double sqrt_discriminant = std::sqrt(discriminant);
 
-	double q = (b < 0.0f)? -0.5*(b - sqrt_discriminant) : -0.5*(b + sqrt_discriminant);
+	double q = (b < 0)? -0.5*(b - sqrt_discriminant) : -0.5*(b + sqrt_discriminant);
 
 	*x1 = (imp_float)(q/a);
 	*x2 = (imp_float)(c/q);

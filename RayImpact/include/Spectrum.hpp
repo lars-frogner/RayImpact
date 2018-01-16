@@ -108,7 +108,7 @@ public:
 
 	bool hasNaNs() const;
 	
-	CoefficientSpectrum clamped(imp_float lower_limit = 0.0f,
+	CoefficientSpectrum clamped(imp_float lower_limit = 0,
 								imp_float upper_limit = IMP_INFINITY) const;
 };
 
@@ -277,7 +277,7 @@ inline CoefficientSpectrum<n>::CoefficientSpectrum()
 {}
 
 template <unsigned int n>
-inline CoefficientSpectrum<n>::CoefficientSpectrum(imp_float initial_value /* = 0.0f */)
+inline CoefficientSpectrum<n>::CoefficientSpectrum(imp_float initial_value /* = 0 */)
 {
 	for (unsigned int i = 0; i < n; i++)
 		coefficients[i] = initial_value;
@@ -457,7 +457,7 @@ inline bool CoefficientSpectrum<n>::isBlack() const
 {
 	for (unsigned int i = 0; i < n; i++)
 	{
-		if (coefficients[i] != 0.0f)
+		if (coefficients[i] != 0)
 			return false;
 	}
 
@@ -477,7 +477,7 @@ inline bool CoefficientSpectrum<n>::hasNaNs() const
 }
 
 template <unsigned int n>
-inline CoefficientSpectrum<n> CoefficientSpectrum<n>::clamped(imp_float lower_limit /* = 0.0f */,
+inline CoefficientSpectrum<n> CoefficientSpectrum<n>::clamped(imp_float lower_limit /* = 0 */,
 															  imp_float upper_limit /* = IMP_INFINITY */) const
 {
 	CoefficientSpectrum<n> result;

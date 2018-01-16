@@ -4,7 +4,7 @@ namespace Impact {
 
 // AtomicFloat method implementations
 
-AtomicFloat::AtomicFloat(imp_float value /* = 0.0f */)
+AtomicFloat::AtomicFloat(imp_float value /* = 0 */)
 	: bits(floatToBits(value))
 {}
 

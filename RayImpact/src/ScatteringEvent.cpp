@@ -13,7 +13,7 @@ ScatteringEvent::ScatteringEvent()
 	  outgoing_direction(),
 	  surface_normal(),
 	  medium_interface(nullptr),
-	  time(0.0f)
+	  time(0)
 {}
 
 ScatteringEvent::ScatteringEvent(const Point3F& position,
@@ -154,24 +154,24 @@ Point3F offsetRayOrigin(const Point3F& ray_origin,
 	imp_float normal_offset_distance = ray_origin_error.dot(abs(surface_normal));
 	Vector3F normal_offset = Vector3F(surface_normal)*normal_offset_distance;
 
-	if (ray_direction.dot(surface_normal) < 0.0f)
+	if (ray_direction.dot(surface_normal) < 0)
 		normal_offset.reverse();
 
 	Point3F offset_ray_origin = ray_origin + normal_offset;
 
-	if (normal_offset.x > 0.0f)
+	if (normal_offset.x > 0)
 		offset_ray_origin.x = closestHigherFloat(offset_ray_origin.x);
-	else if (normal_offset.x < 0.0f)
+	else if (normal_offset.x < 0)
 		offset_ray_origin.x = closestLowerFloat(offset_ray_origin.x);
 
-	if (normal_offset.y > 0.0f)
+	if (normal_offset.y > 0)
 		offset_ray_origin.y = closestHigherFloat(offset_ray_origin.y);
-	else if (normal_offset.y < 0.0f)
+	else if (normal_offset.y < 0)
 		offset_ray_origin.y = closestLowerFloat(offset_ray_origin.y);
 
-	if (normal_offset.z > 0.0f)
+	if (normal_offset.z > 0)
 		offset_ray_origin.z = closestHigherFloat(offset_ray_origin.z);
-	else if (normal_offset.z < 0.0f)
+	else if (normal_offset.z < 0)
 		offset_ray_origin.z = closestLowerFloat(offset_ray_origin.z);
 
 	return offset_ray_origin;

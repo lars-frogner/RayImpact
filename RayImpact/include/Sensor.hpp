@@ -26,7 +26,7 @@ private:
 	struct Pixel
 	{
 		imp_float xyz_values[3] = {0.0f, 0.0f, 0.0f}; // Tristrimulus color values for the pixel
-		imp_float sum_of_filter_weights = 0.0f; // Sum of filter weights for samples contributing to the pixel
+		imp_float sum_of_filter_weights = 0; // Sum of filter weights for samples contributing to the pixel
 		AtomicFloat xyz_sums_of_splats[3]; // Sums of the tristimulus color values accumulated by splats
 		imp_float pad; // Extra variable to ensure alignment in memory
 	};
@@ -55,7 +55,7 @@ public:
 		   std::unique_ptr<Filter> reconstruction_filter,
 		   imp_float diagonal_extent,
 		   const std::string& output_filename,
-		   imp_float final_image_scale = 1.0f);
+		   imp_float final_image_scale = 1);
 
 	BoundingRectangleI samplingBounds() const;
 
@@ -96,7 +96,7 @@ public:
 
 	void addSample(const Point2F& sample_position,
 				   const RadianceSpectrum& radiance,
-				   imp_float sample_weight = 1.0f);
+				   imp_float sample_weight = 1);
 
 	const BoundingRectangleI& pixelBounds() const;
 	
@@ -108,7 +108,7 @@ public:
 struct RawPixel
 {
 	EnergySpectrum recieved_energy = 0.0f; // Sum of weighted radiance contributions
-	imp_float sum_of_filter_weights = 0.0f; // Sum of filter weights for samples contributing to the pixel
+	imp_float sum_of_filter_weights = 0; // Sum of filter weights for samples contributing to the pixel
 };
 
 } // RayImpact

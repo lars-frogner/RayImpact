@@ -28,7 +28,7 @@ public:
 	Ray(const Point3F& origin,
 	    const Vector3F& direction,
 		imp_float max_distance = IMP_INFINITY,
-		imp_float time = 0.0f,
+		imp_float time = 0,
 		const Medium* medium = nullptr);
 
 	Point3F operator()(imp_float distance) const;
@@ -53,7 +53,7 @@ public:
 	RayWithOffsets(const Point3F& origin,
 				   const Vector3F& direction,
 				   imp_float max_distance = IMP_INFINITY,
-				   imp_float time = 0.0f,
+				   imp_float time = 0,
 				   const Medium* medium = nullptr);
 
 	RayWithOffsets(const Ray& ray);

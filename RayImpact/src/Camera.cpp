@@ -30,7 +30,7 @@ imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
 	Ray x_offset_ray;
 	imp_float x_offset_ray_weight = generateRay(x_offset_sample, &x_offset_ray);
 
-	if (x_offset_ray_weight == 0.0f)
+	if (x_offset_ray_weight == 0)
 		return 0.0f;
 
 	ray->x_offset_ray_origin = x_offset_ray.origin;
@@ -44,7 +44,7 @@ imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
 	Ray y_offset_ray;
 	imp_float y_offset_ray_weight = generateRay(y_offset_sample, &y_offset_ray);
 
-	if (y_offset_ray_weight == 0.0f)
+	if (y_offset_ray_weight == 0)
 		return 0.0f;
 
 	ray->y_offset_ray_origin = y_offset_ray.origin;
@@ -77,13 +77,13 @@ ProjectiveCamera::ProjectiveCamera(const Transformation& camera_to_world,
 {
 	screen_to_raster = Transformation::scaling((imp_float)(sensor->full_resolution.x),
 											   (imp_float)(sensor->full_resolution.y),
-											   1.0f)*
+											   1)*
 					   Transformation::scaling( 1.0f/(screen_window.upper_corner.x - screen_window.lower_corner.x),
 											   -1.0f/(screen_window.upper_corner.y - screen_window.lower_corner.y),
-											    1.0f)*
+											    1)*
 					   Transformation::translation(Vector3F(-screen_window.lower_corner.x,
 															-screen_window.upper_corner.y,
-															0.0f));
+															0));
 
 	raster_to_screen = screen_to_raster.inverted();
 

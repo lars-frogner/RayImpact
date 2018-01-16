@@ -69,7 +69,7 @@ BoundingRectangleI Sensor::samplingBounds() const
 BoundingRectangleF Sensor::physicalExtent() const
 {
 	imp_float aspect_ratio = (imp_float)full_resolution.y/(imp_float)full_resolution.x;
-	imp_float x = std::sqrt(diagonal_extent*diagonal_extent/(1.0f + aspect_ratio*aspect_ratio));
+	imp_float x = std::sqrt(diagonal_extent*diagonal_extent/(1 + aspect_ratio*aspect_ratio));
 	imp_float y = x*aspect_ratio;
 
 	return BoundingRectangleF(Point2F(-0.5f*x, -0.5f*y), Point2F(0.5f*x, 0.5f*y));
@@ -149,9 +149,9 @@ void Sensor::setPixels(const EnergySpectrum* pixel_values)
 		
 		pixel.sum_of_filter_weights = 1.0f;
 
-		pixel.xyz_sums_of_splats[0] = 0.0f;
-		pixel.xyz_sums_of_splats[1] = 0.0f;
-		pixel.xyz_sums_of_splats[2] = 0.0f;
+		pixel.xyz_sums_of_splats[0] = 0;
+		pixel.xyz_sums_of_splats[1] = 0;
+		pixel.xyz_sums_of_splats[2] = 0;
 	}
 }
 
@@ -187,13 +187,13 @@ void Sensor::writeImage(imp_float splat_scale)
 		tristimulusToRGB(sensor_pixel.xyz_values, &pixel_rgb_values[3*pixel_idx]);
 
 		// Perform normalization to account for the accumulation of multiple weighted samples
-		if (sensor_pixel.sum_of_filter_weights != 0.0f)
+		if (sensor_pixel.sum_of_filter_weights != 0)
 		{
 			imp_float norm = 1.0f/sensor_pixel.sum_of_filter_weights;
 
-			pixel_rgb_values[3*pixel_idx    ] = std::max<imp_float>(0.0f, pixel_rgb_values[3*pixel_idx    ]*norm);
-			pixel_rgb_values[3*pixel_idx + 1] = std::max<imp_float>(0.0f, pixel_rgb_values[3*pixel_idx + 1]*norm);
-			pixel_rgb_values[3*pixel_idx + 2] = std::max<imp_float>(0.0f, pixel_rgb_values[3*pixel_idx + 2]*norm);
+			pixel_rgb_values[3*pixel_idx    ] = std::max<imp_float>(0, pixel_rgb_values[3*pixel_idx    ]*norm);
+			pixel_rgb_values[3*pixel_idx + 1] = std::max<imp_float>(0, pixel_rgb_values[3*pixel_idx + 1]*norm);
+			pixel_rgb_values[3*pixel_idx + 2] = std::max<imp_float>(0, pixel_rgb_values[3*pixel_idx + 2]*norm);
 		}
 
 		// Add color contributions from splats
@@ -240,7 +240,7 @@ SensorRegion::SensorRegion(const BoundingRectangleI& pixel_bounds,
 // Finds the pixels affected by the given sample and gives them their corresponding radiance contribution
 void SensorRegion::addSample(const Point2F& sample_position,
 						     const RadianceSpectrum& radiance,
-						     imp_float sample_weight /* = 1.0f */)
+						     imp_float sample_weight /* = 1 */)
 {
 	// Convert continuous sample position to the space of discrete pixel positions by subtracting 0.5
 	const Point2F discrete_sample_position = sample_position - Vector2F(0.5f, 0.5f);

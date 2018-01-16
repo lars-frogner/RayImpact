@@ -40,12 +40,12 @@ BoundingBoxF Cylinder::objectSpaceBoundingBox() const
 	}
 	else if (phi_max >= IMP_PI_OVER_TWO)
 	{
-		return BoundingBoxF(Point3F(					0.0f, y_min, std::cos(phi_max)*radius),
+		return BoundingBoxF(Point3F(					   0, y_min, std::cos(phi_max)*radius),
 							Point3F(std::sin(phi_max)*radius, y_max,				   radius));
 	}
 	else
 	{
-		return BoundingBoxF(Point3F(					0.0f, y_min,					 0.0f),
+		return BoundingBoxF(Point3F(					   0, y_min,					    0),
 							Point3F(std::sin(phi_max)*radius, y_max, std::cos(phi_max)*radius));
 	}
 }
@@ -90,12 +90,12 @@ bool Cylinder::intersect(const Ray& ray,
 
 	// The ray misses if the intersection distances are outside the range (0, max_distance)
 	if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
-		longest_intersect_dist.lowerBound() < 0.0f)
+		longest_intersect_dist.lowerBound() < 0)
 		return false;
 	
 	ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
-	if (relevant_intersect_dist.lowerBound() <= 0.0f)
+	if (relevant_intersect_dist.lowerBound() <= 0)
 	{
 		// Try the longest intersection distance if the ray origin is inside the cylinder
 		relevant_intersect_dist = longest_intersect_dist;
@@ -118,7 +118,7 @@ bool Cylinder::intersect(const Ray& ray,
 	imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 	// Remap from [-pi, pi] to [0, 2*pi]
-	if (intersection_phi < 0.0f)
+	if (intersection_phi < 0)
 		intersection_phi += IMP_TWO_PI;
 
 	// Check whether the intersection point is outside the parameter bounds
@@ -149,7 +149,7 @@ bool Cylinder::intersect(const Ray& ray,
 
 		intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
-		if (intersection_phi < 0.0f)
+		if (intersection_phi < 0)
 			intersection_phi += IMP_TWO_PI;
 
 		if (intersection_point.y < y_min ||
@@ -169,13 +169,13 @@ bool Cylinder::intersect(const Ray& ray,
 
 	// Compute u and v derivatives of the intersection point
 
-	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0.0f, intersection_point.x*phi_max);
+	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
-	const Vector3F& position_v_deriv = Vector3F(0.0f, y_range, 0.0f);
+	const Vector3F& position_v_deriv = Vector3F(0, y_range, 0);
 
 	// Compute u and v derivatives of the surface normal
 
-	const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0.0f, intersection_point.z)*(-phi_max*phi_max);
+	const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
 	//				position_uv_deriv = (0, 0, 0)
 	//				position_v2_deriv = (0, 0, 0)
 
@@ -193,7 +193,7 @@ bool Cylinder::intersect(const Ray& ray,
 	//				normal_v_deriv = (0, 0, 0)
 
 	// Compute error for intersection point
-	const Vector3F& intersection_point_error = Vector3F(std::abs(intersection_point.x), 0.0f, std::abs(intersection_point.z))*errorPowerBound(3);
+	const Vector3F& intersection_point_error = Vector3F(std::abs(intersection_point.x), 0, std::abs(intersection_point.z))*errorPowerBound(3);
 
 	// Construct scattering event
 	*scattering_event = (*object_to_world)(SurfaceScatteringEvent(intersection_point,
@@ -203,7 +203,7 @@ bool Cylinder::intersect(const Ray& ray,
 																  position_u_deriv,
 																  position_v_deriv,
 																  normal_u_deriv,
-																  Normal3F(),
+																  Normal3F(0, 0, 0),
 																  transformed_ray.time,
 																  this));
 
@@ -251,12 +251,12 @@ bool Cylinder::hasIntersection(const Ray& ray,
 
 	// The ray misses if the intersection distances are outside the range (0, max_distance)
 	if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
-		longest_intersect_dist.lowerBound() < 0.0f)
+		longest_intersect_dist.lowerBound() < 0)
 		return false;
 	
 	ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
-	if (relevant_intersect_dist.lowerBound() <= 0.0f)
+	if (relevant_intersect_dist.lowerBound() <= 0)
 	{
 		// Try the longest intersection distance if the ray origin is inside the cylinder
 		relevant_intersect_dist = longest_intersect_dist;
@@ -283,7 +283,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
 		intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 		// Remap from [-pi, pi] to [0, 2*pi]
-		if (intersection_phi < 0.0f)
+		if (intersection_phi < 0)
 			intersection_phi += IMP_TWO_PI;
 	}
 	else
@@ -323,7 +323,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
 			intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 			// Remap from [-pi, pi] to [0, 2*pi]
-			if (intersection_phi < 0.0f)
+			if (intersection_phi < 0)
 				intersection_phi += IMP_TWO_PI;
 		}
 		else

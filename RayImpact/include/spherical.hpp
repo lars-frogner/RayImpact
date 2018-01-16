@@ -41,12 +41,12 @@ inline imp_float sphericalTheta(const Vector3F& direction)
 // Returns the spherical phi-coordinate of the given direction vector
 inline imp_float sphericalPhi(const Vector3F& direction)
 {
-	if (direction.x == 0.0f && direction.y == 0.0f)
+	if (direction.x == 0 && direction.y == 0)
 		return 0.0f;
 
 	imp_float phi = std::atan2(direction.y, direction.x);
 
-	return (phi < 0.0f)? (phi + IMP_TWO_PI) : phi;
+	return (phi < 0)? (phi + IMP_TWO_PI) : phi;
 }
 
 } // RayImpact

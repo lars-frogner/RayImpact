@@ -9,14 +9,14 @@ Ray::Ray()
 	: origin(),
 	  direction(),
 	  max_distance(IMP_INFINITY),
-	  time(0.0f),
+	  time(0),
 	  medium(nullptr)
 {}
 
 Ray::Ray(const Point3F& origin,
 	     const Vector3F& direction,
 		 imp_float max_distance /* = IMP_INFINITY */,
-		 imp_float time /* = 0.0f */,
+		 imp_float time /* = 0 */,
 		 const Medium* medium /* = nullptr */)
 	: origin(origin),
 	  direction(direction),
@@ -40,7 +40,7 @@ RayWithOffsets::RayWithOffsets()
 RayWithOffsets::RayWithOffsets(const Point3F& origin,
 							   const Vector3F& direction,
 							   imp_float max_distance /* = IMP_INFINITY */,
-							   imp_float time /* = 0.0f */,
+							   imp_float time /* = 0 */,
 							   const Medium* medium /* = nullptr */)
 	: Ray::Ray(origin, direction, max_distance, time, medium),
 	  has_offsets(false)

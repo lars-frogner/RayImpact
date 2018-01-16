@@ -35,10 +35,10 @@ bool Matrix4x4::operator!=(const Matrix4x4& other) const
 
 bool Matrix4x4::isIdentity() const
 {
-	return a11 == 1.0f && a12 == 0.0f && a13 == 0.0f && a14 == 0.0f &&
-		   a21 == 0.0f && a22 == 1.0f && a23 == 0.0f && a24 == 0.0f &&
-		   a31 == 0.0f && a32 == 0.0f && a33 == 1.0f && a34 == 0.0f &&
-		   a41 == 0.0f && a42 == 0.0f && a43 == 0.0f && a44 == 1.0f;
+	return a11 == 1 && a12 == 0 && a13 == 0 && a14 == 0 &&
+		   a21 == 0 && a22 == 1 && a23 == 0 && a24 == 0 &&
+		   a31 == 0 && a32 == 0 && a33 == 1 && a34 == 0 &&
+		   a41 == 0 && a42 == 0 && a43 == 0 && a44 == 1;
 }
 
 Matrix4x4 Matrix4x4::operator*(const Matrix4x4& other) const

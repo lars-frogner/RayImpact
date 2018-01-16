@@ -284,12 +284,12 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
 {
 	imp_float min_dist_temp, max_dist_temp;
 
-	imp_float min_dist = 0.0f;
+	imp_float min_dist = 0;
 	imp_float max_dist = ray.max_distance;
 
 	imp_float inverse_ray_direction_x = 1.0f/ray.direction.x;
 
-    if (inverse_ray_direction_x >= 0.0f)
+    if (inverse_ray_direction_x >= 0)
     {
         min_dist_temp = (lower_corner.x - ray.origin.x)*inverse_ray_direction_x;
         max_dist_temp = (upper_corner.x - ray.origin.x)*inverse_ray_direction_x;
@@ -313,7 +313,7 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
 
 	imp_float inverse_ray_direction_y = 1.0f/ray.direction.y;
 
-    if (inverse_ray_direction_y >= 0.0f)
+    if (inverse_ray_direction_y >= 0)
     {
         min_dist_temp = (lower_corner.y - ray.origin.y)*inverse_ray_direction_y;
         max_dist_temp = (upper_corner.y - ray.origin.y)*inverse_ray_direction_y;

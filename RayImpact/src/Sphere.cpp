@@ -42,12 +42,12 @@ BoundingBoxF Sphere::objectSpaceBoundingBox() const
 	}
 	else if (phi_max >= IMP_PI_OVER_TWO)
 	{
-		return BoundingBoxF(Point3F(					0.0f, y_min, std::cos(phi_max)*radius),
+		return BoundingBoxF(Point3F(					   0, y_min, std::cos(phi_max)*radius),
 							Point3F(std::sin(phi_max)*radius, y_max,				   radius));
 	}
 	else
 	{
-		return BoundingBoxF(Point3F(					0.0f, y_min,					 0.0f),
+		return BoundingBoxF(Point3F(					   0, y_min,					    0),
 							Point3F(std::sin(phi_max)*radius, y_max, std::cos(phi_max)*radius));
 	}
 }
@@ -92,12 +92,12 @@ bool Sphere::intersect(const Ray& ray,
 
 	// The ray misses if the intersection distances are outside the range (0, max_distance)
 	if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
-		longest_intersect_dist.lowerBound() < 0.0f)
+		longest_intersect_dist.lowerBound() < 0)
 		return false;
 	
 	ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
-	if (relevant_intersect_dist.lowerBound() <= 0.0f)
+	if (relevant_intersect_dist.lowerBound() <= 0)
 	{
 		// Try the longest intersection distance if the ray origin is inside the sphere
 		relevant_intersect_dist = longest_intersect_dist;
@@ -115,14 +115,14 @@ bool Sphere::intersect(const Ray& ray,
 	intersection_point = intersection_point*(radius/distanceBetween(intersection_point, Point3F(0, 0, 0)));
 
 	// Tweak z-coordinate if required to avoid error in atan2
-	if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+	if (intersection_point.x == 0 && intersection_point.z == 0)
 		intersection_point.z = 1e-5f*radius;
 
 	// Compute azimuthal angle of intersection point
 	imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 	// Remap from [-pi, pi] to [0, 2*pi]
-	if (intersection_phi < 0.0f)
+	if (intersection_phi < 0)
 		intersection_phi += IMP_TWO_PI;
 
 	// Check whether the intersection point is outside the parameter bounds
@@ -149,12 +149,12 @@ bool Sphere::intersect(const Ray& ray,
 
 		intersection_point = intersection_point*(radius/distanceBetween(intersection_point, Point3F(0, 0, 0)));
 
-		if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+		if (intersection_point.x == 0 && intersection_point.z == 0)
 			intersection_point.z = 1e-5f*radius;
 
 		intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
-		if (intersection_phi < 0.0f)
+		if (intersection_phi < 0)
 			intersection_phi += IMP_TWO_PI;
 
 		if ((y_min > -radius && intersection_point.y < y_min) ||
@@ -179,14 +179,14 @@ bool Sphere::intersect(const Ray& ray,
 	imp_float cos_phi = intersection_point.z*inverse_zx_radius;
 	imp_float sin_phi = intersection_point.x*inverse_zx_radius;
 
-	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0.0f, intersection_point.x*phi_max);
+	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
 	const Vector3F& position_v_deriv = Vector3F(intersection_point.y*cos_phi, -radius*std::sin(intersection_theta), intersection_point.y*sin_phi)*theta_range;
 
 	// Compute u and v derivatives of the surface normal
 
-	const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0.0f, intersection_point.z)*(-phi_max*phi_max);
-	const Vector3F& position_uv_deriv = Vector3F(-sin_phi, 0.0f, cos_phi)*(theta_range*phi_max*intersection_point.y);
+	const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
+	const Vector3F& position_uv_deriv = Vector3F(-sin_phi, 0, cos_phi)*(theta_range*phi_max*intersection_point.y);
 	const Vector3F& position_v2_deriv = Vector3F(intersection_point.x, intersection_point.y, intersection_point.z)*(-theta_range*theta_range);
 
 	Normal3F normal_u_deriv, normal_v_deriv;
@@ -258,12 +258,12 @@ bool Sphere::hasIntersection(const Ray& ray,
 
 	// The ray misses if the intersection distances are outside the range (0, max_distance)
 	if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
-		longest_intersect_dist.lowerBound() < 0.0f)
+		longest_intersect_dist.lowerBound() < 0)
 		return false;
 	
 	ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
-	if (relevant_intersect_dist.lowerBound() <= 0.0f)
+	if (relevant_intersect_dist.lowerBound() <= 0)
 	{
 		// Try the longest intersection distance if the ray origin is inside the sphere
 		relevant_intersect_dist = longest_intersect_dist;
@@ -285,14 +285,14 @@ bool Sphere::hasIntersection(const Ray& ray,
 	if (phi_max < IMP_TWO_PI)
 	{
 		// Tweak z-coordinate if required to avoid error in atan2
-		if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+		if (intersection_point.x == 0 && intersection_point.z == 0)
 			intersection_point.z = 1e-5f*radius;
 
 		// Compute azimuthal angle of intersection point
 		intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 		// Remap from [-pi, pi] to [0, 2*pi]
-		if (intersection_phi < 0.0f)
+		if (intersection_phi < 0)
 			intersection_phi += IMP_TWO_PI;
 	}
 	else
@@ -327,14 +327,14 @@ bool Sphere::hasIntersection(const Ray& ray,
 		if (phi_max < IMP_TWO_PI)
 		{
 			// Tweak z-coordinate if required to avoid error in atan2
-			if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+			if (intersection_point.x == 0 && intersection_point.z == 0)
 				intersection_point.z = 1e-5f*radius;
 
 			// Compute azimuthal angle of intersection point
 			intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 			// Remap from [-pi, pi] to [0, 2*pi]
-			if (intersection_phi < 0.0f)
+			if (intersection_phi < 0)
 				intersection_phi += IMP_TWO_PI;
 		}
 		else

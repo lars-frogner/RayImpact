@@ -51,10 +51,10 @@ Transformation Transformation::scaling(imp_float scale_x,
 						   0,		0, scale_z, 0,
 						   0,		0,		 0, 1);
 	
-	Matrix4x4 matrix_inverse(1.0f/scale_x,			  0,		    0, 0,
-										0, 1.0f/scale_y,		    0, 0,
-										0,			  0, 1.0f/scale_z, 0,
-										0,			  0,		    0, 1);
+	Matrix4x4 matrix_inverse(1.0f/scale_x,		      0,		    0, 0,
+									    0, 1.0f/scale_y,		    0, 0,
+									    0,		      0, 1.0f/scale_z, 0,
+									    0,		      0,		    0, 1);
 
 	return Transformation(matrix, matrix_inverse);
 }
@@ -163,8 +163,8 @@ Transformation Transformation::worldToCamera(const Point3F& camera_position,
 Transformation Transformation::orthographic(imp_float near_plane_distance,
 											imp_float far_plane_distance)
 {
-	return scaling(1.0f, 1.0f, 1.0f/(far_plane_distance - near_plane_distance))*
-		   translation(Vector3F(0.0f, 0.0f, -near_plane_distance));
+	return scaling(1, 1, 1.0f/(far_plane_distance - near_plane_distance))*
+		   translation(Vector3F(0, 0, -near_plane_distance));
 }
 
 // Computes the perspective projection matrix for the given field of view and near and far plane distance
@@ -175,16 +175,16 @@ Transformation Transformation::perspective(imp_float field_of_view,
 	imp_float z_scale = far_plane_distance/(far_plane_distance - near_plane_distance);
 	imp_float z_shift = near_plane_distance*z_scale;
 
-	Matrix4x4 projection(1.0f, 0.0f,    0.0f,    0.0f,
-						 0.0f, 1.0f,    0.0f,    0.0f,
-						 0.0f, 0.0f, z_scale, z_shift,
-						 0.0f, 0.0f,   -1.0f,    0.0f);
+	Matrix4x4 projection(1, 0,       0,       0,
+						 0, 1,       0,       0,
+						 0, 0, z_scale, z_shift,
+						 0, 0,      -1,       0);
 
 	// tan(FOV/2) is half the extent of the FOV at the far plane distance (z = -1) in screen space.
 	// Scaling by the inverse of this maps the projected x- and y-values inside the FOV to the range [-1, 1].
 	imp_float xy_scale = 1.0f/std::tan(degreesToRadians(field_of_view)*0.5f);
 
-	return scaling(xy_scale, xy_scale, 1.0f)*Transformation(projection);
+	return scaling(xy_scale, xy_scale, 1)*Transformation(projection);
 }
 
 bool Transformation::operator==(const Transformation& other) const
@@ -215,13 +215,13 @@ Point3F Transformation::operator()(const Point3F& point) const
 	imp_float z = matrix.a31*point.x + matrix.a32*point.y + matrix.a33*point.z + matrix.a34;
 	imp_float w = matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44;
 
-	return (w == 1.0f)? Point3F(x, y, z) : Point3F(x, y, z)*(1.0f/w);
+	return (w == 1)? Point3F(x, y, z) : Point3F(x, y, z)*(1.0f/w);
 }
 
 Point3F Transformation::operator()(const Point3F& point, Vector3F* transformed_point_error) const
 {
 	// The error is incorrect if w != 1, i.e. for projective transformations
-	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1);
 
 	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
 										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
@@ -236,7 +236,7 @@ Point3F Transformation::operator()(const Point3F& point, Vector3F* transformed_p
 Point3F Transformation::operator()(const Point3F& point, const Vector3F& point_error, Vector3F* transformed_point_error) const
 {
 	// The error is incorrect if w != 1, i.e. for projective transformations
-	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1.0f);
+	imp_assert(matrix.a41*point.x + matrix.a42*point.y + matrix.a43*point.z + matrix.a44 == 1);
 
 	*transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
 										std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
@@ -309,7 +309,7 @@ Ray Transformation::operator()(const Ray& ray) const
 	imp_float direction_length_squared = direction.squaredLength();
 	imp_float max_distance = ray.max_distance;
 
-	if (direction_length_squared > 0.0f)
+	if (direction_length_squared > 0)
 	{
 		imp_float offset_distance = origin_error.dot(abs(direction))/direction_length_squared;
 
@@ -333,7 +333,7 @@ Ray Transformation::operator()(const Ray& ray, Vector3F* transformed_origin_erro
 	imp_float direction_length_squared = direction.squaredLength();
 	imp_float max_distance = ray.max_distance;
 
-	if (direction_length_squared > 0.0f)
+	if (direction_length_squared > 0)
 	{
 		imp_float offset_distance = transformed_origin_error->dot(abs(direction))/direction_length_squared;
 

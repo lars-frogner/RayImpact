@@ -14,7 +14,7 @@ OrthographicCamera::OrthographicCamera(const Transformation& camera_to_world,
 									   Sensor* sensor,
 									   const Medium* medium)
 	: ProjectiveCamera::ProjectiveCamera(camera_to_world, 
-										 Transformation::orthographic(0.0f, 1.0f),
+										 Transformation::orthographic(0, 1),
 										 screen_window,
 										 shutter_opening_time,
 										 shutter_closing_time,
@@ -23,22 +23,22 @@ OrthographicCamera::OrthographicCamera(const Transformation& camera_to_world,
 										 sensor,
 										 medium)
 {
-	horizontal_pixel_offset = raster_to_camera(Vector3F(1.0f, 0.0f, 0.0f));
-	vertical_pixel_offset = raster_to_camera(Vector3F(0.0f, 1.0f, 0.0f));
+	horizontal_pixel_offset = raster_to_camera(Vector3F(1, 0, 0));
+	vertical_pixel_offset = raster_to_camera(Vector3F(0, 1, 0));
 }
 
 imp_float OrthographicCamera::generateRay(const CameraSample& sample,
 										  Ray* ray) const
 {
-	Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0.0f);
+	Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0);
 	
 	// Find sensor point in camera space
 	const Point3F& sensor_point = raster_to_camera(sensor_point_in_raster_space);
 
 	// Ray starts at the sensor sample point and points in the negative z-direction in camera space
-	*ray = Ray(sensor_point, Vector3F(0.0f, 0.0f, -1.0f));
+	*ray = Ray(sensor_point, Vector3F(0, 0, -1));
 
-	if (lens_radius > 0.0f)
+	if (lens_radius > 0)
 	{
 		// Map [0, 1) square sample to sample on the circular lens
 		const Point2F& lens_point = lens_radius*unitSquareToUnitDisk(sample.lens_point);
@@ -48,7 +48,7 @@ imp_float OrthographicCamera::generateRay(const CameraSample& sample,
 		const Point3F& intersection_point_with_plane_of_focus = (*ray)(intersection_distance_with_plane_of_focus);
 
 		// Update ray to account for lens
-		ray->origin = Point3F(lens_point.x, lens_point.y, 0.0f);
+		ray->origin = Point3F(lens_point.x, lens_point.y, 0);
 		ray->direction = (intersection_point_with_plane_of_focus - ray->origin).normalized();
 	}
 
@@ -64,15 +64,15 @@ imp_float OrthographicCamera::generateRay(const CameraSample& sample,
 imp_float OrthographicCamera::generateRayWithOffsets(const CameraSample& sample,
 													 RayWithOffsets* ray) const
 {
-	Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0.0f);
+	Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0);
 	
 	// Find sensor point in camera space
 	const Point3F& sensor_point = raster_to_camera(sensor_point_in_raster_space);
 
 	// Ray starts at the sensor sample point and points in the negative z-direction in camera space
-	*ray = RayWithOffsets(sensor_point, Vector3F(0.0f, 0.0f, -1.0f));
+	*ray = RayWithOffsets(sensor_point, Vector3F(0, 0, -1));
 
-	if (lens_radius > 0.0f)
+	if (lens_radius > 0)
 	{
 		// Map [0, 1) square sample to sample on the circular lens
 		const Point2F& lens_point = lens_radius*unitSquareToUnitDisk(sample.lens_point);
@@ -82,20 +82,20 @@ imp_float OrthographicCamera::generateRayWithOffsets(const CameraSample& sample,
 		Point3F intersection_point_with_plane_of_focus = (*ray)(intersection_distance_with_plane_of_focus);
 
 		// Update ray to account for lens
-		ray->origin = Point3F(lens_point.x, lens_point.y, 0.0f);
+		ray->origin = Point3F(lens_point.x, lens_point.y, 0);
 		ray->direction = (intersection_point_with_plane_of_focus - ray->origin).normalized();
 		
 		// Compute new intersection distance with the new ray
 		intersection_distance_with_plane_of_focus = focal_distance/ray->direction.z;
 
 		// Compute new intersection point for the x-offset ray
-		intersection_point_with_plane_of_focus = sensor_point + horizontal_pixel_offset + Vector3F(0.0f, 0.0f, -intersection_distance_with_plane_of_focus);
+		intersection_point_with_plane_of_focus = sensor_point + horizontal_pixel_offset + Vector3F(0, 0, -intersection_distance_with_plane_of_focus);
 		
 		ray->x_offset_ray_origin = ray->origin;
 		ray->x_offset_ray_direction = (intersection_point_with_plane_of_focus - ray->x_offset_ray_origin).normalized();
 	
 		// Compute new intersection point for the y-offset ray
-		intersection_point_with_plane_of_focus = sensor_point + vertical_pixel_offset + Vector3F(0.0f, 0.0f, -intersection_distance_with_plane_of_focus);
+		intersection_point_with_plane_of_focus = sensor_point + vertical_pixel_offset + Vector3F(0, 0, -intersection_distance_with_plane_of_focus);
 		
 		ray->y_offset_ray_origin = ray->origin;
 		ray->y_offset_ray_direction = (intersection_point_with_plane_of_focus - ray->y_offset_ray_origin).normalized();

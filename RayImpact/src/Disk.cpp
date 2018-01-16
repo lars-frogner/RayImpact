@@ -39,12 +39,12 @@ BoundingBoxF Disk::objectSpaceBoundingBox() const
 	}
 	else if (phi_max >= IMP_PI_OVER_TWO)
 	{
-		return BoundingBoxF(Point3F(					0.0f, y, std::cos(phi_max)*radius),
+		return BoundingBoxF(Point3F(					   0, y, std::cos(phi_max)*radius),
 							Point3F(std::sin(phi_max)*radius, y,				   radius));
 	}
 	else
 	{
-		return BoundingBoxF(Point3F(					0.0f, y,					 0.0f),
+		return BoundingBoxF(Point3F(					   0, y,					    0),
 							Point3F(std::sin(phi_max)*radius, y, std::cos(phi_max)*radius));
 	}
 }
@@ -62,7 +62,7 @@ bool Disk::intersect(const Ray& ray,
 	const Ray& transformed_ray = (*world_to_object)(ray, &transformed_ray_origin_error, &transformed_ray_direction_error);
 
 	// The ray misses if it points exactly along the disk plane
-	if (transformed_ray.direction.y == 0.0f)
+	if (transformed_ray.direction.y == 0)
 		return false;
 	
 	// Compute distance to intersection with disk plane
@@ -70,7 +70,7 @@ bool Disk::intersect(const Ray& ray,
 
 	// The ray misses if the intersection distance is outside the range (0, max_distance)
 	if (plane_intersection_distance > transformed_ray.max_distance ||
-		plane_intersection_distance < 0.0f)
+		plane_intersection_distance < 0)
 		return false;
 
 	// Compute intersection point
@@ -84,14 +84,14 @@ bool Disk::intersect(const Ray& ray,
 		return false;
 
 	// Tweak z-coordinate if required to avoid error in atan2
-	if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+	if (intersection_point.x == 0 && intersection_point.z == 0)
 		intersection_point.z = 1e-5f*radius;
 
 	// Compute azimuthal angle of intersection point
 	imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 	// Remap from [-pi, pi] to [0, 2*pi]
-	if (intersection_phi < 0.0f)
+	if (intersection_phi < 0)
 		intersection_phi += IMP_TWO_PI;
 	
 	if (intersection_phi > phi_max)
@@ -103,13 +103,13 @@ bool Disk::intersect(const Ray& ray,
 	imp_float radius_range = radius - inner_radius;
 
 	imp_float u = intersection_phi/phi_max;
-	imp_float v = 1.0f - (intersection_radius - inner_radius)/radius_range;
+	imp_float v = 1 - (intersection_radius - inner_radius)/radius_range;
 
 	// Compute u and v derivatives of the intersection point
 
-	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0.0f, intersection_point.x*phi_max);
+	const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
-	const Vector3F& position_v_deriv = Vector3F(intersection_point.x, 0.0f, intersection_point.z)*(-radius_range/intersection_radius);
+	const Vector3F& position_v_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-radius_range/intersection_radius);
 
 	// normal_u_deriv = (0, 0, 0)
 	// normal_v_deriv = (0, 0, 0)
@@ -121,13 +121,13 @@ bool Disk::intersect(const Ray& ray,
 
 	// Construct scattering event
 	*scattering_event = (*object_to_world)(SurfaceScatteringEvent(intersection_point,
-																  Vector3F(),
+																  Vector3F(0, 0, 0),
 																  Point2F(u, v),
 																  -transformed_ray.direction,
 																  position_u_deriv,
 																  position_v_deriv,
-																  Normal3F(),
-																  Normal3F(),
+																  Normal3F(0, 0, 0),
+																  Normal3F(0, 0, 0),
 																  transformed_ray.time,
 																  this));
 
@@ -148,7 +148,7 @@ bool Disk::hasIntersection(const Ray& ray,
 	const Ray& transformed_ray = (*world_to_object)(ray, &transformed_ray_origin_error, &transformed_ray_direction_error);
 
 	// The ray misses if it points exactly along the disk plane
-	if (transformed_ray.direction.y == 0.0f)
+	if (transformed_ray.direction.y == 0)
 		return false;
 	
 	// Compute distance to intersection with disk plane
@@ -156,7 +156,7 @@ bool Disk::hasIntersection(const Ray& ray,
 
 	// The ray misses if the intersection distance is outside the range (0, max_distance)
 	if (plane_intersection_distance > transformed_ray.max_distance ||
-		plane_intersection_distance < 0.0f)
+		plane_intersection_distance < 0)
 		return false;
 
 	// Compute intersection point
@@ -172,14 +172,14 @@ bool Disk::hasIntersection(const Ray& ray,
 	if (phi_max < IMP_TWO_PI)
 	{
 		// Tweak z-coordinate if required to avoid error in atan2
-		if (intersection_point.x == 0.0f && intersection_point.z == 0.0f)
+		if (intersection_point.x == 0 && intersection_point.z == 0)
 			intersection_point.z = 1e-5f*radius;
 
 		// Compute azimuthal angle of intersection point
 		imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
 	
 		// Remap from [-pi, pi] to [0, 2*pi]
-		if (intersection_phi < 0.0f)
+		if (intersection_phi < 0)
 			intersection_phi += IMP_TWO_PI;
 	
 		if (intersection_phi > phi_max)

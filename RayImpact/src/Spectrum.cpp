@@ -398,7 +398,7 @@ void SampledSpectrum::computeRGBValues(imp_float rgb[3]) const
 // Computes the tristimulus values X, Y and Z for the spectrum
 void SampledSpectrum::computeTristimulusValues(imp_float xyz[3]) const
 {
-	xyz[0] = 0.0f; xyz[1] = 0.0f; xyz[2] = 0.0f;
+	xyz[0] = 0; xyz[1] = 0; xyz[2] = 0;
 
 	for (unsigned int i = 0; i < n_spectral_samples; i++)
 	{
@@ -417,7 +417,7 @@ void SampledSpectrum::computeTristimulusValues(imp_float xyz[3]) const
 // Returns the tristimulus value Y for the spectrum
 imp_float SampledSpectrum::tristimulusY() const
 {
-	imp_float Y = 0.0f;
+	imp_float Y = 0;
 
 	for (unsigned int i = 0; i < n_spectral_samples; i++)
 	{
@@ -593,7 +593,7 @@ imp_float averageSamples(const T* wavelengths,
 	if (n_samples == 1)
 		return (imp_float)(values[0]);
 
-	T summed_value = 0.0f;
+	T summed_value = 0;
 
 	// Add endpoint contributions for wavelengths partially outside the sampled range
 	if (start_wavelength < wavelengths[0])

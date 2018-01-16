@@ -14,7 +14,7 @@ private:
 
 public:
 
-	explicit AtomicFloat(imp_float value = 0.0f);
+	explicit AtomicFloat(imp_float value = 0);
 
 	operator imp_float() const;
 
