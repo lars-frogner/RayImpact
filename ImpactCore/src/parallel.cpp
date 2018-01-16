@@ -13,7 +13,8 @@ class ParallelForLoop;
 // Static global variables
 
 static std::vector<std::thread> threads; // Pool of persistent threads
-static unsigned int n_threads_total; // Total number of threads running after the initialization function is called
+unsigned int IMP_N_THREADS; // The number of threads used for parallelization
+thread_local unsigned int IMP_THREAD_ID; // Unique thread identifier
 
 static bool terminate_threads = false; // Whether the persistent threads should be terminated
 
@@ -83,7 +84,7 @@ bool ParallelForLoop::isFinished() const
 static void threadExecutionFunction(unsigned int id)
 {
 	// Update globally visible thread id 
-	thread_id = id;
+	IMP_THREAD_ID = id;
 
 	// Initialize a lock object associated with the loops mutex
 	std::unique_lock<std::mutex> lock(pending_loops_mutex);
@@ -148,17 +149,17 @@ static void threadExecutionFunction(unsigned int id)
 }
 
 // Forks threads for parallel execution and performs required initializations
-void initParallel()
+void initializeParallel(unsigned int n_threads)
 {
 	imp_check(threads.empty());
 
 	// Find total number of threads to use
-	n_threads_total = std::max(1u, std::thread::hardware_concurrency());
+	IMP_N_THREADS = (n_threads == 0)? std::max(1u, std::thread::hardware_concurrency()) : n_threads;
 
-	thread_id = 0; // Give main thread an id of 0
+	IMP_THREAD_ID = 0; // Give main thread an id of 0
 
 	// Create worker threads
-	for (unsigned int id = 1; id < n_threads_total; id++)
+	for (unsigned int id = 1; id < IMP_N_THREADS; id++)
 	{
 		threads.push_back(std::thread(threadExecutionFunction, id));
 	}
@@ -190,6 +191,8 @@ void cleanupParallel()
 
 	// Reset to initial state
 	terminate_threads = false;
+
+	IMP_N_THREADS = 1;
 }
 
 // Executes the given loop body function (taking the loop index as agument) in parallel
@@ -198,7 +201,7 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 				 uint64_t n_iterations,
 				 unsigned int chunk_size /* = 1 */)
 {
-	imp_check(!threads.empty() || n_threads_total == 1);
+	imp_check(!threads.empty() || IMP_N_THREADS == 1);
 
 	// Perform iterations in serial if there are just a few of them (or only one thread)
 	if (threads.empty() || n_iterations < chunk_size)
@@ -277,7 +280,7 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 void parallelFor2D(const std::function<void (uint64_t, uint64_t)>& loop_body,
 				   uint64_t n_iterations_inner, uint64_t n_iterations_outer)
 {
-	imp_check(!threads.empty() || n_threads_total == 1);
+	imp_check(!threads.empty() || IMP_N_THREADS == 1);
 
 	// Perform iterations in serial if there is just one of them (or only one thread)
 	if (threads.empty() || n_iterations_inner*n_iterations_outer <= 1)
