@@ -102,6 +102,14 @@ PixelSampler::PixelSampler(unsigned int n_samples_per_pixel,
 	}
 }
 
+void PixelSampler::setPixel(const Point2I& pixel)
+{
+	Sampler::setPixel(pixel);
+
+	current_1D_component = 0;
+	current_2D_component = 0;
+}
+
 bool PixelSampler::beginNextSample()
 {
 	current_1D_component = 0;
@@ -155,12 +163,12 @@ void GlobalSampler::setPixel(const Point2I& pixel)
 	next_sample_dimension = 0;
 	current_global_sample_idx = pixelToGlobalSampleIndex(0);
 
-	array_end_dimension = array_start_dimension + sample_component_arrays_1D.size() +
-												2*sample_component_arrays_2D.size();
+	array_end_dimension = array_start_dimension + (unsigned int)sample_component_arrays_1D.size() +
+												2*(unsigned int)sample_component_arrays_2D.size();
 
 	// Fill 1D sample component arrays
 
-	for (size_t array_dimension = 0; array_dimension < sample_component_arrays_1D.size(); array_dimension++)
+	for (unsigned int array_dimension = 0; array_dimension < (unsigned int)sample_component_arrays_1D.size(); array_dimension++)
 	{
 		size_t n_pixel_samples = sizes_of_1D_component_arrays[array_dimension]*n_samples_per_pixel;
 
@@ -175,9 +183,9 @@ void GlobalSampler::setPixel(const Point2I& pixel)
 
 	// Fill 2D sample component arrays
 
-	size_t dimension = array_start_dimension + sample_component_arrays_1D.size();
+	unsigned int dimension = array_start_dimension + (unsigned int)sample_component_arrays_1D.size();
 
-	for (size_t array_dimension = 0; array_dimension < sample_component_arrays_2D.size(); array_dimension++)
+	for (unsigned int array_dimension = 0; array_dimension < (unsigned int)sample_component_arrays_2D.size(); array_dimension++)
 	{
 		size_t n_pixel_samples = sizes_of_2D_component_arrays[array_dimension]*n_samples_per_pixel;
 

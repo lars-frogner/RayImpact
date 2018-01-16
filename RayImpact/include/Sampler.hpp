@@ -79,6 +79,8 @@ public:
 	PixelSampler(unsigned int n_samples_per_pixel,
 				 unsigned int n_sampled_dimensions);
 
+	void setPixel(const Point2I& pixel);
+
 	bool beginNextSample();
 
 	bool beginSampleIndex(size_t pixel_sample_idx);
@@ -130,7 +132,7 @@ inline void shuffleArray(T* elements,
 	for (size_t element = 0; element < n_elements; element++)
 	{
 		// Choose random element higher up in the list
-		size_t element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
+		size_t element_to_swap_with = element + rng.uniformUInt32((uint32_t)(n_elements - element));
 	
 		// Swap the elements
 		std::swap(elements[element], elements[element_to_swap_with]);
