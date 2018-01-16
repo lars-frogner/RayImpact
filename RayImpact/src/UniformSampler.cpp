@@ -5,55 +5,89 @@ namespace Impact {
 namespace RayImpact {
 
 // UniformSampler method implementations
-
-UniformSampler::UniformSampler(unsigned int n_samples_per_pixel,
+	
+UniformSampler::UniformSampler(unsigned int n_horizontal_samples_per_pixel,
+							   unsigned int n_vertical_samples_per_pixel,
 							   unsigned int n_sampled_dimensions)
-	: PixelSampler::PixelSampler(n_samples_per_pixel, n_sampled_dimensions)
+	: PixelSampler::PixelSampler(n_horizontal_samples_per_pixel*n_vertical_samples_per_pixel, n_sampled_dimensions),
+	  n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
+	  n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
 {}
 	
 void UniformSampler::setPixel(const Point2I& pixel)
 {
+	PixelSampler::setPixel(pixel);
+
+	imp_float sample_separation = 1.0f/n_samples_per_pixel;
+	imp_float sample_separation_x = 1.0f/n_horizontal_samples_per_pixel;
+	imp_float sample_separation_y = 1.0f/n_vertical_samples_per_pixel;
+
 	// Generate 1D sample components
-	for (size_t i = 0; i < sample_components_1D.size(); i++) {
-		for (size_t j = 0; j < n_samples_per_pixel; j++)
+	for (size_t k = 0; k < sample_components_1D.size(); k++)
+	{
+		for (size_t i = 0; i < n_samples_per_pixel; i++)
 		{
-			sample_components_1D[i][j] = rng.uniformFloat();
+			sample_components_1D[k][i] = (i + 0.5f)*sample_separation;
 		}
 	}
 	
 	// Generate 2D sample components
-	for (size_t i = 0; i < sample_components_2D.size(); i++) {
-		for (size_t j = 0; j < n_samples_per_pixel; j++)
-		{
-			sample_components_2D[i][j].x = rng.uniformFloat();
-			sample_components_2D[i][j].y = rng.uniformFloat();
+	for (size_t k = 0; k < sample_components_2D.size(); k++)
+	{
+		size_t idx = 0;
+
+		for (size_t j = 0; j < n_vertical_samples_per_pixel; j++) {
+			for (size_t i = 0; i < n_horizontal_samples_per_pixel; i++)
+			{
+				sample_components_2D[k][idx].x = (i + 0.5f)*sample_separation_x;
+				sample_components_2D[k][idx].y = (j + 0.5f)*sample_separation_y;
+
+				idx++;
+			}
 		}
 	}
 
 	// Generate 1D sample component arrays
-	for (size_t i = 0; i < sample_component_arrays_1D.size(); i++)
+	for (size_t k = 0; k < sample_component_arrays_1D.size(); k++)
 	{	
-		size_t array_size = sizes_of_1D_component_arrays[i];
+		size_t array_size = sizes_of_1D_component_arrays[k];
 
-		for (size_t j = 0; j < n_samples_per_pixel*array_size; j++)
+		size_t idx = 0;
+
+		for (size_t i = 0; i < n_samples_per_pixel; i++)
 		{
-			sample_component_arrays_1D[i][j] = rng.uniformFloat();
+			imp_float sample = (i + 0.5f)*sample_separation;
+
+			for (size_t n = 0; n < array_size; n++)
+			{
+				sample_component_arrays_1D[k][idx++] = sample;
+			}
 		}
 	}
 
 	// Generate 2D sample component arrays
-	for (size_t i = 0; i < sample_component_arrays_2D.size(); i++)
+	for (size_t k = 0; k < sample_component_arrays_2D.size(); k++)
 	{	
-		size_t array_size = sizes_of_2D_component_arrays[i];
+		size_t array_size = sizes_of_2D_component_arrays[k];
 
-		for (size_t j = 0; j < n_samples_per_pixel*array_size; j++)
-		{
-			sample_component_arrays_2D[i][j].x = rng.uniformFloat();
-			sample_component_arrays_2D[i][j].y = rng.uniformFloat();
+		size_t idx = 0;
+		
+		for (size_t j = 0; j < n_vertical_samples_per_pixel; j++) {
+			for (size_t i = 0; i < n_horizontal_samples_per_pixel; i++)
+			{
+				imp_float sample_x = (i + 0.5f)*sample_separation_x;
+				imp_float sample_y = (j + 0.5f)*sample_separation_y;
+
+				for (size_t n = 0; n < array_size; n++)
+				{
+					sample_component_arrays_2D[k][idx].x = sample_x;
+					sample_component_arrays_2D[k][idx].y = sample_y;
+					
+					idx++;
+				}
+			}
 		}
 	}
-
-	PixelSampler::setPixel(pixel);
 }
 
 std::unique_ptr<Sampler> UniformSampler::cloned()
