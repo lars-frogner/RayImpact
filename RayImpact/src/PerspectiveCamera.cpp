@@ -5,7 +5,7 @@ namespace RayImpact {
 
 // PerspectiveCamera method implementations
 
-PerspectiveCamera::PerspectiveCamera(const Transformation& camera_to_world,
+PerspectiveCamera::PerspectiveCamera(const AnimatedTransformation& camera_to_world,
 									 const BoundingRectangleF& screen_window,
 									 imp_float shutter_opening_time,
 									 imp_float shutter_closing_time,

@@ -3,20 +3,28 @@
 #include "Matrix4x4.hpp"
 #include "geometry.hpp"
 #include "Ray.hpp"
+#include "Quaternion.hpp"
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
+// Forward declarations
+class AnimatedTransformation;
+
 // Transformation declarations
 
 class Transformation {
 
-private:
+friend AnimatedTransformation;
+
+protected:
 
 	Matrix4x4 matrix; // Transformation matrix
 	Matrix4x4 matrix_inverse; // Inverse of transformation matrix
+
+	static Quaternion quaternionFromMatrix(const Matrix4x4& matrix);
 
 public:
 
@@ -38,6 +46,8 @@ public:
 	static Transformation rotationFromZToX(imp_float angle);
 	
 	static Transformation rotation(const Vector3F& axis, imp_float angle);
+
+	static Transformation rotation(const Quaternion& quaternion);
 	
 	static Transformation worldToCamera(const Point3F& camera_position,
 										const Vector3F& up_vector,
@@ -82,6 +92,8 @@ public:
 	Transformation transposed() const;
 
 	Transformation inverted() const;
+
+	Quaternion quaternion() const;
 };
 
 } // RayImpact

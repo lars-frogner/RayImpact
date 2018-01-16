@@ -4,6 +4,7 @@
 #include "BoundingBox.hpp"
 #include "Ray.hpp"
 #include "Transformation.hpp"
+#include "AnimatedTransformation.hpp"
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
 #include <memory>
@@ -80,12 +81,12 @@ class TransformedModel : public Model {
 private:
 
 	std::shared_ptr<Model> model; // The underlying model for the transformed model
-	const Transformation model_to_world; // The transformation from the shape's notion of world space to actual world space
+	const AnimatedTransformation model_to_world; // The transformation from the shape's notion of world space to actual world space
 
 public:
 
 	TransformedModel(const std::shared_ptr<Model>& model,
-				     const Transformation& model_to_world);
+				     const AnimatedTransformation& model_to_world);
 
 	BoundingBoxF worldSpaceBoundingBox() const;
 	

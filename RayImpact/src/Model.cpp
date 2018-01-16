@@ -71,22 +71,27 @@ void GeometricModel::computeScatteringFunctions(SurfaceScatteringEvent* scatteri
 // TransformedModel method implementations
 
 TransformedModel::TransformedModel(const std::shared_ptr<Model>& model,
-								   const Transformation& model_to_world)
+								   const AnimatedTransformation& model_to_world)
 	: model(model),
 	  model_to_world(model_to_world)
 {}
 
 BoundingBoxF TransformedModel::worldSpaceBoundingBox() const
 {
-	return model_to_world(model->worldSpaceBoundingBox());
+	return model_to_world.encompassMotionInBoundingBox(model->worldSpaceBoundingBox());
 }
 	
 bool TransformedModel::intersect(const Ray& ray,
 							     SurfaceScatteringEvent* scattering_event) const
 {
+	// Find transformation matrix at the time of the ray
+	Transformation interpolated_model_to_world;
+	model_to_world.computeInterpolatedTransformation(&interpolated_model_to_world, ray.time);
+	
 	// Transform ray from world space to model space
-	const Ray& model_space_ray = model_to_world.inverted()(ray);
+	const Ray& model_space_ray = interpolated_model_to_world.inverted()(ray);
 
+	// Perform intersection
 	if (!model->intersect(model_space_ray, scattering_event))
 		return false;
 
@@ -94,14 +99,17 @@ bool TransformedModel::intersect(const Ray& ray,
 	ray.max_distance = model_space_ray.max_distance;
 	
 	// Transform scattering event from model space to world space
-	*scattering_event = model_to_world(*scattering_event);
+	*scattering_event = interpolated_model_to_world(*scattering_event);
 
 	return true;
 }
 	
 bool TransformedModel::hasIntersection(const Ray& ray) const
 {
-	return model->hasIntersection(model_to_world.inverted()(ray));
+	Transformation interpolated_model_to_world;
+	model_to_world.computeInterpolatedTransformation(&interpolated_model_to_world, ray.time);
+
+	return model->hasIntersection(interpolated_model_to_world.inverted()(ray));
 }
 
 const AreaLight* TransformedModel::getAreaLight() const

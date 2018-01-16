@@ -5,6 +5,7 @@
 #include "BoundingRectangle.hpp"
 #include "Ray.hpp"
 #include "Transformation.hpp"
+#include "AnimatedTransformation.hpp"
 #include "Sensor.hpp"
 #include <cmath>
 
@@ -26,13 +27,13 @@ class Camera {
 
 public:
 
-	Transformation camera_to_world; // Transformation from camera space to world space
+	AnimatedTransformation camera_to_world; // Transformation from camera space to world space
 	const imp_float shutter_opening_time; // Point in time that the shutter opens
 	const imp_float shutter_closing_time; // Point in time that the shutter closes
 	Sensor* sensor; // The sensor used by the camera
 	const Medium* medium; // The medium surrounding the camera
 
-	Camera(const Transformation& camera_to_world,
+	Camera(const AnimatedTransformation& camera_to_world,
 		   imp_float shutter_opening_time,
 		   imp_float shutter_closing_time,
 		   Sensor* sensor,
@@ -61,7 +62,7 @@ protected:
 
 public:
 
-	ProjectiveCamera(const Transformation& camera_to_world,
+	ProjectiveCamera(const AnimatedTransformation& camera_to_world,
 				     const Transformation& camera_to_screen,
 					 const BoundingRectangleF& screen_window,
 				     imp_float shutter_opening_time,

@@ -130,6 +130,25 @@ Transformation Transformation::rotation(const Vector3F& axis, imp_float angle)
 	return Transformation(matrix, matrix.transposed());
 }
 
+Transformation Transformation::rotation(const Quaternion& quaternion)
+{
+	Matrix4x4 matrix;
+
+	matrix.a11 = 1 - 2*(quaternion.imag.y*quaternion.imag.y + quaternion.imag.z*quaternion.imag.z);
+	matrix.a12 =	 2*(quaternion.imag.x*quaternion.imag.y + quaternion.imag.z*quaternion.w);
+	matrix.a13 =	 2*(quaternion.imag.x*quaternion.imag.z - quaternion.imag.y*quaternion.w);
+
+	matrix.a21 =	 2*(quaternion.imag.x*quaternion.imag.y - quaternion.imag.z*quaternion.w); 
+	matrix.a22 = 1 - 2*(quaternion.imag.x*quaternion.imag.x + quaternion.imag.z*quaternion.imag.z);
+	matrix.a23 =	 2*(quaternion.imag.y*quaternion.imag.z + quaternion.imag.x*quaternion.w);
+
+	matrix.a31 =	 2*(quaternion.imag.x*quaternion.imag.z + quaternion.imag.y*quaternion.w);    
+	matrix.a32 =	 2*(quaternion.imag.y*quaternion.imag.z - quaternion.imag.x*quaternion.w);
+	matrix.a33 = 1 - 2*(quaternion.imag.x*quaternion.imag.x + quaternion.imag.y*quaternion.imag.y);
+		
+	return Transformation(matrix, matrix.inverted());
+}
+
 Transformation Transformation::worldToCamera(const Point3F& camera_position,
 											 const Vector3F& up_vector,
 											 const Point3F& look_point)
@@ -459,6 +478,143 @@ Transformation Transformation::transposed() const
 Transformation Transformation::inverted() const
 {
 	return Transformation(matrix_inverse, matrix);
+}
+
+Quaternion Transformation::quaternionFromMatrix(const Matrix4x4& matrix)
+{
+	Quaternion result;
+
+	// Precompute values that will potentially be used in a sqrt
+	imp_float trace_1 = 1 + matrix.a11 + matrix.a22 + matrix.a33;
+	imp_float trace_2 = 1 + matrix.a11 - matrix.a22 - matrix.a33;
+	imp_float trace_3 = 1 - matrix.a11 + matrix.a22 - matrix.a33;
+	imp_float trace_4 = 1 - matrix.a11 - matrix.a22 + matrix.a33;
+
+	// Choose one of the four possible ways of computing the quaternion
+	// depending on which will use the largest argument in the sqrt
+	// (to avoid numerical instability)
+
+	if (trace_1 >= trace_2)
+	{
+		if (trace_1 >= trace_3)
+		{
+			if (trace_1 >= trace_4)
+			{
+				// trace_1 is largest
+
+				result.imag.x = 0.5f*std::sqrt(trace_1);
+
+				imp_float norm = 0.25f/result.imag.x;
+
+				result.imag.y = (matrix.a32 - matrix.a23)*norm;
+				result.imag.z = (matrix.a13 - matrix.a31)*norm;
+				result.w	  = (matrix.a21 - matrix.a12)*norm;
+			}
+			else
+			{
+				// trace_4 is largest
+
+				result.w = 0.5f*std::sqrt(trace_4);
+
+				imp_float norm = 0.25f/result.w;
+
+				result.imag.x = (matrix.a21 - matrix.a12)*norm;
+				result.imag.y = (matrix.a13 + matrix.a31)*norm;
+				result.imag.z = (matrix.a23 + matrix.a32)*norm;
+			}
+		}
+		else
+		{
+			if (trace_3 >= trace_4)
+			{
+				// trace_3 is largest
+
+				result.imag.z = 0.5f*std::sqrt(trace_3);
+
+				imp_float norm = 0.25f/result.imag.z;
+
+				result.imag.x = (matrix.a13 - matrix.a31)*norm;
+				result.imag.y = (matrix.a12 + matrix.a21)*norm;
+				result.w	  = (matrix.a23 + matrix.a32)*norm;
+			}
+			else
+			{
+				// trace_4 is largest
+
+				result.w = 0.5f*std::sqrt(trace_4);
+
+				imp_float norm = 0.25f/result.w;
+
+				result.imag.x = (matrix.a21 - matrix.a12)*norm;
+				result.imag.y = (matrix.a13 + matrix.a31)*norm;
+				result.imag.z = (matrix.a23 + matrix.a32)*norm;
+			}
+		}
+	}
+	else
+	{
+		if (trace_2 >= trace_3)
+		{
+			if (trace_2 >= trace_4)
+			{
+				// trace_2 is largest
+
+				result.imag.y = 0.5f*std::sqrt(trace_2);
+
+				imp_float norm = 0.25f/result.imag.y;
+
+				result.imag.x = (matrix.a32 - matrix.a23)*norm;
+				result.imag.z = (matrix.a12 + matrix.a21)*norm;
+				result.w	  = (matrix.a13 + matrix.a31)*norm;
+			}
+			else
+			{
+				// trace_4 is largest
+
+				result.w = 0.5f*std::sqrt(trace_4);
+
+				imp_float norm = 0.25f/result.w;
+
+				result.imag.x = (matrix.a21 - matrix.a12)*norm;
+				result.imag.y = (matrix.a13 + matrix.a31)*norm;
+				result.imag.z = (matrix.a23 + matrix.a32)*norm;
+			}
+		}
+		else
+		{
+			if (trace_3 >= trace_4)
+			{
+				// trace_3 is largest
+
+				result.imag.z = 0.5f*std::sqrt(trace_3);
+
+				imp_float norm = 0.25f/result.imag.z;
+
+				result.imag.x = (matrix.a13 - matrix.a31)*norm;
+				result.imag.y = (matrix.a12 + matrix.a21)*norm;
+				result.w	  = (matrix.a23 + matrix.a32)*norm;
+			}
+			else
+			{
+				// trace_4 is largest
+
+				result.w = 0.5f*std::sqrt(trace_4);
+
+				imp_float norm = 0.25f/result.w;
+
+				result.imag.x = (matrix.a21 - matrix.a12)*norm;
+				result.imag.y = (matrix.a13 + matrix.a31)*norm;
+				result.imag.z = (matrix.a23 + matrix.a32)*norm;
+			}
+		}
+	}
+
+	return result;
+}
+
+Quaternion Transformation::quaternion() const
+{
+	return quaternionFromMatrix(matrix);
 }
 
 } // RayImpact

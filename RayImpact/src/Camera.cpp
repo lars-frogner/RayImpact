@@ -5,7 +5,7 @@ namespace RayImpact {
 
 // Camera method implementations
 
-Camera::Camera(const Transformation& camera_to_world,
+Camera::Camera(const AnimatedTransformation& camera_to_world,
 			   imp_float shutter_opening_time,
 			   imp_float shutter_closing_time,
 			   Sensor* sensor,
@@ -57,7 +57,7 @@ imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
 
 // ProjectiveCamera method implementations
 
-ProjectiveCamera::ProjectiveCamera(const Transformation& camera_to_world,
+ProjectiveCamera::ProjectiveCamera(const AnimatedTransformation& camera_to_world,
 								   const Transformation& camera_to_screen,
 								   const BoundingRectangleF& screen_window,
 								   imp_float shutter_opening_time,
