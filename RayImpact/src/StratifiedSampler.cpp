@@ -8,22 +8,22 @@ namespace RayImpact {
 
 StratifiedSampler::StratifiedSampler(unsigned int n_horizontal_samples_per_pixel,
 									 unsigned int n_vertical_samples_per_pixel,
-									 bool jitter_samples,
 									 unsigned int n_sampled_dimensions)
 	: PixelSampler::PixelSampler(n_horizontal_samples_per_pixel*n_vertical_samples_per_pixel, n_sampled_dimensions),
 	  n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
-	  n_vertical_samples_per_pixel(n_vertical_samples_per_pixel),
-	  jitter_samples(jitter_samples)
+	  n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
 {}
 	
 void StratifiedSampler::setPixel(const Point2I& pixel)
 {
+	PixelSampler::setPixel(pixel);
+
 	// Generate 1D sample components
 	for (size_t i = 0; i < sample_components_1D.size(); i++)
 	{
 		generateStratifiedSamples(sample_components_1D[i].data(),
 								  n_samples_per_pixel,
-								  rng, jitter_samples);
+								  rng);
 
 		shuffleArray(sample_components_1D[i].data(),
 					 n_samples_per_pixel,
@@ -36,7 +36,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 		generateStratifiedSamples(sample_components_2D[i].data(),
 								  n_horizontal_samples_per_pixel,
 								  n_vertical_samples_per_pixel,
-								  rng, jitter_samples);
+								  rng);
 
 		shuffleArray(sample_components_2D[i].data(),
 					 n_samples_per_pixel,
@@ -50,7 +50,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 			size_t array_size = sizes_of_1D_component_arrays[i];
 
 			generateStratifiedSamples(&(sample_component_arrays_1D[i][j*array_size]),
-									  array_size, rng, jitter_samples);
+									  array_size, rng);
 
 			shuffleArray(&(sample_component_arrays_1D[i][j*array_size]),
 						 array_size, rng);
@@ -68,8 +68,6 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 										  array_size, 2, rng);
 		}
 	}
-
-	PixelSampler::setPixel(pixel);
 }
 
 std::unique_ptr<Sampler> StratifiedSampler::cloned()
@@ -95,16 +93,13 @@ std::unique_ptr<Sampler> StratifiedSampler::cloned(unsigned int seed)
 // Fills the given array with stratified sample values covering the unit interval
 void generateStratifiedSamples(imp_float* samples,
 							   size_t n_samples,
-							   RandomNumberGenerator& rng,
-							   bool jitter_samples)
+							   RandomNumberGenerator& rng)
 {
 	imp_float sample_separation = 1.0f/n_samples;
 
 	for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
 	{
-		imp_float local_sample_offset = (jitter_samples)? rng.uniformFloat() : 0.5f;
-
-		samples[sample_idx] = std::min((sample_idx + local_sample_offset)*sample_separation, IMP_ONE_MINUS_EPS);
+		samples[sample_idx] = std::min((sample_idx + rng.uniformFloat())*sample_separation, IMP_ONE_MINUS_EPS);
 	}
 }
 
@@ -112,8 +107,7 @@ void generateStratifiedSamples(imp_float* samples,
 void generateStratifiedSamples(Point2F* samples,
 							   size_t n_samples_x,
 							   size_t n_samples_y,
-							   RandomNumberGenerator& rng,
-							   bool jitter_samples)
+							   RandomNumberGenerator& rng)
 {
 	imp_float sample_separation_x = 1.0f/n_samples_x;
 	imp_float sample_separation_y = 1.0f/n_samples_y;
@@ -122,11 +116,8 @@ void generateStratifiedSamples(Point2F* samples,
 	for (size_t y = 0; y < n_samples_y; y++) {
 		for (size_t x = 0; x < n_samples_x; x++)
 		{
-			imp_float local_sample_offset_x = (jitter_samples)? rng.uniformFloat() : 0.5f;
-			imp_float local_sample_offset_y = (jitter_samples)? rng.uniformFloat() : 0.5f;
-
-			samples[sample_idx].x = std::min((x + local_sample_offset_x)*sample_separation_x, IMP_ONE_MINUS_EPS);
-			samples[sample_idx].y = std::min((y + local_sample_offset_y)*sample_separation_y, IMP_ONE_MINUS_EPS);
+			samples[sample_idx].x = std::min((x + rng.uniformFloat())*sample_separation_x, IMP_ONE_MINUS_EPS);
+			samples[sample_idx].y = std::min((y + rng.uniformFloat())*sample_separation_y, IMP_ONE_MINUS_EPS);
 		
 			sample_idx++;
 		}
@@ -156,7 +147,7 @@ void generateLatinHypercubeSamples(imp_float* samples,
 		for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
 		{
 			// Choose random sample higher up in the list
-			size_t sample_to_swap_with = sample_idx + rng.uniformUInt32(n_samples - sample_idx);
+			size_t sample_to_swap_with = sample_idx + rng.uniformUInt32();
 	
 			// Swap the samples
 			std::swap(samples[         sample_idx*n_sample_dimensions + n],

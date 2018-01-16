@@ -12,13 +12,11 @@ private:
 
 	const unsigned int n_horizontal_samples_per_pixel; // Number of samples to take horizontally for each pixel
 	const unsigned int n_vertical_samples_per_pixel; // Number of samples to take vertically for each pixel
-	const bool jitter_samples; // Whether to perturb the samples away from their regularly assigned values
 
 public:
 
 	StratifiedSampler(unsigned int n_horizontal_samples_per_pixel,
 					  unsigned int n_vertical_samples_per_pixel,
-					  bool jitter_samples,
 					  unsigned int n_sampled_dimensions);
 	
 
@@ -32,14 +30,12 @@ public:
 
 void generateStratifiedSamples(imp_float* samples,
 						  	   size_t n_samples,
-							   RandomNumberGenerator& rng,
-							   bool jitter_samples);
+							   RandomNumberGenerator& rng);
 
 void generateStratifiedSamples(Point2F* samples,
 							   size_t n_horizontal_samples,
 							   size_t n_vertical_samples,
-							   RandomNumberGenerator& rng,
-							   bool jitter_samples);
+							   RandomNumberGenerator& rng);
 
 void generateLatinHypercubeSamples(imp_float* samples,
 								   size_t n_samples,
