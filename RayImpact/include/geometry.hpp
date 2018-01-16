@@ -701,14 +701,14 @@ inline void Vector3<T>::reverse()
 template <typename T>
 inline void Vector3<T>::flipToSameHemisphereAs(const Vector3& other)
 {
-	if (dot(other) < 0.0f)
+	if (dot(other) < 0)
 		reverse();
 }
 
 template <typename T>
 inline void Vector3<T>::flipToSameHemisphereAs(const Normal3<T>& normal)
 {
-	if (dot(normal) < 0.0f)
+	if (dot(normal) < 0)
 		reverse();
 }
 
@@ -914,14 +914,14 @@ inline void Normal3<T>::reverse()
 template <typename T>
 inline void Normal3<T>::flipToSameHemisphereAs(const Normal3& other)
 {
-	if (dot(other) < 0.0f)
+	if (dot(other) < 0)
 		reverse();
 }
 
 template <typename T>
 inline void Normal3<T>::flipToSameHemisphereAs(const Vector3<T>& vector)
 {
-	if (dot(vector) < 0.0f)
+	if (dot(vector) < 0)
 		reverse();
 }
 
