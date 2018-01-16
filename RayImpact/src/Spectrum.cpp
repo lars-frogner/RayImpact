@@ -4,6 +4,55 @@
 namespace Impact {
 namespace RayImpact {
 
+// Global variables
+
+static const unsigned int n_CIE_samples = 471; // Number of samples of the CIE spectral matching curves
+static const imp_float CIE_wavelengths[n_CIE_samples]; // Wavelengths [nm] for samples of the CIE spectral matching curves
+extern const imp_float CIE_X_values[n_CIE_samples]; // Values of the CIE X spectral matching curve
+extern const imp_float CIE_Y_values[n_CIE_samples]; // Values of the CIE Y spectral matching curve
+extern const imp_float CIE_Z_values[n_CIE_samples]; // Values of the CIE > spectral matching curve
+
+static const imp_float CIE_Y_integral = 106.856895f; // Integral of the CIE Y spectral matching curve
+
+static const unsigned int n_SPD_samples = 32; // Number of samples of the base color SPDs
+static const double SPD_wavelengths[n_SPD_samples]; // Wavelengths [nm] for samples of the base color SPDs
+
+static const double reflectance_white_SPD_values[n_SPD_samples];
+static const double reflectance_red_SPD_values[n_SPD_samples];
+static const double reflectance_green_SPD_values[n_SPD_samples];
+static const double reflectance_blue_SPD_values[n_SPD_samples];
+static const double reflectance_cyan_SPD_values[n_SPD_samples];
+static const double reflectance_magenta_SPD_values[n_SPD_samples];
+static const double reflectance_yellow_SPD_values[n_SPD_samples];
+
+static const double illumination_white_SPD_values[n_SPD_samples];
+static const double illumination_red_SPD_values[n_SPD_samples];
+static const double illumination_green_SPD_values[n_SPD_samples];
+static const double illumination_blue_SPD_values[n_SPD_samples];
+static const double illumination_cyan_SPD_values[n_SPD_samples];
+static const double illumination_magenta_SPD_values[n_SPD_samples];
+static const double illumination_yellow_SPD_values[n_SPD_samples];
+
+static SampledSpectrum CIE_X; // CIE X spectral matching curve
+static SampledSpectrum CIE_Y; // CIE Y spectral matching curve
+static SampledSpectrum CIE_Z; // CIE Z spectral matching curve
+
+static SampledSpectrum reflectance_white_SPD; // White reflectance SPD
+static SampledSpectrum reflectance_red_SPD; // Red reflectance SPD
+static SampledSpectrum reflectance_green_SPD; // Green reflectance SPD
+static SampledSpectrum reflectance_blue_SPD; // Blue reflectance SPD
+static SampledSpectrum reflectance_cyan_SPD; // Cyan reflectance SPD
+static SampledSpectrum reflectance_magenta_SPD; // Magenta reflectance SPD
+static SampledSpectrum reflectance_yellow_SPD; // Yellow reflectance SPD
+
+static SampledSpectrum illumination_white_SPD; // White illumination SPD
+static SampledSpectrum illumination_red_SPD; // Red illumination SPD
+static SampledSpectrum illumination_green_SPD; // Green illumination SPD
+static SampledSpectrum illumination_blue_SPD; // Blue illumination SPD
+static SampledSpectrum illumination_cyan_SPD; // Cyan illumination SPD
+static SampledSpectrum illumination_magenta_SPD; // Magenta illumination SPD
+static SampledSpectrum illumination_yellow_SPD; // Yellow illumination SPD
+
 // RGBSpectrum method implementations
 
 RGBSpectrum::RGBSpectrum()
