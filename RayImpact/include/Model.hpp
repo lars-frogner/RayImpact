@@ -12,10 +12,6 @@
 namespace Impact {
 namespace RayImpact {
 
-// Forward declarations
-class AreaLight;
-class Material;
-
 // Model declarations
 
 class Model {
@@ -35,7 +31,7 @@ public:
 
 	virtual void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
 											RegionAllocator& allocator,
-											//TransportMode mode,
+											TransportMode mode,
 											bool allow_multiple_lobes) const = 0;
 };
 
@@ -70,7 +66,7 @@ public:
 
 	void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
 									RegionAllocator& allocator,
-									//TransportMode mode,
+									TransportMode mode,
 									bool allow_multiple_lobes) const;
 };
 
@@ -101,7 +97,7 @@ public:
 
 	void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
 									RegionAllocator& allocator,
-									//TransportMode mode,
+									TransportMode mode,
 									bool allow_multiple_lobes) const;
 };
 

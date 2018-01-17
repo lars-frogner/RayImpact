@@ -7,10 +7,6 @@
 namespace Impact {
 namespace RayImpact {
 
-// Forward declarations
-
-class Medium {};
-
 // Ray declarations
 
 class Ray {

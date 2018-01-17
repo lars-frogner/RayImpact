@@ -1,5 +1,6 @@
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
+#include "Model.hpp"
 #include "math.hpp"
 
 namespace Impact {

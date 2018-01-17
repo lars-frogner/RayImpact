@@ -10,6 +10,24 @@ namespace Impact {
 namespace RayImpact {
 
 // Forward declarations
+
+class SurfaceScatteringEvent;
+//class RegionAllocator;
+class Scene;
+
+class BSDF{};
+class BSSRDF{};
+class TransportMode{};
+class Material{ public: void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
+														RegionAllocator& allocator,
+														TransportMode mode,
+														bool allow_multiple_lobes) const {} };
+class Light{ public: void preprocess(const Scene& scene) const {} };
+class AreaLight{};
+class Medium{};
+class MediumInterface{};
+
+// Forward declarations
 	
 template <typename T>
 class Vector2;

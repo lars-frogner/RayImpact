@@ -56,15 +56,15 @@ const Material* GeometricModel::getMaterial() const
 
 void GeometricModel::computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
 												RegionAllocator& allocator,
-												//TransportMode mode,
+												TransportMode mode,
 												bool allow_multiple_lobes) const
 {
 	if (material)
 	{
-		/*material->computeScatteringFunctions(scattering_event,
+		material->computeScatteringFunctions(scattering_event,
 											 allocator,
-											 //mode,
-											 allow_multiple_lobes);*/
+											 mode,
+											 allow_multiple_lobes);
 	}
 }
 
@@ -125,9 +125,9 @@ const Material* TransformedModel::getMaterial() const
 }
 
 void TransformedModel::computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-												RegionAllocator& allocator,
-												//TransportMode mode,
-												bool allow_multiple_lobes) const
+												  RegionAllocator& allocator,
+												  TransportMode mode,
+												  bool allow_multiple_lobes) const
 {
 	printSevereMessage("\"computeScatteringFunctions()\" method of TransformedModel was called");
 }

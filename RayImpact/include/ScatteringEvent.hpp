@@ -6,16 +6,12 @@
 namespace Impact {
 namespace RayImpact {
 
-// Offset from the end of a shadow ray to the area light the ray points towards
-constexpr imp_float IMP_SHADOW_EPS = 0.0001f;
-
 // Forward declarations
 class Shape;
 class Model;
-class BSDF;
-class BSSRDF;
 
-class MediumInterface {};
+// Offset from the end of a shadow ray to the area light the ray points towards
+constexpr imp_float IMP_SHADOW_EPS = 0.0001f;
 
 // ScatteringEvent declarations
 
