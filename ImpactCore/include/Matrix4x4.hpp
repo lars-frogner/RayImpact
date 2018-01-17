@@ -19,6 +19,8 @@ public:
 			  imp_float a31, imp_float a32, imp_float a33, imp_float a34,
 			  imp_float a41, imp_float a42, imp_float a43, imp_float a44);
 
+    Matrix4x4(const imp_float elements[16]);
+
 	bool operator==(const Matrix4x4& other) const;
 	bool operator!=(const Matrix4x4& other) const;
 

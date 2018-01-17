@@ -20,6 +20,13 @@ Matrix4x4::Matrix4x4(imp_float a11, imp_float a12, imp_float a13, imp_float a14,
 	  a41(a41), a42(a42), a43(a43), a44(a44)
 {}
 
+Matrix4x4::Matrix4x4(const imp_float elements[16])
+	: a11(elements[0]),  a12(elements[1]),  a13(elements[2]),  a14(elements[3]),
+	  a21(elements[4]),  a22(elements[5]),  a23(elements[6]),  a24(elements[7]),
+	  a31(elements[8]),  a32(elements[9]),  a33(elements[10]), a34(elements[11]),
+	  a41(elements[12]), a42(elements[13]), a43(elements[14]), a44(elements[15])
+{}
+
 bool Matrix4x4::operator==(const Matrix4x4& other) const
 {
 	return a11 == other.a11 && a12 == other.a12 && a13 == other.a13 && a14 == other.a14 &&
