@@ -70,7 +70,7 @@ public:
 	void addSplat(const Point2F& sample_position,
 				  const RadianceSpectrum& radiance);
 
-	void writeImage(imp_float splat_scale);
+	void writeImage(imp_float splat_scale = 1);
 };
 
 // SensorSection declarations

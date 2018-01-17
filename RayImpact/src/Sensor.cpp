@@ -172,7 +172,7 @@ void Sensor::addSplat(const Point2F& sample_position,
 	sample_pixel.xyz_sums_of_splats[2].add(xyz[2]);
 }
 
-void Sensor::writeImage(imp_float splat_scale)
+void Sensor::writeImage(imp_float splat_scale /* = 1 */)
 {
 	std::unique_ptr<imp_float[]> pixel_rgb_values(new imp_float[3*raster_crop_window.area()]);
 
