@@ -6,7 +6,6 @@
 #include "Transformation.hpp"
 #include "AnimatedTransformation.hpp"
 #include "Spectrum.hpp"
-#include "ParameterSet.hpp"
 #include "Shape.hpp"
 #include "Model.hpp"
 #include "Scene.hpp"
@@ -68,7 +67,7 @@ public:
 	}
 };
 
-static uint32_t active_transformation_bits = all_transformation_bits; // Bit vector indicating the types of transformations stored in the current transformation set
+static uint32_t active_transformation_bits = all_transformations_bits; // Bit vector indicating the types of transformations stored in the current transformation set
 static TransformationSet current_transformations; // Variable holding the currently active transformations
 
 static std::map<std::string, TransformationSet> defined_coordinate_systems; // A table of named transformation sets corresponding to defined coordinate systems
@@ -111,12 +110,12 @@ struct Configurations
 
 	Integrator* createIntegrator()
 	{
-
+		return nullptr;
 	}
 
 	Scene* createScene()
 	{
-
+		return nullptr;
 	}
 };
 
@@ -138,12 +137,12 @@ public:
 
 	std::shared_ptr<Material> createMaterial(const ParameterSet& parameters)
 	{
-
+		return nullptr;
 	}
 
 	MediumInterface createMediumInterface(const ParameterSet& parameters)
 	{
-
+		return MediumInterface();
 	}
 };
 
@@ -175,7 +174,7 @@ public:
 		else
 		{
 			// Allocate memory for the transformation and its inverse
-			transformation_ptr = allocator.allocate<Transformation>(2, false);
+			transformation_ptr = nullptr;//allocator.allocate<Transformation>(2, false);
 			inverse_transformation_ptr = transformation_ptr + 1;
 
 			// Store the transformation and its inverse
@@ -206,26 +205,34 @@ static TransformationCache transformation_cache; // Holds stored transformations
 
 // API macros
 
+#define verify_uninitialized(function_name) \
+	if (current_API_state != APIState::Uninitialized) \
+	{ \
+		printErrorMessage("API system must not be initialized when calling \"%s\". Ignoring call.", function_name); \
+		return; \
+	} \
+	else // required so that the trailing semicolon doesn't cause syntax error
+
 #define verify_initialized(function_name) \
 	if (current_API_state == APIState::Uninitialized) \
 	{ \
-		printErrorMessage("API system must be initialized before calling \"%s()\". Ignoring call.", function_name); \
+		printErrorMessage("API system must be initialized before calling \"%s\". Ignoring call.", function_name); \
 		return; \
 	} \
 	else // required so that the trailing semicolon doesn't cause syntax error
 
 #define verify_in_config_state(function_name) \
-	if (current_API_state == APIState::Configuration) \
+	if (current_API_state != APIState::Configuration) \
 	{ \
-		printErrorMessage("API system must be in the configuration state when calling \"%s()\". Ignoring call.", function_name); \
+		printErrorMessage("API system must be in the configuration state when calling \"%s\". Ignoring call.", function_name); \
 		return; \
 	} \
 	else // required so that the trailing semicolon doesn't cause syntax error
 
 #define verify_in_scene_descript_state(function_name) \
-	if (current_API_state == APIState::SceneDescription) \
+	if (current_API_state != APIState::SceneDescription) \
 	{ \
-		printErrorMessage("API system must be in the scene generation state when calling \"%s()\". Ignoring call.", function_name); \
+		printErrorMessage("API system must be in the scene generation state when calling \"%s\". Ignoring call.", function_name); \
 		return; \
 	} \
 	else // required so that the trailing semicolon doesn't cause syntax error
@@ -247,14 +254,14 @@ std::vector< std::shared_ptr<Shape> > createShapes(const std::string& type,
 												   bool use_reverse_orientation,
 												   const ParameterSet& parameters)
 {
-
+	return std::vector< std::shared_ptr<Shape> >();
 }
 
 std::shared_ptr<Model> CreateAccelerationStructure(const std::string& type,
 												   const std::vector< std::shared_ptr<Model> >& models,
 												   const ParameterSet& parameters)
 {
-
+	return nullptr;
 }
 
 std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
@@ -263,16 +270,45 @@ std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
 										   const ParameterSet& parameters,
 										   std::shared_ptr<Shape> shape)
 {
-
+	return nullptr;
 }
 
 // API function implementations
 
-// Performs required initializations for the rendering system
-void RIMP_Initialize(const Options& options)
+void RIMP_SetOption(const std::string& option, const std::string& value)
 {
-	RIMP_OPTIONS = options;
+	verify_uninitialized("SetOption");
 
+	if (option == "n_threads")
+	{
+		int n_threads = std::stoi(value);
+
+		if (n_threads < 0)
+		{
+			printWarningMessage("invalid number of threads: %d. Using default.", n_threads);
+			return;
+		}
+
+		RIMP_OPTIONS.n_threads = (unsigned int)n_threads;
+	}
+	else if (option == "image_filename")
+	{
+		RIMP_OPTIONS.image_filename = value;
+	}
+	else
+	{
+		printWarningMessage("invalid option \"%s\"", option.c_str());
+	}
+}
+
+bool needsCleanup()
+{
+	return current_API_state != APIState::Uninitialized;
+}
+
+// Performs required initializations for the rendering system
+void RIMP_Initialize()
+{
 	if (current_API_state != APIState::Uninitialized)
 		printErrorMessage("API system has already been initialized");
 
@@ -282,7 +318,7 @@ void RIMP_Initialize(const Options& options)
 
 	current_graphics_state = GraphicsState();
 
-	initializeParallel(options.n_threads);
+	initializeParallel(RIMP_OPTIONS.n_threads);
 
 	SampledSpectrum::initialize();
 }
@@ -331,43 +367,41 @@ void RIMP_UseIdentity()
 	)
 }
 
-void RIMP_UseTranslation(imp_float dx, imp_float dy, imp_float dz)
+void RIMP_UseTranslation(const Vector3F& displacement)
 {
 	verify_initialized("UseTranslation");
 
 	for_active_transformations(
-		current_transformations[idx] = Transformation::translation(Vector3F(dx, dy, dz));
+		current_transformations[idx] = Transformation::translation(displacement);
 	)
 }
 
-void RIMP_UseRotation(imp_float axis_x, imp_float axis_y, imp_float axis_z, imp_float angle)
+void RIMP_UseRotation(const Vector3F& axis, imp_float angle)
 {
 	verify_initialized("UseRotation");
 
 	for_active_transformations(
-		current_transformations[idx] = Transformation::rotation(Vector3F(axis_x, axis_y, axis_z), angle);
+		current_transformations[idx] = Transformation::rotation(axis, angle);
 	)
 }
 
-void RIMP_UseScaling(imp_float scale_x, imp_float scale_y, imp_float scale_z)
+void RIMP_UseScaling(const Vector3F& scaling)
 {
 	verify_initialized("UseScaling");
 
 	for_active_transformations(
-		current_transformations[idx] = Transformation::scaling(scale_x, scale_y, scale_z);
+		current_transformations[idx] = Transformation::scaling(scaling.x, scaling.y, scaling.z);
 	)
 }
 
-void RIMP_UseWorldToCamera(imp_float camera_pos_x, imp_float camera_pos_y, imp_float camera_pos_z,
-						   imp_float     up_vec_x, imp_float     up_vec_y, imp_float     up_vec_z,
-						   imp_float look_point_x, imp_float look_point_y, imp_float look_point_z)
+void RIMP_UseWorldToCamera(const Point3F& camera_position,
+						   const Vector3F& up_vector,
+						   const Point3F& look_point)
 {
 	verify_initialized("UseWorldToCamera");
 
 	for_active_transformations(
-		current_transformations[idx] = Transformation::worldToCamera(Point3F(camera_pos_x, camera_pos_y, camera_pos_z),
-																	 Vector3F(   up_vec_x,     up_vec_y,     up_vec_z),
-																	 Point3F(look_point_x, look_point_y, look_point_z));
+		current_transformations[idx] = Transformation::worldToCamera(camera_position, up_vector, look_point);
 	)
 }
 
@@ -409,7 +443,7 @@ void RIMP_UseCoordinateSystem(const std::string& name)
 	if (entry != defined_coordinate_systems.end())
 		current_transformations = entry->second;
 	else
-		printWarningMessage("coordinate system \"%s\" not found. Ignoring call to \"UseCoordinateSystem()\".", name.c_str());
+		printWarningMessage("coordinate system \"%s\" not found. Ignoring call to \"UseCoordinateSystem\".", name.c_str());
 }
 
 // Medium functions
@@ -417,6 +451,8 @@ void RIMP_UseCoordinateSystem(const std::string& name)
 void RIMP_DefineMedium(const std::string& name, const ParameterSet& parameters)
 {
 	verify_initialized("DefineMedium");
+
+	printErrorMessage("\"DefineMedium\" is not implemented. Ignoring call.");
 
 	//configurations->defined_media[name] = // medium;
 }
@@ -521,7 +557,7 @@ void RIMP_EndAttribute()
 
 	if (graphics_state_stack.empty())
 	{
-		printErrorMessage("unmatched \"EndAttribute()\" call encountered. Ignoring call.");
+		printErrorMessage("unmatched \"EndAttribute\" call encountered. Ignoring call.");
 		return;
 	}
 
@@ -548,7 +584,7 @@ void RIMP_EndTransformation()
 
 	if (transformation_stack.empty())
 	{
-		printErrorMessage("unmatched \"EndTransformation()\" call encountered. Ignoring call.");
+		printErrorMessage("unmatched \"EndTransformation\" call encountered. Ignoring call.");
 		return;
 	}
 
@@ -688,7 +724,7 @@ void RIMP_BeginObject(const std::string& name)
 	RIMP_BeginAttribute();
 
 	if (configurations->current_object)
-		printErrorMessage("\"BeginObject()\" called from inside object definition");
+		printErrorMessage("\"BeginObject\" called from inside object definition");
 
 	configurations->objects[name] = std::vector< std::shared_ptr<Model> >();
 
@@ -700,7 +736,7 @@ void RIMP_EndObject()
 	verify_in_scene_descript_state("EndObject");
 
 	if (!configurations->current_object)
-		printErrorMessage("\"EndObject()\" called from outside object definition");
+		printErrorMessage("\"EndObject\" called from outside object definition");
 
 	configurations->current_object = nullptr;
 
@@ -713,7 +749,7 @@ void RIMP_CreateObjectInstance(const std::string& name)
 
 	if (configurations->current_object)
 	{
-		printErrorMessage("\"CreateObjectInstance()\" called from inside object definition. Ignoring call.");
+		printErrorMessage("\"CreateObjectInstance\" called from inside object definition. Ignoring call.");
 		return;
 	}
 
@@ -721,7 +757,7 @@ void RIMP_CreateObjectInstance(const std::string& name)
 
 	if (entry == configurations->objects.end())
 	{
-		printWarningMessage("object \"%s\" not found. Ignoring call to \"CreateObjectInstance()\".", name.c_str());
+		printWarningMessage("object \"%s\" not found. Ignoring call to \"CreateObjectInstance\".", name.c_str());
 		return;
 	}
 
@@ -763,7 +799,7 @@ void RIMP_EndSceneDescription()
 
 	while (!graphics_state_stack.empty())
 	{
-		printWarningMessage("missing \"EndAttribute()\" call");
+		printWarningMessage("missing \"EndAttribute\" call");
 		graphics_state_stack.pop_back();
 		transformation_stack.pop_back();
 		active_transformation_bits_stack.pop_back();
@@ -771,7 +807,7 @@ void RIMP_EndSceneDescription()
 
 	while (!transformation_stack.empty())
 	{
-		printWarningMessage("missing \"EndTransformation()\" call");
+		printWarningMessage("missing \"EndTransformation\" call");
 		transformation_stack.pop_back();
 		active_transformation_bits_stack.pop_back();
 	}
