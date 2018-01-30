@@ -76,7 +76,7 @@ std::string join(const std::vector<std::string>& sequence,
 	return concatenated;
 }
 
-inline std::string formatString(const char* format, ...)
+std::string formatString(const char* format, ...)
 {
 	va_list arguments;
 	char buffer[256];
