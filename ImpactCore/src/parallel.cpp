@@ -29,7 +29,7 @@ class ParallelForLoop {
 public:
 	
 	std::function<void (uint64_t)> loop_body_1D; // Loop body function for 1D loops
-	std::function<void (uint64_t, uint64_t)> loop_body_2D; // Loop body function for 2D loops
+	std::function<void (uint32_t, uint32_t)> loop_body_2D; // Loop body function for 2D loops
 	uint64_t max_loop_index; // One more than the largest loop index to execute
 	uint64_t max_inner_loop_index; // One more than the largest inner loop index to execute
 	const unsigned int chunk_size; // Minimum number of contiguous loop iterations to perform at a time
@@ -42,8 +42,8 @@ public:
 					uint64_t n_iterations,
 					unsigned int chunk_size);
 
-	ParallelForLoop(const std::function<void (uint64_t, uint64_t)>& loop_body_2D,
-					uint64_t n_iterations_inner, uint64_t n_iterations_outer);
+	ParallelForLoop(const std::function<void (uint32_t, uint32_t)>& loop_body_2D,
+					uint32_t n_iterations_inner, uint32_t n_iterations_outer);
 
 	bool isFinished() const;
 };
@@ -62,8 +62,8 @@ ParallelForLoop::ParallelForLoop(const std::function<void (uint64_t)>& loop_body
 	  next_loop(nullptr)
 {}
 
-ParallelForLoop::ParallelForLoop(const std::function<void (uint64_t, uint64_t)>& loop_body_2D,
-								 uint64_t n_iterations_inner, uint64_t n_iterations_outer)
+ParallelForLoop::ParallelForLoop(const std::function<void (uint32_t, uint32_t)>& loop_body_2D,
+								 uint32_t n_iterations_inner, uint32_t n_iterations_outer)
 	: loop_body_2D(loop_body_2D),
 	  max_loop_index(n_iterations_inner*n_iterations_outer),
 	  max_inner_loop_index(n_iterations_inner),
@@ -131,7 +131,7 @@ static void threadExecutionFunction(unsigned int id)
 				else
 				{
 					imp_check(loop.loop_body_2D);
-					loop.loop_body_2D(i % loop.max_inner_loop_index, i/loop.max_inner_loop_index);
+					loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
 				}
 			}
 
@@ -263,7 +263,7 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 			else
 			{
 				imp_check(loop.loop_body_2D);
-				loop.loop_body_2D(i % loop.max_inner_loop_index, i/loop.max_inner_loop_index);
+				loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
 			}
 		}
 
@@ -277,16 +277,16 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 
 // Executes the given 2D loop body function (taking the loop indices as aguments) in parallel
 // for the given number of inner and outer iterations
-void parallelFor2D(const std::function<void (uint64_t, uint64_t)>& loop_body,
-				   uint64_t n_iterations_inner, uint64_t n_iterations_outer)
+void parallelFor2D(const std::function<void (uint32_t, uint32_t)>& loop_body,
+				   uint32_t n_iterations_inner, uint32_t n_iterations_outer)
 {
 	imp_check(!threads.empty() || IMP_N_THREADS == 1);
 
 	// Perform iterations in serial if there is just one of them (or only one thread)
 	if (threads.empty() || n_iterations_inner*n_iterations_outer <= 1)
 	{
-		for (unsigned int j = 0; j < n_iterations_outer; j++)
-			for (unsigned int i = 0; i < n_iterations_inner; i++)
+		for (uint32_t j = 0; j < n_iterations_outer; j++)
+			for (uint32_t i = 0; i < n_iterations_inner; i++)
 				loop_body(i, j);
 
 		return;
@@ -343,7 +343,7 @@ void parallelFor2D(const std::function<void (uint64_t, uint64_t)>& loop_body,
 			else
 			{
 				imp_check(loop.loop_body_2D);
-				loop.loop_body_2D(i % loop.max_inner_loop_index, i/loop.max_inner_loop_index);
+				loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
 			}
 		}
 

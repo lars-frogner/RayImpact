@@ -16,7 +16,7 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 				 uint64_t n_iterations,
 				 unsigned int chunk_size = 1);
 
-void parallelFor2D(const std::function<void (uint64_t, uint64_t)>& loop_body,
-				   uint64_t n_iterations_inner, uint64_t n_iterations_outer);
+void parallelFor2D(const std::function<void (uint32_t, uint32_t)>& loop_body,
+				   uint32_t n_iterations_inner, uint32_t n_iterations_outer);
 
 } // Impact
