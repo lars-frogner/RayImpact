@@ -101,7 +101,7 @@ public:
 												   unsigned int n_xyz_triples);
 
 	void constructSpectrumParameterFromSamples(const std::string& name, const imp_float* wavelengths,
-											   const imp_float* values, const unsigned int* n_samples,
+											   const imp_float* values, const int* n_samples,
 											   unsigned int n_sample_arrays);
 
 	//void constructSpectrumParameterFromSampleFiles(const std::string& name, const std::string* filenames,

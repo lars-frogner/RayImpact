@@ -285,7 +285,7 @@ void ParameterSet::constructSpectrumParameterFromTristimulus(const std::string& 
 }
 
 void ParameterSet::constructSpectrumParameterFromSamples(const std::string& name, const imp_float* wavelengths,
-														 const imp_float* values, const unsigned int* n_samples,	
+														 const imp_float* values, const int* n_samples,	
 														 unsigned int n_sample_arrays)
 {
 	std::unique_ptr<Spectrum[]> spectra(new Spectrum[n_sample_arrays]);
@@ -317,67 +317,67 @@ void ParameterSet::warnAboutUnusedParameters() const
 	for (const auto& param : bool_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("bool parameter \"%s\" is unused", param->name);
+			printWarningMessage("bool parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : int_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("int parameter \"%s\" is unused", param->name);
+			printWarningMessage("int parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : float_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("float parameter \"%s\" is unused", param->name);
+			printWarningMessage("float parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : string_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("string parameter \"%s\" is unused", param->name);
+			printWarningMessage("string parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : texture_name_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("texture name parameter \"%s\" is unused", param->name);
+			printWarningMessage("texture name parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : point2f_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Point2F parameter \"%s\" is unused", param->name);
+			printWarningMessage("Point2F parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : vector2f_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Vector2F parameter \"%s\" is unused", param->name);
+			printWarningMessage("Vector2F parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : point3f_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Point3F parameter \"%s\" is unused", param->name);
+			printWarningMessage("Point3F parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : vector3f_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Vector3F parameter \"%s\" is unused", param->name);
+			printWarningMessage("Vector3F parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : normal3f_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Normal3F parameter \"%s\" is unused", param->name);
+			printWarningMessage("Normal3F parameter \"%s\" is unused", param->name.c_str());
 	}
 
 	for (const auto& param : spectrum_params)
 	{
 		if (!param->was_looked_up)
-			printWarningMessage("Spectrum parameter \"%s\" is unused", param->name);
+			printWarningMessage("Spectrum parameter \"%s\" is unused", param->name.c_str());
 	}
 }
 
