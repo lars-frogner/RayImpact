@@ -6,13 +6,14 @@
 #include <algorithm>
 #include <ostream>
 
+#include "RegionAllocator.hpp"
+
 namespace Impact {
 namespace RayImpact {
 
 // Forward declarations
 
 class SurfaceScatteringEvent;
-//class RegionAllocator;
 class Scene;
 
 class BSDF{};
