@@ -31,12 +31,12 @@ void SampleIntegrator::render(const Scene& scene)
 	const BoundingRectangleI& sensor_sampling_bounds = camera->sensor->samplingBounds();
 	const Vector2I& sampling_extents = sensor_sampling_bounds.diagonal();
 
-	uint64_t n_sensor_regions_x = (sampling_extents.x + sensor_region_extent - 1)/sensor_region_extent;
-	uint64_t n_sensor_regions_y = (sampling_extents.y + sensor_region_extent - 1)/sensor_region_extent;
+	uint32_t n_sensor_regions_x = (sampling_extents.x + sensor_region_extent - 1)/sensor_region_extent;
+	uint32_t n_sensor_regions_y = (sampling_extents.y + sensor_region_extent - 1)/sensor_region_extent;
 
 	// Loop over each sensor region in parallel
 	parallelFor2D(
-	[&](uint64_t region_i, uint64_t region_j)
+	[&](uint32_t region_i, uint32_t region_j)
 	{
 		// Create thread-private allocator
 		RegionAllocator allocator;
@@ -73,7 +73,7 @@ void SampleIntegrator::render(const Scene& scene)
 				// Get the eye ray for the camera sample
 				RayWithOffsets eye_ray;
 				imp_float ray_weight = camera->generateRayWithOffsets(camera_sample, &eye_ray);
-				eye_ray.scaleOffsets(1.0f/std::sqrt(region_sampler->n_samples_per_pixel));
+				eye_ray.scaleOffsets(1.0f/std::sqrt((imp_float)region_sampler->n_samples_per_pixel));
 
 				// Compute the radiance incident on the sensor sample point
 				RadianceSpectrum incident_radiance(0.0f);
