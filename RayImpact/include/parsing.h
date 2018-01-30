@@ -8,11 +8,11 @@ extern FILE* yyout;
 
 extern int yylineno, yychar;
 
-bool parseFile(const char* filename);
+int parseFile(const char* filename);
 
 const char* nextPositionalArgumentID();
 
-void addBoolElement(bool value);
+void addBoolElement(int value);
 void addIntElement(int value);
 void addFloatElement(double value);
 void addStringElement(const char* value);

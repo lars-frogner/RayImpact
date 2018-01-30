@@ -118,7 +118,7 @@ const char* nextPositionalArgumentID()
 	return next_positional_argument_id.c_str();
 }
 
-void addBoolElement(bool value)
+void addBoolElement(int value)
 {
 	bool_array.push_back(value);
 }
@@ -520,14 +520,14 @@ void callAPIFunction(const char* name)
 	resetArguments();
 }
 
-bool parseFile(const char* filename)
+int parseFile(const char* filename)
 {
 	if (std::string(filename) != "stdin")
 	{
 		if (fopen_s(&yyin, filename, "r") != 0)
 		{
 			printErrorMessage("could not open \"%s\" for parsing. Ignoring.", filename);
-			return false;
+			return 0;
 		}
 	}
 		
@@ -548,7 +548,7 @@ bool parseFile(const char* filename)
 	if (yyout)
 		fclose(yyout);
 
-	return true;
+	return 1;
 }
 
 namespace Impact {
