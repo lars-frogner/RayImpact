@@ -6,6 +6,7 @@
 #include "Quaternion.hpp"
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -16,6 +17,8 @@ class AnimatedTransformation;
 // Transformation declarations
 
 class Transformation {
+
+friend std::ostream& operator<<(std::ostream& stream, const Transformation& transformation);
 
 friend AnimatedTransformation;
 
@@ -62,6 +65,8 @@ public:
 
 	bool operator==(const Transformation& other) const;
 	bool operator!=(const Transformation& other) const;
+	
+	bool operator<(const Transformation& other) const;
 
 	Transformation operator*(const Transformation& other) const;
 	Transformation& operator*=(const Transformation& other);

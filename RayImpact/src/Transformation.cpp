@@ -216,6 +216,47 @@ bool Transformation::operator!=(const Transformation& other) const
 	return !(*this == other);
 }
 
+bool Transformation::operator<(const Transformation& other) const
+{
+    if (matrix.a11 < other.matrix.a11) return true;
+    if (matrix.a11 > other.matrix.a11) return false;
+    if (matrix.a12 < other.matrix.a12) return true;
+    if (matrix.a12 > other.matrix.a12) return false;
+    if (matrix.a13 < other.matrix.a13) return true;
+    if (matrix.a13 > other.matrix.a13) return false;
+    if (matrix.a14 < other.matrix.a14) return true;
+    if (matrix.a14 > other.matrix.a14) return false;
+	
+    if (matrix.a21 < other.matrix.a21) return true;
+    if (matrix.a21 > other.matrix.a21) return false;
+    if (matrix.a22 < other.matrix.a22) return true;
+    if (matrix.a22 > other.matrix.a22) return false;
+    if (matrix.a23 < other.matrix.a23) return true;
+    if (matrix.a23 > other.matrix.a23) return false;
+    if (matrix.a24 < other.matrix.a24) return true;
+    if (matrix.a24 > other.matrix.a24) return false;
+	
+    if (matrix.a31 < other.matrix.a31) return true;
+    if (matrix.a31 > other.matrix.a31) return false;
+    if (matrix.a32 < other.matrix.a32) return true;
+    if (matrix.a32 > other.matrix.a32) return false;
+    if (matrix.a33 < other.matrix.a33) return true;
+    if (matrix.a33 > other.matrix.a33) return false;
+    if (matrix.a34 < other.matrix.a34) return true;
+    if (matrix.a34 > other.matrix.a34) return false;
+	
+    if (matrix.a41 < other.matrix.a41) return true;
+    if (matrix.a41 > other.matrix.a41) return false;
+    if (matrix.a42 < other.matrix.a42) return true;
+    if (matrix.a42 > other.matrix.a42) return false;
+    if (matrix.a43 < other.matrix.a43) return true;
+    if (matrix.a43 > other.matrix.a43) return false;
+    if (matrix.a44 < other.matrix.a44) return true;
+    if (matrix.a44 > other.matrix.a44) return false;
+
+    return false;
+}
+
 Transformation Transformation::operator*(const Transformation& other) const
 {
 	return Transformation(matrix*other.matrix, other.matrix_inverse*matrix_inverse);
@@ -615,6 +656,30 @@ Quaternion Transformation::quaternionFromMatrix(const Matrix4x4& matrix)
 Quaternion Transformation::quaternion() const
 {
 	return quaternionFromMatrix(matrix);
+}
+
+// Printing functions
+
+std::ostream& operator<<(std::ostream& stream, const Transformation& transformation)
+{
+	stream << "["
+		   << transformation.matrix.a11 << ", "
+		   << transformation.matrix.a12 << ", "
+		   << transformation.matrix.a13 << ", "
+		   << transformation.matrix.a14 << "; "
+		   << transformation.matrix.a21 << ", "
+		   << transformation.matrix.a22 << ", "
+		   << transformation.matrix.a23 << ", "
+		   << transformation.matrix.a24 << "; "
+		   << transformation.matrix.a31 << ", "
+		   << transformation.matrix.a32 << ", "
+		   << transformation.matrix.a33 << ", "
+		   << transformation.matrix.a34 << "; "
+		   << transformation.matrix.a41 << ", "
+		   << transformation.matrix.a42 << ", "
+		   << transformation.matrix.a43 << ", "
+		   << transformation.matrix.a44 << "]";
+	return stream;
 }
 
 } // RayImpact
