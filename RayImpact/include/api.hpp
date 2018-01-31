@@ -8,8 +8,8 @@ namespace RayImpact {
 
 struct Options
 {
-	unsigned int n_threads = 0; // The number of threads to use for parallelization (determined automatically if set to 0)
-	std::string image_filename = "out.pfm"; // The filename to use for the rendered image
+    unsigned int n_threads = 0; // The number of threads to use for parallelization (determined automatically if set to 0)
+    std::string image_filename = "out.pfm"; // The filename to use for the rendered image
 };
 
 extern Options RIMP_OPTIONS; // Global rendering options
@@ -41,8 +41,8 @@ void RIMP_UseRotation(const Vector3F& axis, imp_float angle);
 void RIMP_UseScaling(const Vector3F& scaling);
 
 void RIMP_UseWorldToCamera(const Point3F& camera_position,
-						   const Vector3F& up_vector,
-						   const Point3F& look_point);
+                           const Vector3F& up_vector,
+                           const Point3F& look_point);
 
 void RIMP_UseTransformation(const imp_float matrix_elements[16]);
 

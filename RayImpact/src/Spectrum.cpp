@@ -56,463 +56,463 @@ static SampledSpectrum illumination_yellow_SPD; // Yellow illumination SPD
 // RGBSpectrum method implementations
 
 RGBSpectrum::RGBSpectrum()
-	: CoefficientSpectrum<3>::CoefficientSpectrum()
+    : CoefficientSpectrum<3>::CoefficientSpectrum()
 {}
 
 RGBSpectrum::RGBSpectrum(imp_float initial_value)
-	: CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
+    : CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
 {}
-	
+    
 RGBSpectrum::RGBSpectrum(const imp_float* wavelengths,
-						 const imp_float* values,
-						 unsigned int n_samples)
+                         const imp_float* values,
+                         unsigned int n_samples)
 {
-	*this = RGBSpectrum::fromSamples(wavelengths, values, n_samples);
+    *this = RGBSpectrum::fromSamples(wavelengths, values, n_samples);
 }
 
 RGBSpectrum::RGBSpectrum(const imp_float rgb[3],
-						 SpectrumType type /* = SpectrumType::Reflectance */)
+                         SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	*this = RGBSpectrum::fromRGBValues(rgb, type);
+    *this = RGBSpectrum::fromRGBValues(rgb, type);
 }
-	
+    
 RGBSpectrum::RGBSpectrum(const CoefficientSpectrum& other)
-	: CoefficientSpectrum<3>::CoefficientSpectrum(other)
+    : CoefficientSpectrum<3>::CoefficientSpectrum(other)
 {}
-	
+    
 RGBSpectrum::RGBSpectrum(const SampledSpectrum& other,
-						 SpectrumType type /* = SpectrumType::Reflectance */)
+                         SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	imp_float rgb[3];
+    imp_float rgb[3];
 
-	other.computeRGBValues(rgb);
+    other.computeRGBValues(rgb);
 
-	*this = RGBSpectrum::fromRGBValues(rgb, type);
+    *this = RGBSpectrum::fromRGBValues(rgb, type);
 }
 
 // Creates an RGBSpectrum object from the given array of sample wavelengths and values
 RGBSpectrum RGBSpectrum::fromSamples(const imp_float* wavelengths,
-								     const imp_float* values,
-								     unsigned int n_samples)
+                                     const imp_float* values,
+                                     unsigned int n_samples)
 {
-	imp_check(wavelengths);
-	imp_check(values);
+    imp_check(wavelengths);
+    imp_check(values);
 
-	RGBSpectrum result;
+    RGBSpectrum result;
 
-	if (!samplesAreSorted(wavelengths, n_samples))
-	{
-		std::vector<imp_float> wavelengths_vec(wavelengths, wavelengths + n_samples);
-		std::vector<imp_float> values_vec(values, values + n_samples);
+    if (!samplesAreSorted(wavelengths, n_samples))
+    {
+        std::vector<imp_float> wavelengths_vec(wavelengths, wavelengths + n_samples);
+        std::vector<imp_float> values_vec(values, values + n_samples);
 
-		sortSamples(wavelengths_vec, values_vec);
+        sortSamples(wavelengths_vec, values_vec);
 
-		return RGBSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
-	}
+        return RGBSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
+    }
 
-	imp_float xyz[3] = {0.0f, 0.0f, 0.0f};
+    imp_float xyz[3] = {0.0f, 0.0f, 0.0f};
 
-	for (unsigned int i = 0; i < n_CIE_samples; i++)
-	{
-		imp_float sample_value = interpolateSamples(wavelengths, values, n_samples, CIE_wavelengths[i]);
+    for (unsigned int i = 0; i < n_CIE_samples; i++)
+    {
+        imp_float sample_value = interpolateSamples(wavelengths, values, n_samples, CIE_wavelengths[i]);
 
-		xyz[0] += sample_value*CIE_X_values[i];
-		xyz[1] += sample_value*CIE_Y_values[i];
-		xyz[2] += sample_value*CIE_Z_values[i];
-	}
+        xyz[0] += sample_value*CIE_X_values[i];
+        xyz[1] += sample_value*CIE_Y_values[i];
+        xyz[2] += sample_value*CIE_Z_values[i];
+    }
 
-	imp_float norm = static_cast<imp_float>(CIE_wavelengths[n_CIE_samples-1] - CIE_wavelengths[0])/(CIE_Y_integral*n_CIE_samples);
+    imp_float norm = static_cast<imp_float>(CIE_wavelengths[n_CIE_samples-1] - CIE_wavelengths[0])/(CIE_Y_integral*n_CIE_samples);
 
-	xyz[0] *= norm;
-	xyz[1] *= norm;
-	xyz[2] *= norm;
+    xyz[0] *= norm;
+    xyz[1] *= norm;
+    xyz[2] *= norm;
 
-	return RGBSpectrum::fromTristimulusValues(xyz);
+    return RGBSpectrum::fromTristimulusValues(xyz);
 }
 
 // Creates an RGBSpectrum object from the given RGB color values
 RGBSpectrum RGBSpectrum::fromRGBValues(const imp_float rgb[3],
-									   SpectrumType type /* = SpectrumType::Reflectance */)
+                                       SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	RGBSpectrum result;
+    RGBSpectrum result;
 
-	result.coefficients[0] = rgb[0];
-	result.coefficients[1] = rgb[1];
-	result.coefficients[2] = rgb[2];
+    result.coefficients[0] = rgb[0];
+    result.coefficients[1] = rgb[1];
+    result.coefficients[2] = rgb[2];
 
-	return result;
+    return result;
 }
 
 // Creates an RGBSpectrum object from the given tristimulus X, Y and Z values
 RGBSpectrum RGBSpectrum::fromTristimulusValues(const imp_float xyz[3],
-											   SpectrumType type /* = SpectrumType::Reflectance */)
+                                               SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	imp_float rgb[3];
+    imp_float rgb[3];
 
-	tristimulusToRGB(xyz, rgb);
+    tristimulusToRGB(xyz, rgb);
 
-	return RGBSpectrum::fromRGBValues(rgb);
+    return RGBSpectrum::fromRGBValues(rgb);
 }
 
 // Computes the RGB values for the spectrum
 void RGBSpectrum::computeRGBValues(imp_float rgb[3]) const
 {
-	rgb[0] = coefficients[0];
-	rgb[1] = coefficients[1];
-	rgb[2] = coefficients[2];
+    rgb[0] = coefficients[0];
+    rgb[1] = coefficients[1];
+    rgb[2] = coefficients[2];
 }
 
 // Computes the tristimulus values X, Y and Z for the spectrum
 void RGBSpectrum::computeTristimulusValues(imp_float xyz[3]) const
 {
-	RGBToTristimulus(coefficients, xyz);
+    RGBToTristimulus(coefficients, xyz);
 }
 
 // Returns the tristimulus value Y for the spectrum
 imp_float RGBSpectrum::tristimulusY() const
 {
-	return RGBToTristimulusY(coefficients);
+    return RGBToTristimulusY(coefficients);
 }
 
 const RGBSpectrum& RGBSpectrum::toRGBSpectrum() const
 {
-	return *this;
+    return *this;
 }
 
 SampledSpectrum RGBSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
 {
-	return SampledSpectrum(*this, type);
+    return SampledSpectrum(*this, type);
 }
 
 // SampledSpectrum method implementations
 
 SampledSpectrum::SampledSpectrum()
-	: CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum()
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum()
 {}
 
 SampledSpectrum::SampledSpectrum(imp_float initial_value)
-	: CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(initial_value)
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(initial_value)
 {}
 
 SampledSpectrum::SampledSpectrum(const imp_float* wavelengths,
-								 const imp_float* values,
-								 unsigned int n_samples)
+                                 const imp_float* values,
+                                 unsigned int n_samples)
 {
-	*this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
+    *this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
 }
 
-	
+    
 SampledSpectrum::SampledSpectrum(const imp_float rgb[3],
-								 SpectrumType type /* = SpectrumType::Reflectance */)
+                                 SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	*this = SampledSpectrum::fromRGBValues(rgb, type);
+    *this = SampledSpectrum::fromRGBValues(rgb, type);
 }
-	
+    
 SampledSpectrum::SampledSpectrum(const CoefficientSpectrum& other)
-	: CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(other)
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(other)
 {}
-	
+    
 SampledSpectrum::SampledSpectrum(const RGBSpectrum& other,
-								 SpectrumType type /* = SpectrumType::Reflectance */)
+                                 SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	imp_float rgb[3];
+    imp_float rgb[3];
 
-	other.computeRGBValues(rgb);
+    other.computeRGBValues(rgb);
 
-	*this = SampledSpectrum::fromRGBValues(rgb, type);
+    *this = SampledSpectrum::fromRGBValues(rgb, type);
 }
 
 // Creates a SampledSpectrum object from the given array of sample wavelengths and values
 SampledSpectrum SampledSpectrum::fromSamples(const imp_float* wavelengths,
-											 const imp_float* values,
-											 unsigned int n_samples)
+                                             const imp_float* values,
+                                             unsigned int n_samples)
 {
-	imp_check(wavelengths);
-	imp_check(values);
+    imp_check(wavelengths);
+    imp_check(values);
 
-	SampledSpectrum result;
+    SampledSpectrum result;
 
-	if (!samplesAreSorted(wavelengths, n_samples))
-	{
-		std::vector<imp_float> wavelengths_vec(wavelengths, wavelengths + n_samples);
-		std::vector<imp_float> values_vec(values, values + n_samples);
+    if (!samplesAreSorted(wavelengths, n_samples))
+    {
+        std::vector<imp_float> wavelengths_vec(wavelengths, wavelengths + n_samples);
+        std::vector<imp_float> values_vec(values, values + n_samples);
 
-		sortSamples(wavelengths_vec, values_vec);
+        sortSamples(wavelengths_vec, values_vec);
 
-		return SampledSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
-	}
+        return SampledSpectrum::fromSamples(wavelengths_vec.data(), values_vec.data(), n_samples);
+    }
 
-	for (unsigned int i = 0; i < n_spectral_samples; i++)
-	{
-		result.coefficients[i] = averageSamples(wavelengths, values, n_samples,
-												  sampleWavelength(i), sampleWavelength(i + 1));
-	}
+    for (unsigned int i = 0; i < n_spectral_samples; i++)
+    {
+        result.coefficients[i] = averageSamples(wavelengths, values, n_samples,
+                                                  sampleWavelength(i), sampleWavelength(i + 1));
+    }
 
-	return result;
+    return result;
 }
 
 // Creates a SampledSpectrum object from the given RGB color values
 SampledSpectrum SampledSpectrum::fromRGBValues(const imp_float rgb[3],
-											   SpectrumType type /* = SpectrumType::Reflectance */)
+                                               SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	SampledSpectrum result(0.0f);
+    SampledSpectrum result(0.0f);
 
-	if (type == SpectrumType::Reflectance)
-	{
-		if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2])
-		{
-			// Red is smallest
-			result += rgb[0]*reflectance_white_SPD;
+    if (type == SpectrumType::Reflectance)
+    {
+        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2])
+        {
+            // Red is smallest
+            result += rgb[0]*reflectance_white_SPD;
 
-			if (rgb[1] <= rgb[2])
-			{
-				// Green is second smallest
-				result += (rgb[1] - rgb[0])*reflectance_cyan_SPD;
-				result += (rgb[2] - rgb[1])*reflectance_blue_SPD;
-			}
-			else
-			{
-				// Blue is second smallest
-				result += (rgb[2] - rgb[0])*reflectance_cyan_SPD;
-				result += (rgb[1] - rgb[2])*reflectance_green_SPD;
-			}
-		}
-		else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2])
-		{
-			// Green is smallest
-			result += rgb[1]*reflectance_white_SPD;
+            if (rgb[1] <= rgb[2])
+            {
+                // Green is second smallest
+                result += (rgb[1] - rgb[0])*reflectance_cyan_SPD;
+                result += (rgb[2] - rgb[1])*reflectance_blue_SPD;
+            }
+            else
+            {
+                // Blue is second smallest
+                result += (rgb[2] - rgb[0])*reflectance_cyan_SPD;
+                result += (rgb[1] - rgb[2])*reflectance_green_SPD;
+            }
+        }
+        else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2])
+        {
+            // Green is smallest
+            result += rgb[1]*reflectance_white_SPD;
 
-			if (rgb[0] <= rgb[2])
-			{
-				// Red is second smallest
-				result += (rgb[0] - rgb[1])*reflectance_magenta_SPD;
-				result += (rgb[2] - rgb[0])*reflectance_blue_SPD;
-			}
-			else
-			{
-				// Blue is second smallest
-				result += (rgb[2] - rgb[1])*reflectance_magenta_SPD;
-				result += (rgb[0] - rgb[2])*reflectance_red_SPD;
-			}
-		}
-		else
-		{
-			// Blue is smallest
-			result += rgb[2]*reflectance_white_SPD;
+            if (rgb[0] <= rgb[2])
+            {
+                // Red is second smallest
+                result += (rgb[0] - rgb[1])*reflectance_magenta_SPD;
+                result += (rgb[2] - rgb[0])*reflectance_blue_SPD;
+            }
+            else
+            {
+                // Blue is second smallest
+                result += (rgb[2] - rgb[1])*reflectance_magenta_SPD;
+                result += (rgb[0] - rgb[2])*reflectance_red_SPD;
+            }
+        }
+        else
+        {
+            // Blue is smallest
+            result += rgb[2]*reflectance_white_SPD;
 
-			if (rgb[0] <= rgb[1])
-			{
-				// Red is second smallest
-				result += (rgb[0] - rgb[2])*reflectance_yellow_SPD;
-				result += (rgb[1] - rgb[0])*reflectance_green_SPD;
-			}
-			else
-			{
-				// Green is second smallest
-				result += (rgb[1] - rgb[2])*reflectance_yellow_SPD;
-				result += (rgb[0] - rgb[1])*reflectance_red_SPD;
-			}
-		}
-	}
-	else
-	{
-		if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2])
-		{
-			// Red is smallest
-			result += rgb[0]*illumination_white_SPD;
+            if (rgb[0] <= rgb[1])
+            {
+                // Red is second smallest
+                result += (rgb[0] - rgb[2])*reflectance_yellow_SPD;
+                result += (rgb[1] - rgb[0])*reflectance_green_SPD;
+            }
+            else
+            {
+                // Green is second smallest
+                result += (rgb[1] - rgb[2])*reflectance_yellow_SPD;
+                result += (rgb[0] - rgb[1])*reflectance_red_SPD;
+            }
+        }
+    }
+    else
+    {
+        if (rgb[0] <= rgb[1] && rgb[0] <= rgb[2])
+        {
+            // Red is smallest
+            result += rgb[0]*illumination_white_SPD;
 
-			if (rgb[1] <= rgb[2])
-			{
-				// Green is second smallest
-				result += (rgb[1] - rgb[0])*illumination_cyan_SPD;
-				result += (rgb[2] - rgb[1])*illumination_blue_SPD;
-			}
-			else
-			{
-				// Blue is second smallest
-				result += (rgb[2] - rgb[0])*illumination_cyan_SPD;
-				result += (rgb[1] - rgb[2])*illumination_green_SPD;
-			}
-		}
-		else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2])
-		{
-			// Green is smallest
-			result += rgb[1]*illumination_white_SPD;
+            if (rgb[1] <= rgb[2])
+            {
+                // Green is second smallest
+                result += (rgb[1] - rgb[0])*illumination_cyan_SPD;
+                result += (rgb[2] - rgb[1])*illumination_blue_SPD;
+            }
+            else
+            {
+                // Blue is second smallest
+                result += (rgb[2] - rgb[0])*illumination_cyan_SPD;
+                result += (rgb[1] - rgb[2])*illumination_green_SPD;
+            }
+        }
+        else if (rgb[1] <= rgb[0] && rgb[1] <= rgb[2])
+        {
+            // Green is smallest
+            result += rgb[1]*illumination_white_SPD;
 
-			if (rgb[0] <= rgb[2])
-			{
-				// Red is second smallest
-				result += (rgb[0] - rgb[1])*illumination_magenta_SPD;
-				result += (rgb[2] - rgb[0])*illumination_blue_SPD;
-			}
-			else
-			{
-				// Blue is second smallest
-				result += (rgb[2] - rgb[1])*illumination_magenta_SPD;
-				result += (rgb[0] - rgb[2])*illumination_red_SPD;
-			}
-		}
-		else
-		{
-			// Blue is smallest
-			result += rgb[2]*illumination_white_SPD;
+            if (rgb[0] <= rgb[2])
+            {
+                // Red is second smallest
+                result += (rgb[0] - rgb[1])*illumination_magenta_SPD;
+                result += (rgb[2] - rgb[0])*illumination_blue_SPD;
+            }
+            else
+            {
+                // Blue is second smallest
+                result += (rgb[2] - rgb[1])*illumination_magenta_SPD;
+                result += (rgb[0] - rgb[2])*illumination_red_SPD;
+            }
+        }
+        else
+        {
+            // Blue is smallest
+            result += rgb[2]*illumination_white_SPD;
 
-			if (rgb[0] <= rgb[1])
-			{
-				// Red is second smallest
-				result += (rgb[0] - rgb[2])*illumination_yellow_SPD;
-				result += (rgb[1] - rgb[0])*illumination_green_SPD;
-			}
-			else
-			{
-				// Green is second smallest
-				result += (rgb[1] - rgb[2])*illumination_yellow_SPD;
-				result += (rgb[0] - rgb[1])*illumination_red_SPD;
-			}
-		}
-	}
+            if (rgb[0] <= rgb[1])
+            {
+                // Red is second smallest
+                result += (rgb[0] - rgb[2])*illumination_yellow_SPD;
+                result += (rgb[1] - rgb[0])*illumination_green_SPD;
+            }
+            else
+            {
+                // Green is second smallest
+                result += (rgb[1] - rgb[2])*illumination_yellow_SPD;
+                result += (rgb[0] - rgb[1])*illumination_red_SPD;
+            }
+        }
+    }
 
-	return result.clamped();
+    return result.clamped();
 }
 
 // Creates a SampledSpectrum object from the given tristimulus X, Y and Z values
 SampledSpectrum SampledSpectrum::fromTristimulusValues(const imp_float xyz[3],
-													   SpectrumType type /* = SpectrumType::Reflectance */)
+                                                       SpectrumType type /* = SpectrumType::Reflectance */)
 {
-	imp_float rgb[3];
+    imp_float rgb[3];
 
-	tristimulusToRGB(xyz, rgb);
+    tristimulusToRGB(xyz, rgb);
 
-	return SampledSpectrum::fromRGBValues(rgb);
+    return SampledSpectrum::fromRGBValues(rgb);
 }
 
 // Computes the RGB values for the spectrum
 void SampledSpectrum::computeRGBValues(imp_float rgb[3]) const
 {
-	imp_float xyz[3];
+    imp_float xyz[3];
 
-	SampledSpectrum::computeTristimulusValues(xyz);
-	tristimulusToRGB(xyz, rgb);
+    SampledSpectrum::computeTristimulusValues(xyz);
+    tristimulusToRGB(xyz, rgb);
 }
 
 // Computes the tristimulus values X, Y and Z for the spectrum
 void SampledSpectrum::computeTristimulusValues(imp_float xyz[3]) const
 {
-	xyz[0] = 0; xyz[1] = 0; xyz[2] = 0;
+    xyz[0] = 0; xyz[1] = 0; xyz[2] = 0;
 
-	for (unsigned int i = 0; i < n_spectral_samples; i++)
-	{
-		xyz[0] += coefficients[i]*CIE_X.coefficients[i];
-		xyz[1] += coefficients[i]*CIE_Y.coefficients[i];
-		xyz[2] += coefficients[i]*CIE_Z.coefficients[i];
-	}
+    for (unsigned int i = 0; i < n_spectral_samples; i++)
+    {
+        xyz[0] += coefficients[i]*CIE_X.coefficients[i];
+        xyz[1] += coefficients[i]*CIE_Y.coefficients[i];
+        xyz[2] += coefficients[i]*CIE_Z.coefficients[i];
+    }
 
-	imp_float norm = static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
+    imp_float norm = static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
 
-	xyz[0] *= norm;
-	xyz[1] *= norm;
-	xyz[2] *= norm;
+    xyz[0] *= norm;
+    xyz[1] *= norm;
+    xyz[2] *= norm;
 }
 
 // Returns the tristimulus value Y for the spectrum
 imp_float SampledSpectrum::tristimulusY() const
 {
-	imp_float Y = 0;
+    imp_float Y = 0;
 
-	for (unsigned int i = 0; i < n_spectral_samples; i++)
-	{
-		Y += coefficients[i]*CIE_Y.coefficients[i];
-	}
+    for (unsigned int i = 0; i < n_spectral_samples; i++)
+    {
+        Y += coefficients[i]*CIE_Y.coefficients[i];
+    }
 
-	return Y*static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
+    return Y*static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
 }
 
 RGBSpectrum SampledSpectrum::toRGBSpectrum() const
 {
-	return RGBSpectrum(*this);
+    return RGBSpectrum(*this);
 }
 
 const SampledSpectrum& SampledSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
 {
-	return *this;
+    return *this;
 }
 
 // Initializes the SampledSpectrum objects representing the CIE X, Y and Z spectral matching curves
 void SampledSpectrum::initializeSpectralMatchingCurves()
 {
-	for (unsigned int i = 0; i < n_spectral_samples; i++)
-	{
-		imp_float sample_start_wavelength = sampleWavelength(i);
-		imp_float sample_end_wavelength = sampleWavelength(i + 1);
+    for (unsigned int i = 0; i < n_spectral_samples; i++)
+    {
+        imp_float sample_start_wavelength = sampleWavelength(i);
+        imp_float sample_end_wavelength = sampleWavelength(i + 1);
 
-		CIE_X.coefficients[i] = averageSamples(CIE_wavelengths, CIE_X_values, n_CIE_samples,
-											   sample_start_wavelength, sample_end_wavelength);
+        CIE_X.coefficients[i] = averageSamples(CIE_wavelengths, CIE_X_values, n_CIE_samples,
+                                               sample_start_wavelength, sample_end_wavelength);
 
-		CIE_Y.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Y_values, n_CIE_samples,
-											   sample_start_wavelength, sample_end_wavelength);
+        CIE_Y.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Y_values, n_CIE_samples,
+                                               sample_start_wavelength, sample_end_wavelength);
 
-		CIE_Z.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Z_values, n_CIE_samples,
-											   sample_start_wavelength, sample_end_wavelength);
-	}
+        CIE_Z.coefficients[i] = averageSamples(CIE_wavelengths, CIE_Z_values, n_CIE_samples,
+                                               sample_start_wavelength, sample_end_wavelength);
+    }
 }
 
 // Initializes the SampledSpectrum objects representing the SPDs for the basic colors
 void SampledSpectrum::initializeBaseColorSPDs()
 {
-	for (unsigned int i = 0; i < n_spectral_samples; i++)
-	{
-		double sample_start_wavelength = sampleWavelength(i);
-		double sample_end_wavelength = sampleWavelength(i + 1);
+    for (unsigned int i = 0; i < n_spectral_samples; i++)
+    {
+        double sample_start_wavelength = sampleWavelength(i);
+        double sample_end_wavelength = sampleWavelength(i + 1);
 
-		reflectance_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_white_SPD_values, n_SPD_samples,
-															     sample_start_wavelength, sample_end_wavelength);
+        reflectance_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_white_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, reflectance_red_SPD_values, n_SPD_samples,
-															     sample_start_wavelength, sample_end_wavelength);
+        reflectance_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, reflectance_red_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_green_SPD_values, n_SPD_samples,
-																 sample_start_wavelength, sample_end_wavelength);
+        reflectance_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, reflectance_green_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_blue_SPD_values, n_SPD_samples,
-																 sample_start_wavelength, sample_end_wavelength);
+        reflectance_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_blue_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_cyan_SPD_values, n_SPD_samples,
-																 sample_start_wavelength, sample_end_wavelength);
+        reflectance_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, reflectance_cyan_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, reflectance_magenta_SPD_values, n_SPD_samples,
-																 sample_start_wavelength, sample_end_wavelength);
+        reflectance_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, reflectance_magenta_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		reflectance_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, reflectance_yellow_SPD_values, n_SPD_samples,
-																 sample_start_wavelength, sample_end_wavelength);
+        reflectance_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, reflectance_yellow_SPD_values, n_SPD_samples,
+                                                                 sample_start_wavelength, sample_end_wavelength);
 
-		illumination_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_white_SPD_values, n_SPD_samples,
-															  	  sample_start_wavelength, sample_end_wavelength);
+        illumination_white_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_white_SPD_values, n_SPD_samples,
+                                                                    sample_start_wavelength, sample_end_wavelength);
 
-		illumination_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, illumination_red_SPD_values, n_SPD_samples,
-															      sample_start_wavelength, sample_end_wavelength);
+        illumination_red_SPD.coefficients[i]     = averageSamples(SPD_wavelengths, illumination_red_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_green_SPD_values, n_SPD_samples,
-																  sample_start_wavelength, sample_end_wavelength);
+        illumination_green_SPD.coefficients[i]   = averageSamples(SPD_wavelengths, illumination_green_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_blue_SPD_values, n_SPD_samples,
-																  sample_start_wavelength, sample_end_wavelength);
+        illumination_blue_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_blue_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_cyan_SPD_values, n_SPD_samples,
-																  sample_start_wavelength, sample_end_wavelength);
+        illumination_cyan_SPD.coefficients[i]    = averageSamples(SPD_wavelengths, illumination_cyan_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, illumination_magenta_SPD_values, n_SPD_samples,
-																  sample_start_wavelength, sample_end_wavelength);
+        illumination_magenta_SPD.coefficients[i] = averageSamples(SPD_wavelengths, illumination_magenta_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
 
-		illumination_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, illumination_yellow_SPD_values, n_SPD_samples,
-																  sample_start_wavelength, sample_end_wavelength);
-	}
+        illumination_yellow_SPD.coefficients[i]  = averageSamples(SPD_wavelengths, illumination_yellow_SPD_values, n_SPD_samples,
+                                                                  sample_start_wavelength, sample_end_wavelength);
+    }
 }
 
 // Initializes SampledSpectrum objects required for conversion between different color representations
 void SampledSpectrum::initialize()
 {
-	initializeSpectralMatchingCurves();
-	initializeBaseColorSPDs();
+    initializeSpectralMatchingCurves();
+    initializeBaseColorSPDs();
 }
 
 // Utility functions
@@ -520,7 +520,7 @@ void SampledSpectrum::initialize()
 // Converts the given tristimulus X, Y and Z values to RGB values
 void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])
 {
-	rgb[0] = 3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
+    rgb[0] = 3.240479f*xyz[0] - 1.537150f*xyz[1] - 0.498535f*xyz[2];
     rgb[1] = -0.969256f*xyz[0] + 1.875991f*xyz[1] + 0.041556f*xyz[2];
     rgb[2] = 0.055648f*xyz[0] - 0.204043f*xyz[1] + 1.057311f*xyz[2];
 }
@@ -528,7 +528,7 @@ void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])
 // Converts the given RGB values to tristimulus X, Y and Z values
 void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3])
 {
-	xyz[0] = 0.412453f*rgb[0] + 0.357580f*rgb[1] + 0.180423f*rgb[2];
+    xyz[0] = 0.412453f*rgb[0] + 0.357580f*rgb[1] + 0.180423f*rgb[2];
     xyz[1] = 0.212671f*rgb[0] + 0.715160f*rgb[1] + 0.072169f*rgb[2];
     xyz[2] = 0.019334f*rgb[0] + 0.119193f*rgb[1] + 0.950227f*rgb[2];
 }
@@ -541,115 +541,115 @@ imp_float RGBToTristimulusY(const imp_float rgb[3])
 
 // Determines whether the given wavelengths are sorted in ascending order
 bool samplesAreSorted(const imp_float* wavelengths,
-					  unsigned int n_samples)
+                      unsigned int n_samples)
 {
-	for (unsigned int i = 0; i < n_samples-1; i++)
-	{
-		if (wavelengths[i+1] < wavelengths[i])
-			return false;
-	}
+    for (unsigned int i = 0; i < n_samples-1; i++)
+    {
+        if (wavelengths[i+1] < wavelengths[i])
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 // Sorts the given wavelengths and sample values by wavelength (ascending)
 void sortSamples(std::vector<imp_float>& wavelengths,
-				 std::vector<imp_float>& values)
+                 std::vector<imp_float>& values)
 {
-	unsigned int n_samples = (unsigned int)wavelengths.size();
+    unsigned int n_samples = (unsigned int)wavelengths.size();
 
-	std::vector< std::pair<imp_float, imp_float> > combined;
+    std::vector< std::pair<imp_float, imp_float> > combined;
 
     combined.reserve(n_samples);
 
     for (unsigned int i = 0; i < n_samples; i++)
-	{
+    {
         combined.push_back(std::make_pair(wavelengths[i], values[i]));
-	}
+    }
 
     std::sort(combined.begin(), combined.end());
 
     for (unsigned int i = 0; i < n_samples; i++)
-	{
+    {
         wavelengths[i] = combined[i].first;
         values[i] = combined[i].second;
     }
 }
-	
+    
 // Computes the average of the sample values in the given wavelength range
 template <typename T>
 imp_float averageSamples(const T* wavelengths,
-						 const T* values,
-						 unsigned int n_samples,
-						 T start_wavelength, T end_wavelength)
+                         const T* values,
+                         unsigned int n_samples,
+                         T start_wavelength, T end_wavelength)
 {
-	// Simply use endpoint values if the given wavelength range is outside the sampled range
-	if (end_wavelength <= wavelengths[0])
-		return (imp_float)(values[0]);
-	if (start_wavelength >= wavelengths[n_samples-1])
-		return (imp_float)(values[n_samples-1]);
+    // Simply use endpoint values if the given wavelength range is outside the sampled range
+    if (end_wavelength <= wavelengths[0])
+        return (imp_float)(values[0]);
+    if (start_wavelength >= wavelengths[n_samples-1])
+        return (imp_float)(values[n_samples-1]);
 
-	// Return the single sample value if there is only one
-	if (n_samples == 1)
-		return (imp_float)(values[0]);
+    // Return the single sample value if there is only one
+    if (n_samples == 1)
+        return (imp_float)(values[0]);
 
-	T summed_value = 0;
+    T summed_value = 0;
 
-	// Add endpoint contributions for wavelengths partially outside the sampled range
-	if (start_wavelength < wavelengths[0])
-		summed_value += values[0]*(wavelengths[0] - start_wavelength);
-	if (end_wavelength > wavelengths[n_samples-1])
-		summed_value += values[n_samples-1]*(end_wavelength - wavelengths[n_samples-1]);
+    // Add endpoint contributions for wavelengths partially outside the sampled range
+    if (start_wavelength < wavelengths[0])
+        summed_value += values[0]*(wavelengths[0] - start_wavelength);
+    if (end_wavelength > wavelengths[n_samples-1])
+        summed_value += values[n_samples-1]*(end_wavelength - wavelengths[n_samples-1]);
 
-	unsigned int sample_idx = 0;
-	
-	// Advance to first sample index inside the wavelength range
-	while (start_wavelength > wavelengths[sample_idx])
-		sample_idx++;
+    unsigned int sample_idx = 0;
+    
+    // Advance to first sample index inside the wavelength range
+    while (start_wavelength > wavelengths[sample_idx])
+        sample_idx++;
 
-	// Add sample contributions from each segment inside the wavelength range
-	for (; (sample_idx < n_samples-1) && (wavelengths[sample_idx] <= end_wavelength); sample_idx++)
-	{
-		T segment_start_wavelength = std::max(start_wavelength, wavelengths[sample_idx]);
-		T segment_end_wavelength = std::min(end_wavelength, wavelengths[sample_idx+1]);
+    // Add sample contributions from each segment inside the wavelength range
+    for (; (sample_idx < n_samples-1) && (wavelengths[sample_idx] <= end_wavelength); sample_idx++)
+    {
+        T segment_start_wavelength = std::max(start_wavelength, wavelengths[sample_idx]);
+        T segment_end_wavelength = std::min(end_wavelength, wavelengths[sample_idx+1]);
 
-		summed_value += 0.5f*(::Impact::lerp(values[sample_idx], values[sample_idx+1], (start_wavelength - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])) +
-							  ::Impact::lerp(values[sample_idx], values[sample_idx+1], (end_wavelength   - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])))*
-						(segment_end_wavelength - segment_start_wavelength);
-	}
+        summed_value += 0.5f*(::Impact::lerp(values[sample_idx], values[sample_idx+1], (start_wavelength - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])) +
+                              ::Impact::lerp(values[sample_idx], values[sample_idx+1], (end_wavelength   - wavelengths[sample_idx])/(wavelengths[sample_idx+1] - wavelengths[sample_idx])))*
+                        (segment_end_wavelength - segment_start_wavelength);
+    }
 
-	return (imp_float)(summed_value/(end_wavelength - start_wavelength));
+    return (imp_float)(summed_value/(end_wavelength - start_wavelength));
 }
-	
+    
 // Interpolates the given sample values at the given wavelength
 imp_float interpolateSamples(const imp_float* wavelengths,
-							 const imp_float* values,
-							 unsigned int n_samples,
-							 imp_float wavelength)
+                             const imp_float* values,
+                             unsigned int n_samples,
+                             imp_float wavelength)
 {
-	// Simply use endpoint values if the given wavelength is outside the sampled range
-	if (wavelength <= wavelengths[0])
-		return values[0];
-	if (wavelength >= wavelengths[n_samples-1])
-		return values[n_samples-1];
+    // Simply use endpoint values if the given wavelength is outside the sampled range
+    if (wavelength <= wavelengths[0])
+        return values[0];
+    if (wavelength >= wavelengths[n_samples-1])
+        return values[n_samples-1];
 
-	// Find start index of the wavelengths interval containing wavelength
-	unsigned int offset = findLastIndexWhere([wavelengths, wavelength](unsigned int idx)
-										     {
-											     return wavelengths[idx] <= wavelength;
-										     },
-											 n_samples);
+    // Find start index of the wavelengths interval containing wavelength
+    unsigned int offset = findLastIndexWhere([wavelengths, wavelength](unsigned int idx)
+                                             {
+                                                 return wavelengths[idx] <= wavelength;
+                                             },
+                                             n_samples);
 
-	imp_float weight = (wavelength - wavelengths[offset])/(wavelengths[offset+1] - wavelengths[offset]);
+    imp_float weight = (wavelength - wavelengths[offset])/(wavelengths[offset+1] - wavelengths[offset]);
 
-	return ::Impact::lerp(values[offset], values[offset+1], weight);
+    return ::Impact::lerp(values[offset], values[offset+1], weight);
 }
 
 // Returns the wavelength [nm] corresponding to the given sample index
 imp_float sampleWavelength(unsigned int sample_idx)
 {
-	return ::Impact::lerp(wavelength_samples_start, wavelength_samples_end,
-						  static_cast<imp_float>(sample_idx)/static_cast<imp_float>(n_spectral_samples));
+    return ::Impact::lerp(wavelength_samples_start, wavelength_samples_end,
+                          static_cast<imp_float>(sample_idx)/static_cast<imp_float>(n_spectral_samples));
 }
 
 // Initializations of the CIE mathcing curve samples
@@ -936,65 +936,65 @@ extern const imp_float CIE_Y_values[n_CIE_samples] =
 
 extern const imp_float CIE_Z_values[n_CIE_samples] = 
 {
-    0.0006061000f,	 0.0006808792f,	  0.0007651456f,   0.0008600124f,
-    0.0009665928f,	 0.001086000f,	  0.001220586f,    0.001372729f,
-    0.001543579f,	 0.001734286f,	  0.001946000f,    0.002177777f,
-    0.002435809f,	 0.002731953f,	  0.003078064f,    0.003486000f,
-    0.003975227f,	 0.004540880f,	  0.005158320f,    0.005802907f,
-    0.006450001f,	 0.007083216f,	  0.007745488f,    0.008501152f,
-    0.009414544f,	 0.01054999f,	  0.01196580f,     0.01365587f,
-    0.01558805f,	 0.01773015f,	  0.02005001f,     0.02251136f,
-    0.02520288f,	 0.02827972f,	  0.03189704f,     0.03621000f,
-    0.04143771f,	 0.04750372f,	  0.05411988f,     0.06099803f,
-    0.06785001f,	 0.07448632f,	  0.08136156f,     0.08915364f,
-    0.09854048f,	 0.1102000f,	  0.1246133f,      0.1417017f,
-    0.1613035f,		 0.1832568f,	  0.2074000f,      0.2336921f,
-    0.2626114f,		 0.2947746f,	  0.3307985f,      0.3713000f,
-    0.4162091f,		 0.4654642f,	  0.5196948f,      0.5795303f,
-    0.6456000f,		 0.7184838f,	  0.7967133f,      0.8778459f,
-    0.9594390f,		 1.0390501f,	  1.1153673f,      1.1884971f,
-    1.2581233f,		 1.3239296f,	  1.3856000f,      1.4426352f,
-    1.4948035f,		 1.5421903f,	  1.5848807f,      1.6229600f,
-    1.6564048f,		 1.6852959f,	  1.7098745f,      1.7303821f,
-    1.7470600f,		 1.7600446f,	  1.7696233f,      1.7762637f,
-    1.7804334f,		 1.7826000f,	  1.7829682f,      1.7816998f,
-    1.7791982f,		 1.7758671f,	  1.7721100f,      1.7682589f,
-    1.7640390f,		 1.7589438f,	  1.7524663f,      1.7441000f,
-    1.7335595f,		 1.7208581f,	  1.7059369f,      1.6887372f,
-    1.6692000f,		 1.6475287f,	  1.6234127f,      1.5960223f,
-    1.5645280f,		 1.5281000f,	  1.4861114f,      1.4395215f,
-    1.3898799f,		 1.3387362f,	  1.2876400f,      1.2374223f,
-    1.1878243f,		 1.1387611f,	  1.0901480f,      1.0419000f,
-    0.9941976f,		 0.9473473f,	  0.9014531f,      0.8566193f,
-    0.8129501f,		 0.7705173f,	  0.7294448f,      0.6899136f,
-    0.6521049f,		 0.6162000f,	  0.5823286f,      0.5504162f,
-    0.5203376f,		 0.4919673f,	  0.4651800f,      0.4399246f,
-    0.4161836f,		 0.3938822f,	  0.3729459f,      0.3533000f,
-    0.3348578f,		 0.3175521f,	  0.3013375f,      0.2861686f,
-    0.2720000f,		 0.2588171f,	  0.2464838f,      0.2347718f,
-    0.2234533f,		 0.2123000f,	  0.2011692f,      0.1901196f,
-    0.1792254f,		 0.1685608f,	  0.1582000f,      0.1481383f,
-    0.1383758f,		 0.1289942f,	  0.1200751f,      0.1117000f,
-    0.1039048f,		 0.09666748f,	  0.08998272f,     0.08384531f,
-    0.07824999f,	 0.07320899f,	  0.06867816f,     0.06456784f,
-    0.06078835f,	 0.05725001f,	  0.05390435f,     0.05074664f,
-    0.04775276f,	 0.04489859f,	  0.04216000f,     0.03950728f,
-    0.03693564f,	 0.03445836f,	  0.03208872f,	   0.02984000f,
-    0.02771181f,	 0.02569444f,	  0.02378716f,	   0.02198925f,
-    0.02030000f,	 0.01871805f,	  0.01724036f,	   0.01586364f,
-    0.01458461f,	 0.01340000f,	  0.01230723f,	   0.01130188f,
-    0.01037792f,	 0.009529306f,	  0.008749999f,    0.008035200f,
-    0.007381600f,	 0.006785400f,	  0.006242800f,    0.005749999f,
-    0.005303600f,	 0.004899800f,	  0.004534200f,    0.004202400f,
-    0.003900000f,	 0.003623200f,	  0.003370600f,    0.003141400f,
-    0.002934800f,	 0.002749999f,	  0.002585200f,    0.002438600f,
-    0.002309400f,	 0.002196800f,	  0.002100000f,    0.002017733f,
-    0.001948200f,	 0.001889800f,	  0.001840933f,    0.001800000f,
-    0.001766267f,	 0.001737800f,	  0.001711200f,    0.001683067f,
-    0.001650001f,	 0.001610133f,	  0.001564400f,    0.001513600f,
-    0.001458533f,	 0.001400000f,	  0.001336667f,    0.001270000f,
-    0.001205000f,	 0.001146667f,	  0.001100000f,    0.001068800f,
-    0.001049400f,	 0.001035600f,	  0.001021200f,	   0.001000000f,
+    0.0006061000f,     0.0006808792f,      0.0007651456f,   0.0008600124f,
+    0.0009665928f,     0.001086000f,      0.001220586f,    0.001372729f,
+    0.001543579f,     0.001734286f,      0.001946000f,    0.002177777f,
+    0.002435809f,     0.002731953f,      0.003078064f,    0.003486000f,
+    0.003975227f,     0.004540880f,      0.005158320f,    0.005802907f,
+    0.006450001f,     0.007083216f,      0.007745488f,    0.008501152f,
+    0.009414544f,     0.01054999f,      0.01196580f,     0.01365587f,
+    0.01558805f,     0.01773015f,      0.02005001f,     0.02251136f,
+    0.02520288f,     0.02827972f,      0.03189704f,     0.03621000f,
+    0.04143771f,     0.04750372f,      0.05411988f,     0.06099803f,
+    0.06785001f,     0.07448632f,      0.08136156f,     0.08915364f,
+    0.09854048f,     0.1102000f,      0.1246133f,      0.1417017f,
+    0.1613035f,         0.1832568f,      0.2074000f,      0.2336921f,
+    0.2626114f,         0.2947746f,      0.3307985f,      0.3713000f,
+    0.4162091f,         0.4654642f,      0.5196948f,      0.5795303f,
+    0.6456000f,         0.7184838f,      0.7967133f,      0.8778459f,
+    0.9594390f,         1.0390501f,      1.1153673f,      1.1884971f,
+    1.2581233f,         1.3239296f,      1.3856000f,      1.4426352f,
+    1.4948035f,         1.5421903f,      1.5848807f,      1.6229600f,
+    1.6564048f,         1.6852959f,      1.7098745f,      1.7303821f,
+    1.7470600f,         1.7600446f,      1.7696233f,      1.7762637f,
+    1.7804334f,         1.7826000f,      1.7829682f,      1.7816998f,
+    1.7791982f,         1.7758671f,      1.7721100f,      1.7682589f,
+    1.7640390f,         1.7589438f,      1.7524663f,      1.7441000f,
+    1.7335595f,         1.7208581f,      1.7059369f,      1.6887372f,
+    1.6692000f,         1.6475287f,      1.6234127f,      1.5960223f,
+    1.5645280f,         1.5281000f,      1.4861114f,      1.4395215f,
+    1.3898799f,         1.3387362f,      1.2876400f,      1.2374223f,
+    1.1878243f,         1.1387611f,      1.0901480f,      1.0419000f,
+    0.9941976f,         0.9473473f,      0.9014531f,      0.8566193f,
+    0.8129501f,         0.7705173f,      0.7294448f,      0.6899136f,
+    0.6521049f,         0.6162000f,      0.5823286f,      0.5504162f,
+    0.5203376f,         0.4919673f,      0.4651800f,      0.4399246f,
+    0.4161836f,         0.3938822f,      0.3729459f,      0.3533000f,
+    0.3348578f,         0.3175521f,      0.3013375f,      0.2861686f,
+    0.2720000f,         0.2588171f,      0.2464838f,      0.2347718f,
+    0.2234533f,         0.2123000f,      0.2011692f,      0.1901196f,
+    0.1792254f,         0.1685608f,      0.1582000f,      0.1481383f,
+    0.1383758f,         0.1289942f,      0.1200751f,      0.1117000f,
+    0.1039048f,         0.09666748f,      0.08998272f,     0.08384531f,
+    0.07824999f,     0.07320899f,      0.06867816f,     0.06456784f,
+    0.06078835f,     0.05725001f,      0.05390435f,     0.05074664f,
+    0.04775276f,     0.04489859f,      0.04216000f,     0.03950728f,
+    0.03693564f,     0.03445836f,      0.03208872f,       0.02984000f,
+    0.02771181f,     0.02569444f,      0.02378716f,       0.02198925f,
+    0.02030000f,     0.01871805f,      0.01724036f,       0.01586364f,
+    0.01458461f,     0.01340000f,      0.01230723f,       0.01130188f,
+    0.01037792f,     0.009529306f,      0.008749999f,    0.008035200f,
+    0.007381600f,     0.006785400f,      0.006242800f,    0.005749999f,
+    0.005303600f,     0.004899800f,      0.004534200f,    0.004202400f,
+    0.003900000f,     0.003623200f,      0.003370600f,    0.003141400f,
+    0.002934800f,     0.002749999f,      0.002585200f,    0.002438600f,
+    0.002309400f,     0.002196800f,      0.002100000f,    0.002017733f,
+    0.001948200f,     0.001889800f,      0.001840933f,    0.001800000f,
+    0.001766267f,     0.001737800f,      0.001711200f,    0.001683067f,
+    0.001650001f,     0.001610133f,      0.001564400f,    0.001513600f,
+    0.001458533f,     0.001400000f,      0.001336667f,    0.001270000f,
+    0.001205000f,     0.001146667f,      0.001100000f,    0.001068800f,
+    0.001049400f,     0.001035600f,      0.001021200f,       0.001000000f,
     0.0009686400f,   0.0009299200f,   0.0008868800f,   0.0008425600f,
     0.0008000000f,   0.0007609600f,   0.0007236800f,   0.0006859200f,
     0.0006454400f,   0.0006000000f,   0.0005478667f,   0.0004916000f,
@@ -1002,14 +1002,14 @@ extern const imp_float CIE_Z_values[n_CIE_samples] =
     0.0002831600f,   0.0002654400f,   0.0002518133f,   0.0002400000f,
     0.0002295467f,   0.0002206400f,   0.0002119600f,   0.0002021867f,
     0.0001900000f,   0.0001742133f,   0.0001556400f,   0.0001359600f,
-    0.0001168533f,   0.0001000000f,	  0.00008613333f,  0.00007460000f,
+    0.0001168533f,   0.0001000000f,      0.00008613333f,  0.00007460000f,
     0.00006500000f,  0.00005693333f,  0.00004999999f,  0.00004416000f,
     0.00003948000f,  0.00003572000f,  0.00003264000f,  0.00003000000f,
     0.00002765333f,  0.00002556000f,  0.00002364000f,  0.00002181333f,
     0.00002000000f,  0.00001813333f,  0.00001620000f,  0.00001420000f,
     0.00001213333f,  0.00001000000f,  0.000007733333f, 0.000005400000f,
-    0.000003200000f, 0.000001333333f, 0.0f,			   0.0f,
-    0.0f,			 0.0f,			  0.0f,			   0.0f,
+    0.000003200000f, 0.000001333333f, 0.0f,               0.0f,
+    0.0f,             0.0f,              0.0f,               0.0f,
     0.0f,            0.0f,            0.0f,            0.0f,
     0.0f,            0.0f,            0.0f,            0.0f,
     0.0f,            0.0f,            0.0f,            0.0f,
@@ -1053,7 +1053,7 @@ extern const imp_float CIE_Z_values[n_CIE_samples] =
     0.0f,            0.0f,            0.0f,            0.0f,
     0.0f,            0.0f,            0.0f,            0.0f,
     0.0f,            0.0f,            0.0f,            0.0f,
-    0.0f,			 0.0f,			  0.0f
+    0.0f,             0.0f,              0.0f
 };
 
 extern const double SPD_wavelengths[n_SPD_samples] =

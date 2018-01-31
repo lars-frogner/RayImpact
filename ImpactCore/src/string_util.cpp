@@ -53,41 +53,41 @@ std::vector<std::string> split(const std::string& s, char delim /* = ' '*/)
 }
 
 std::string join(const std::vector<std::string>& sequence,
-				 const std::string& separator,
-				 int start /* = 0 */, int end /* = -1 */)
+                 const std::string& separator,
+                 int start /* = 0 */, int end /* = -1 */)
 {
-	int sequence_length = (int)(sequence.size());
+    int sequence_length = (int)(sequence.size());
 
-	if (end < 0)
-		end += sequence_length;
+    if (end < 0)
+        end += sequence_length;
 
-	imp_assert(end >= start && start >= 0 && end < sequence_length);
+    imp_assert(end >= start && start >= 0 && end < sequence_length);
 
-	if (sequence_length == 0)
-		return std::string();
+    if (sequence_length == 0)
+        return std::string();
 
-	std::string concatenated = sequence[start];
+    std::string concatenated = sequence[start];
 
-	for (int idx = start + 1; idx <= end; idx++)
-	{
-		concatenated += separator + sequence[idx];
-	}
+    for (int idx = start + 1; idx <= end; idx++)
+    {
+        concatenated += separator + sequence[idx];
+    }
 
-	return concatenated;
+    return concatenated;
 }
 
 std::string formatString(const char* format, ...)
 {
-	va_list arguments;
-	char buffer[256];
+    va_list arguments;
+    char buffer[256];
 
-	va_start(arguments, format);
-	int n_chars_written = vsprintf_s(buffer, 256, format, arguments);
-	va_end(arguments);
+    va_start(arguments, format);
+    int n_chars_written = vsprintf_s(buffer, 256, format, arguments);
+    va_end(arguments);
 
-	imp_assert(n_chars_written < 256);
+    imp_assert(n_chars_written < 256);
 
-	return std::string(buffer);
+    return std::string(buffer);
 }
 
 } // Impact

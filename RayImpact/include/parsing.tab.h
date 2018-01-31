@@ -96,9 +96,9 @@ typedef union YYSTYPE
 /* Line 2058 of yacc.c  */
 #line 8 "parsing.y"
 
-	char s[YYLVAL_STR_LEN];
-	int i;
-	double f;
+    char s[YYLVAL_STR_LEN];
+    int i;
+    double f;
 
 
 /* Line 2058 of yacc.c  */

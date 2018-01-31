@@ -17,39 +17,39 @@ class Cylinder : public Shape {
 
 public:
 
-	imp_float radius; // Radius of the cylinder
-	imp_float y_min; // y-coordinate for the bottom of the cylinder
-	imp_float y_max; // y-coordinate for the top of the cylinder
-	imp_float phi_max; // Largest azimuthal angle of the partial cylinder
+    imp_float radius; // Radius of the cylinder
+    imp_float y_min; // y-coordinate for the bottom of the cylinder
+    imp_float y_max; // y-coordinate for the top of the cylinder
+    imp_float phi_max; // Largest azimuthal angle of the partial cylinder
 
-	// Phi is the angle in the zx-plane with respect to the positive z-axis.
+    // Phi is the angle in the zx-plane with respect to the positive z-axis.
 
-	Cylinder(const Transformation* object_to_world,
-		     const Transformation* world_to_object,
-		     bool has_reverse_orientation,
-		     imp_float radius,
-		     imp_float y_min, imp_float y_max,
-		     imp_float phi_max);
+    Cylinder(const Transformation* object_to_world,
+             const Transformation* world_to_object,
+             bool has_reverse_orientation,
+             imp_float radius,
+             imp_float y_min, imp_float y_max,
+             imp_float phi_max);
 
-	BoundingBoxF objectSpaceBoundingBox() const;
+    BoundingBoxF objectSpaceBoundingBox() const;
 
-	bool intersect(const Ray& ray,
-				   imp_float* intersection_distance,
-				   SurfaceScatteringEvent* scattering_event,
-				   bool test_alpha_texture = true) const;
+    bool intersect(const Ray& ray,
+                   imp_float* intersection_distance,
+                   SurfaceScatteringEvent* scattering_event,
+                   bool test_alpha_texture = true) const;
 
-	bool hasIntersection(const Ray& ray,
-						 bool test_alpha_texture = true) const;
+    bool hasIntersection(const Ray& ray,
+                         bool test_alpha_texture = true) const;
 
-	imp_float surfaceArea() const;
+    imp_float surfaceArea() const;
 };
 
 // Cylinder creation
 
 std::shared_ptr<Shape> createCylinder(const Transformation* object_to_world,
-									  const Transformation* world_to_object,
-									  bool has_reverse_orientation,
-									  const ParameterSet& parameters);
+                                      const Transformation* world_to_object,
+                                      bool has_reverse_orientation,
+                                      const ParameterSet& parameters);
 
 } // RayImpact
 } // Impact

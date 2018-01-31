@@ -15,21 +15,21 @@ class Scene {
 
 private:
 
-	std::shared_ptr<Model> model_aggregate; // An aggregate of all models in the scene
-	BoundingBoxF world_bounding_box; // Bounding box encompassing all models in the scene
+    std::shared_ptr<Model> model_aggregate; // An aggregate of all models in the scene
+    BoundingBoxF world_bounding_box; // Bounding box encompassing all models in the scene
 
 public:
 
-	std::vector< std::shared_ptr<Light> > lights; // All lights in the scene
+    std::vector< std::shared_ptr<Light> > lights; // All lights in the scene
 
-	Scene(std::shared_ptr<Model> model_aggregate,
-		  const std::vector< std::shared_ptr<Light> >& lights);
+    Scene(std::shared_ptr<Model> model_aggregate,
+          const std::vector< std::shared_ptr<Light> >& lights);
 
-	const BoundingBoxF& worldSpaceBoundingBox() const;
+    const BoundingBoxF& worldSpaceBoundingBox() const;
 
-	bool intersect(const Ray& ray, SurfaceScatteringEvent* scattering_event) const;
+    bool intersect(const Ray& ray, SurfaceScatteringEvent* scattering_event) const;
 
-	bool hasIntersection(const Ray& ray) const;
+    bool hasIntersection(const Ray& ray) const;
 };
 
 } // RayImpact

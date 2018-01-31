@@ -10,17 +10,17 @@ class AtomicFloat {
 
 private:
 
-	std::atomic<imp_float_bits> bits;
+    std::atomic<imp_float_bits> bits;
 
 public:
 
-	explicit AtomicFloat(imp_float value = 0);
+    explicit AtomicFloat(imp_float value = 0);
 
-	operator imp_float() const;
+    operator imp_float() const;
 
-	imp_float operator=(imp_float value);
+    imp_float operator=(imp_float value);
 
-	void add(imp_float value);
+    void add(imp_float value);
 };
 
 } // Impact
