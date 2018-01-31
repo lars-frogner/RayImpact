@@ -24,7 +24,7 @@ class Material{ public: void computeScatteringFunctions(SurfaceScatteringEvent* 
 														TransportMode mode,
 														bool allow_multiple_lobes) const {} };
 class Light{ public: void preprocess(const Scene& scene) const {} };
-class AreaLight{};
+class AreaLight : public Light {};
 class Medium{};
 class MediumInterface{ public: const Medium* outside; };
 
