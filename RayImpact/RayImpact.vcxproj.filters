@@ -19,6 +19,9 @@
     <Filter Include="User interface">
       <UniqueIdentifier>{39795467-769c-40d5-b233-8da7a7fde85f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parsing">
+      <UniqueIdentifier>{29488a34-1eb2-49e3-b8cf-a44ce3ca1a22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ray.cpp">
@@ -64,6 +67,23 @@
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\api.cpp">
       <Filter>User interface</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Quaternion.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AnimatedTransformation.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Integrator.cpp" />
+    <ClCompile Include="src\parsing.cpp">
+      <Filter>Parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parsing.flex.cpp">
+      <Filter>Parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parsing.tab.cpp">
+      <Filter>Parsing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,5 +152,29 @@
     <ClInclude Include="include\api.hpp">
       <Filter>User interface</Filter>
     </ClInclude>
+    <ClInclude Include="include\Quaternion.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimatedTransformation.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene.hpp" />
+    <ClInclude Include="include\Integrator.hpp" />
+    <ClInclude Include="include\parsing.h">
+      <Filter>Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\parsing.tab.h">
+      <Filter>Parsing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Flex Include="src\parsing.l">
+      <Filter>Parsing</Filter>
+    </Flex>
+  </ItemGroup>
+  <ItemGroup>
+    <Bison Include="src\parsing.y">
+      <Filter>Parsing</Filter>
+    </Bison>
   </ItemGroup>
 </Project>

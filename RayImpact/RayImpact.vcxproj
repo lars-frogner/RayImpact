@@ -19,19 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AnimatedTransformation.cpp" />
     <ClCompile Include="src\api.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\Disk.cpp" />
+    <ClCompile Include="src\Integrator.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OrthographicCamera.cpp" />
     <ClCompile Include="src\ParameterSet.cpp" />
+    <ClCompile Include="src\parsing.cpp" />
+    <ClCompile Include="src\parsing.flex.cpp" />
+    <ClCompile Include="src\parsing.tab.cpp" />
     <ClCompile Include="src\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\Quaternion.cpp" />
     <ClCompile Include="src\RandomSampler.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\Sampler.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Sensor.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Spectrum.cpp" />
@@ -41,6 +48,7 @@
     <ClCompile Include="src\UniformSampler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AnimatedTransformation.hpp" />
     <ClInclude Include="include\BoundingBox.hpp" />
     <ClInclude Include="include\BoundingRectangle.hpp" />
     <ClInclude Include="include\BoxFilter.hpp" />
@@ -50,15 +58,20 @@
     <ClInclude Include="include\Filter.hpp" />
     <ClInclude Include="include\GaussianFilter.hpp" />
     <ClInclude Include="include\geometry.hpp" />
+    <ClInclude Include="include\Integrator.hpp" />
     <ClInclude Include="include\Model.hpp" />
     <ClInclude Include="include\OrthographicCamera.hpp" />
     <ClInclude Include="include\ParameterSet.hpp" />
+    <ClInclude Include="include\parsing.h" />
+    <ClInclude Include="include\parsing.tab.h" />
     <ClInclude Include="include\PerspectiveCamera.hpp" />
+    <ClInclude Include="include\Quaternion.hpp" />
     <ClInclude Include="include\RandomSampler.hpp" />
     <ClInclude Include="include\Ray.hpp" />
     <ClInclude Include="include\api.hpp" />
     <ClInclude Include="include\Sampler.hpp" />
     <ClInclude Include="include\ScatteringEvent.hpp" />
+    <ClInclude Include="include\Scene.hpp" />
     <ClInclude Include="include\Sensor.hpp" />
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\Spectrum.hpp" />
@@ -68,6 +81,12 @@
     <ClInclude Include="include\Transformation.hpp" />
     <ClInclude Include="include\TriangleFilter.hpp" />
     <ClInclude Include="include\UniformSampler.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Flex Include="src\parsing.l" />
+  </ItemGroup>
+  <ItemGroup>
+    <Bison Include="src\parsing.y" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -104,6 +123,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="..\External\win_flex_bison\custom_build_rules\win_flex_bison_custom_build.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -152,6 +172,16 @@
       <AdditionalDependencies>ImpactCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ImpactCore\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)src\%(Filename).tab.cpp</OutputFile>
+    </Bison>
+    <Bison>
+      <DefinesFile>$(ProjectDir)include\%(Filename).tab.h</DefinesFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)src\%(Filename).flex.cpp</OutputFile>
+      <Cpp>false</Cpp>
+    </Flex>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -168,6 +198,16 @@
       <AdditionalDependencies>ImpactCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ImpactCore\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)src\%(Filename).tab.cpp</OutputFile>
+    </Bison>
+    <Bison>
+      <DefinesFile>$(ProjectDir)include\%(Filename).tab.h</DefinesFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)src\%(Filename).flex.cpp</OutputFile>
+      <Cpp>false</Cpp>
+    </Flex>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -189,6 +229,16 @@
       <AdditionalDependencies>ImpactCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ImpactCore\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)src\%(Filename).tab.cpp</OutputFile>
+    </Bison>
+    <Bison>
+      <DefinesFile>$(ProjectDir)include\%(Filename).tab.h</DefinesFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)src\%(Filename).flex.cpp</OutputFile>
+      <Cpp>false</Cpp>
+    </Flex>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -209,8 +259,19 @@
       <AdditionalDependencies>ImpactCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ImpactCore\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)src\%(Filename).tab.cpp</OutputFile>
+    </Bison>
+    <Bison>
+      <DefinesFile>$(ProjectDir)include\%(Filename).tab.h</DefinesFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)src\%(Filename).flex.cpp</OutputFile>
+      <Cpp>false</Cpp>
+    </Flex>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\External\win_flex_bison\custom_build_rules\win_flex_bison_custom_build.targets" />
   </ImportGroup>
 </Project>
