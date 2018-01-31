@@ -90,9 +90,9 @@ void yyerror(char* s);
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "parsing.tab.hpp".  */
-#ifndef YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_HPP_INCLUDED
-# define YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_HPP_INCLUDED
+   by #include "parsing.tab.h".  */
+#ifndef YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
+# define YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -186,7 +186,7 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_HPP_INCLUDED  */
+#endif /* !YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
