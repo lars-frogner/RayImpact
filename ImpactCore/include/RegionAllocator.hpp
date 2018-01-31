@@ -5,6 +5,8 @@
 
 namespace Impact {
 
+// RegionAllocator declarations
+
 class RegionAllocator {
 
 private:

@@ -5,6 +5,8 @@
 
 namespace Impact {
 
+// RegionAllocator method implementations
+
 RegionAllocator::RegionAllocator(size_t block_size /* = 262144 */)
 	: block_size(block_size),
 	  current_block(nullptr),
