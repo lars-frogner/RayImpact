@@ -108,5 +108,16 @@ std::unique_ptr<Sampler> UniformSampler::cloned(unsigned int seed)
 	return std::unique_ptr<Sampler>(sampler);
 }
 
+// UniformSampler creation
+
+Sampler* createUniformSampler(const ParameterSet& parameters)
+{
+	unsigned int n_pix_samples_x = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples_x", 1));
+	unsigned int n_pix_samples_y = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples_y", 1));
+	unsigned int n_sample_dims = (unsigned int)std::abs(parameters.getSingleIntValue("n_sample_dims", 5));
+
+	return new UniformSampler(n_pix_samples_x, n_pix_samples_y, n_sample_dims);
+}
+
 } // RayImpact
 } // Impact

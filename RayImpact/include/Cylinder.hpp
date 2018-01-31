@@ -5,6 +5,8 @@
 #include "Transformation.hpp"
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
+#include "ParameterSet.hpp"
+#include <memory>
 
 namespace Impact {
 namespace RayImpact {
@@ -41,6 +43,13 @@ public:
 
 	imp_float surfaceArea() const;
 };
+
+// Cylinder creation
+
+std::shared_ptr<Shape> createCylinder(const Transformation* object_to_world,
+									  const Transformation* world_to_object,
+									  bool has_reverse_orientation,
+									  const ParameterSet& parameters);
 
 } // RayImpact
 } // Impact

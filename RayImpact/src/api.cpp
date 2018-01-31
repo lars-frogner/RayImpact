@@ -5,11 +5,25 @@
 #include "RegionAllocator.hpp"
 #include "Transformation.hpp"
 #include "AnimatedTransformation.hpp"
+#include "Camera.hpp"
+#include "OrthographicCamera.hpp"
+#include "PerspectiveCamera.hpp"
 #include "Spectrum.hpp"
 #include "Shape.hpp"
+#include "Sphere.hpp"
+#include "Cylinder.hpp"
+#include "Disk.hpp"
 #include "Model.hpp"
 #include "Scene.hpp"
 #include "Integrator.hpp"
+#include "Filter.hpp"
+#include "BoxFilter.hpp"
+#include "TriangleFilter.hpp"
+#include "GaussianFilter.hpp"
+#include "Sampler.hpp"
+#include "UniformSampler.hpp"
+#include "RandomSampler.hpp"
+#include "StratifiedSampler.hpp"
 #include <memory>
 #include <map>
 #include <vector>
@@ -47,6 +61,11 @@ public:
 		return transformations[idx];
 	}
 
+	const Transformation& operator[](unsigned int idx) const
+	{
+		return transformations[idx];
+	}
+
 	TransformationSet inverted() const
 	{
 		TransformationSet result;
@@ -75,8 +94,10 @@ static std::map<std::string, TransformationSet> defined_coordinate_systems; // A
 // Configurations tracking
 
 // Container for rendering configurations
-struct Configurations
-{
+class Configurations {
+
+public:
+
 	imp_float transformation_start_time = 0.0f; // Point in time when the initial transformation applies
 	imp_float transformation_end_time = 1.0f; // Point in time when the final transformation applies
 
@@ -103,20 +124,14 @@ struct Configurations
 	std::map< std::string, std::shared_ptr<Medium> > defined_media; // A table of named media
 
 	std::vector< std::shared_ptr<Model> > models; // List of models in the scene
-	std::vector< std::shared_ptr<AreaLight> > lights; // List of area lights in the scene
+	std::vector< std::shared_ptr<Light> > lights; // List of lights in the scene
 
 	std::map< std::string, std::vector< std::shared_ptr<Model> > > objects; // Table of object instances in the scene
 	std::vector< std::shared_ptr<Model> >* current_object = nullptr; // The current object instance
 
-	Integrator* createIntegrator()
-	{
-		return nullptr;
-	}
-
-	Scene* createScene()
-	{
-		return nullptr;
-	}
+	Scene* createScene();
+	Integrator* createIntegrator() const;
+	Camera* createCamera() const;
 };
 
 static std::unique_ptr<Configurations> configurations; // The current rendering configurations
@@ -135,15 +150,9 @@ public:
 
 	bool use_reverse_orientation = false;
 
-	std::shared_ptr<Material> createMaterial(const ParameterSet& parameters)
-	{
-		return nullptr;
-	}
+	std::shared_ptr<Material> createMaterial(const ParameterSet& parameters);
 
-	MediumInterface createMediumInterface(const ParameterSet& parameters)
-	{
-		return MediumInterface();
-	}
+	MediumInterface createMediumInterface();
 };
 
 // Container for stored transformations
@@ -248,20 +257,161 @@ static TransformationCache transformation_cache; // Holds stored transformations
 
 // Creation functions
 
+std::shared_ptr<Sampler> createSampler(const std::string& type,
+									   const ParameterSet& parameters)
+{
+	Sampler* sampler = nullptr;
+
+	if (type == "uniform")
+	{
+		sampler = createUniformSampler(parameters);
+	}
+	else if (type == "random")
+	{
+		sampler = createRandomSampler(parameters);
+	}
+	else if (type == "stratified")
+	{
+		sampler = createStratifiedSampler(parameters);
+	}
+	else
+	{
+		printSevereMessage("sampler type \"%s\" is invalid.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return std::shared_ptr<Sampler>(sampler);
+}
+
+Filter* createFilter(const std::string& type,
+					 const ParameterSet& parameters)
+{
+	Filter* filter = nullptr;
+
+	if (type == "box")
+	{
+		filter = createBoxFilter(parameters);
+	}
+	else if (type == "triangle")
+	{
+		filter = createTriangleFilter(parameters);
+	}
+	else if (type == "gaussian")
+	{
+		filter = createGaussianFilter(parameters);
+	}
+	else
+	{
+		printErrorMessage("filter type \"%s\" is invalid.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return filter;
+}
+
+Sensor* createSensor(const std::string& type,
+					 std::unique_ptr<Filter> filter,
+					 const std::string& output_filename,
+					 const ParameterSet& parameters)
+{
+	Sensor* sensor = nullptr;
+
+	if (type == "image")
+	{
+		sensor = createImageSensor(std::move(filter), output_filename, parameters);
+	}
+	else
+	{
+		printErrorMessage("sensor type \"%s\" is invalid.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return sensor;
+}
+
 std::vector< std::shared_ptr<Shape> > createShapes(const std::string& type,
-												   const Transformation* model_to_world,
-												   const Transformation* world_to_model,
+												   const Transformation* object_to_world,
+												   const Transformation* world_to_object,
 												   bool use_reverse_orientation,
 												   const ParameterSet& parameters)
 {
-	return std::vector< std::shared_ptr<Shape> >();
+	std::vector< std::shared_ptr<Shape> > shapes;
+
+	if (type == "sphere")
+	{
+		shapes.push_back(createSphere(object_to_world,
+									  world_to_object,
+									  use_reverse_orientation,
+									  parameters));
+	}
+	else if (type == "cylinder")
+	{
+		shapes.push_back(createCylinder(object_to_world,
+									    world_to_object,
+									    use_reverse_orientation,
+									    parameters));
+	}
+	else if (type == "disk")
+	{
+		shapes.push_back(createDisk(object_to_world,
+									world_to_object,
+									use_reverse_orientation,
+									parameters));
+	}
+	else
+	{
+		printErrorMessage("shape type \"%s\" is invalid. Ignoring call.", type.c_str());
+	}
+
+	return shapes;
 }
 
 std::shared_ptr<Model> CreateAccelerationStructure(const std::string& type,
 												   const std::vector< std::shared_ptr<Model> >& models,
 												   const ParameterSet& parameters)
 {
-	return nullptr;
+	std::shared_ptr<Model> accelerator;
+
+	if (false)//type == "bvh")
+	{
+
+	}
+	else if (false)//type == "kdtree")
+	{
+
+	}
+	else
+	{
+		printErrorMessage("accelerator type \"%s\" is invalid. Ignoring call.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return accelerator;
+}
+
+std::shared_ptr<Light> createLight(const std::string& type,
+								   const Transformation& light_to_world,
+								   const MediumInterface& medium_interface,
+								   const ParameterSet& parameters)
+{
+	std::shared_ptr<Light> light;
+
+	if (false)//type == "point")
+	{
+
+	}
+	else
+	{
+		printErrorMessage("light type \"%s\" is invalid. Ignoring call.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return light;
 }
 
 std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
@@ -270,7 +420,147 @@ std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
 										   const ParameterSet& parameters,
 										   std::shared_ptr<Shape> shape)
 {
+	std::shared_ptr<AreaLight> area_light;
+
+	if (false)//type == "diffuse")
+	{
+
+	}
+	else
+	{
+		printErrorMessage("area light type \"%s\" is invalid. Ignoring call.", type.c_str());
+	}
+
+	parameters.warnAboutUnusedParameters();
+
+	return area_light;
+}
+
+std::shared_ptr<Material> GraphicsState::createMaterial(const ParameterSet& parameters)
+{
 	return nullptr;
+}
+
+MediumInterface GraphicsState::createMediumInterface()
+{
+	return MediumInterface();
+}
+
+Scene* Configurations::createScene()
+{
+	std::shared_ptr<Model> accelerator = CreateAccelerationStructure(accelerator_type,
+																	 models,
+																	 accelerator_parameters);
+
+	//if (!accelerator)
+	//	accelerator = std::make_shared<BoundingVolumeHierarchy>(models);
+
+	Scene* scene = new Scene(accelerator, lights);
+
+	models.clear();
+	lights.clear();
+
+	return scene;
+}
+
+Integrator* Configurations::createIntegrator() const
+{
+	std::shared_ptr<const Camera> camera(createCamera());
+
+	if (!camera)
+	{
+		printErrorMessage("could not create camera");
+		return nullptr;
+	}
+
+	std::shared_ptr<Sampler> sampler = createSampler(sampler_type, sampler_parameters);
+
+	if (!sampler)
+	{
+		printErrorMessage("could not create sampler");
+		return nullptr;
+	}
+
+	Integrator* integrator = nullptr;
+
+	if (false)//integrator_type == "whitted")
+	{
+
+	}
+	else
+	{
+		printErrorMessage("integrator type \"%s\" is invalid. Ignoring call.", integrator_type.c_str());
+		return nullptr;
+	}
+
+	integrator_parameters.warnAboutUnusedParameters();
+
+	if (lights.empty())
+		printWarningMessage("no lights specified. Rendered image will be black.");
+
+	return integrator;
+}
+
+Camera* Configurations::createCamera() const
+{
+	imp_assert(max_transformations == 2);
+
+	Transformation* camera_to_world_start;
+	Transformation* camera_to_world_end;
+
+	transformation_cache.lookup(camera_to_world[0], &camera_to_world_start, nullptr);
+	transformation_cache.lookup(camera_to_world[1], &camera_to_world_end, nullptr);
+
+	AnimatedTransformation camera_to_world_animated(camera_to_world_start,
+													camera_to_world_end,
+													transformation_start_time,
+													transformation_end_time);
+
+	Filter* filter = createFilter(filter_type, filter_parameters);
+
+	if (!filter)
+	{
+		printErrorMessage("could not create filter");
+		return nullptr;
+	}
+
+	Sensor* sensor = createSensor(sensor_type,
+								  std::unique_ptr<Filter>(filter),
+								  RIMP_OPTIONS.image_filename,
+								  sensor_parameters);
+
+	if (!sensor)
+	{
+		printErrorMessage("could not create sensor");
+		return nullptr;
+	}
+
+	Camera* camera = nullptr;
+
+	MediumInterface medium_interface = current_graphics_state.createMediumInterface();
+
+	if (camera_type == "orthographic")
+	{
+		camera = createOrthographicCamera(camera_to_world_animated,
+										  sensor,
+										  medium_interface.outside,
+										  camera_parameters);
+	}
+	else if (camera_type == "perspective")
+	{
+		camera = createPerspectiveCamera(camera_to_world_animated,
+										 sensor,
+										 medium_interface.outside,
+										 camera_parameters);
+	}
+	else
+	{
+		printErrorMessage("camera type \"%s\" is invalid.", camera_type.c_str());
+	}
+
+	camera_parameters.warnAboutUnusedParameters();
+
+	return camera;
 }
 
 // API function implementations
@@ -626,7 +916,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 
 		parameters.warnAboutUnusedParameters();
 
-		MediumInterface medium_interface = current_graphics_state.createMediumInterface(parameters);
+		MediumInterface medium_interface = current_graphics_state.createMediumInterface();
 
 		for (auto shape : shapes)
 		{
@@ -672,7 +962,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 
 		parameters.warnAboutUnusedParameters();
 
-		MediumInterface medium_interface = current_graphics_state.createMediumInterface(parameters);
+		MediumInterface medium_interface = current_graphics_state.createMediumInterface();
 
 		for (auto shape : shapes)
 			models.push_back(std::make_shared<GeometricModel>(shape, material, nullptr, medium_interface));

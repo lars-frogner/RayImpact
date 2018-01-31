@@ -119,5 +119,45 @@ imp_float OrthographicCamera::generateRayWithOffsets(const CameraSample& sample,
 	return 1.0f;
 }
 
+// OrthographicCamera creation
+
+Camera* createOrthographicCamera(const AnimatedTransformation& camera_to_world,
+								 Sensor* sensor,
+								 const Medium* medium,
+								 const ParameterSet& parameters)
+{
+	BoundingRectangleF screen_window;
+
+	unsigned int n_values;
+	const Point2F* screen_window_corners = parameters.getPoint2FValues("screen_window", &n_values);
+
+	if (!screen_window_corners || n_values != 2)
+	{
+		screen_window.lower_corner = Point2F(-1, -1);
+		screen_window.upper_corner = Point2F(1, 1);
+
+		if (n_values != 2)
+			printErrorMessage("the camera \"screen_window\" parameter must consist of exactly two point2f values. Using default screen window.");
+	}
+	else
+	{
+		screen_window = screen_window.aroundPoints(screen_window_corners[0], screen_window_corners[1]);
+	}
+
+	imp_float shutter_opening_time = parameters.getSingleFloatValue("shutter_opening_time", 0.0f);
+	imp_float shutter_closing_time = parameters.getSingleFloatValue("shutter_closing_time", 0.002f);
+	imp_float lens_radius = parameters.getSingleFloatValue("lens_radius", 0.0f);
+	imp_float focal_distance = parameters.getSingleFloatValue("focal_distance", 1.0f);
+
+	return new OrthographicCamera(camera_to_world,
+								  screen_window,
+								  shutter_opening_time,
+								  shutter_closing_time,
+								  lens_radius,
+								  focal_distance,
+								  sensor,
+								  medium);
+}
+
 } // RayImpact
 } // Impact

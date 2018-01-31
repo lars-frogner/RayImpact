@@ -194,5 +194,25 @@ imp_float Disk::surfaceArea() const
 	return 0.5f*phi_max*(radius*radius - inner_radius*inner_radius);
 }
 
+// Disk creation
+
+std::shared_ptr<Shape> createDisk(const Transformation* object_to_world,
+								  const Transformation* world_to_object,
+								  bool has_reverse_orientation,
+								  const ParameterSet& parameters)
+{
+	imp_float radius = parameters.getSingleFloatValue("radius", 1.0f);
+	imp_float inner_radius = parameters.getSingleFloatValue("inner_radius", 0.0f);
+	imp_float y = parameters.getSingleFloatValue("y", 0.0f);
+	imp_float phi_max = parameters.getSingleFloatValue("phi_max", 360.0f);
+
+	return std::make_shared<Disk>(object_to_world,
+								  world_to_object,
+								  has_reverse_orientation,
+								  radius, inner_radius,
+								  y,
+								  phi_max);
+}
+
 } // RayImpact
 } // Impact

@@ -1,5 +1,6 @@
 #pragma once
 #include "Filter.hpp"
+#include "ParameterSet.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -24,6 +25,15 @@ inline BoxFilter::BoxFilter(const Vector2F& radius)
 inline imp_float BoxFilter::evaluate(const Point2F& position) const
 {
 	return 1.0f;
+}
+
+// BoxFilter creation
+
+inline Filter* createBoxFilter(const ParameterSet& parameters)
+{
+	Vector2F radius = parameters.getSingleVector2FValue("radius", Vector2F(5.0f, 5.0f));
+
+	return new BoxFilter(radius);
 }
 
 } // RayImpact

@@ -1,6 +1,8 @@
 #pragma once
 #include "precision.hpp"
 #include "Camera.hpp"
+#include "ParameterSet.hpp"
+#include <memory>
 
 namespace Impact {
 namespace RayImpact {
@@ -31,6 +33,13 @@ public:
 	imp_float generateRayWithOffsets(const CameraSample& sample,
 									 RayWithOffsets* ray) const;
 };
+
+// OrthographicCamera creation
+
+Camera* createOrthographicCamera(const AnimatedTransformation& camera_to_world,
+								 Sensor* sensor,
+								 const Medium* medium,
+								 const ParameterSet& parameters);
 
 } // RayImpact
 } // Impact

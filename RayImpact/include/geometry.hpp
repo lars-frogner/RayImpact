@@ -26,7 +26,7 @@ class Material{ public: void computeScatteringFunctions(SurfaceScatteringEvent* 
 class Light{ public: void preprocess(const Scene& scene) const {} };
 class AreaLight{};
 class Medium{};
-class MediumInterface{};
+class MediumInterface{ public: const Medium* outside; };
 
 // Forward declarations
 	

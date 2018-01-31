@@ -5,6 +5,7 @@
 #include "BoundingRectangle.hpp"
 #include "Filter.hpp"
 #include "Spectrum.hpp"
+#include "ParameterSet.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -110,6 +111,12 @@ struct RawPixel
 	EnergySpectrum recieved_energy = 0.0f; // Sum of weighted radiance contributions
 	imp_float sum_of_filter_weights = 0; // Sum of filter weights for samples contributing to the pixel
 };
+
+// Sensor creation
+
+Sensor* createImageSensor(std::unique_ptr<Filter> filter,
+						  const std::string& output_filename,
+						  const ParameterSet& parameters);
 
 } // RayImpact
 } // Impact

@@ -26,6 +26,10 @@ public:
 	std::unique_ptr<Sampler> cloned(unsigned int seed);
 };
 
+// StratifiedSampler creation
+
+Sampler* createStratifiedSampler(const ParameterSet& parameters);
+
 // Utility functions for stratified sampling
 
 void generateStratifiedSamples(imp_float* samples,

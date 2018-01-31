@@ -74,5 +74,15 @@ std::unique_ptr<Sampler> RandomSampler::cloned(unsigned int seed)
 	return std::unique_ptr<Sampler>(sampler);
 }
 
+// RandomSampler creation
+
+Sampler* createRandomSampler(const ParameterSet& parameters)
+{
+	unsigned int n_pix_samples = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples", 1));
+	unsigned int n_sample_dims = (unsigned int)std::abs(parameters.getSingleIntValue("n_sample_dims", 5));
+
+	return new RandomSampler(n_pix_samples, n_sample_dims);
+}
+
 } // RayImpact
 } // Impact

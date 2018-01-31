@@ -358,5 +358,25 @@ imp_float Sphere::surfaceArea() const
 	return phi_max*radius*(y_max - y_min);
 }
 
+// Sphere creation
+
+std::shared_ptr<Shape> createSphere(const Transformation* object_to_world,
+								    const Transformation* world_to_object,
+								    bool has_reverse_orientation,
+									const ParameterSet& parameters)
+{
+	imp_float radius = parameters.getSingleFloatValue("radius", 1.0f);
+	imp_float y_min = parameters.getSingleFloatValue("y_min", -radius);
+	imp_float y_max = parameters.getSingleFloatValue("y_max", radius);
+	imp_float phi_max = parameters.getSingleFloatValue("phi_max", 360.0f);
+
+	return std::make_shared<Sphere>(object_to_world,
+									world_to_object,
+									has_reverse_orientation,
+									radius,
+									y_min, y_max,
+									phi_max);
+}
+
 } // RayImpact
 } // Impact

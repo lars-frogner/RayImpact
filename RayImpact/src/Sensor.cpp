@@ -312,5 +312,59 @@ RawPixel& SensorRegion::rawPixel(const Point2I& pixel_position)
 	return pixels[region_pixel_idx];
 }
 
+// Sensor creation
+
+Sensor* createImageSensor(std::unique_ptr<Filter> filter,
+						  const std::string& output_filename,
+						  const ParameterSet& parameters)
+{
+	unsigned int n_values;
+
+	Vector2I resolution;
+
+	const int* resolution_values = parameters.getIntValues("resolution", &n_values);
+
+	if (!resolution_values || n_values != 2)
+	{
+		resolution.x = 400;
+		resolution.y = 400;
+
+		if (n_values != 2)
+			printErrorMessage("the sensor \"resolution\" parameter must consist of exactly two integers. Using default resolution.");
+	}
+	else
+	{
+		resolution.x = std::abs(resolution_values[0]);
+		resolution.y = std::abs(resolution_values[1]);
+	}
+
+	BoundingRectangleF crop_window;
+
+	const Point2F* crop_window_corners = parameters.getPoint2FValues("crop_window", &n_values);
+
+	if (!crop_window_corners || n_values != 2)
+	{
+		crop_window.lower_corner = Point2F(0, 0);
+		crop_window.upper_corner = Point2F(1, 1);
+
+		if (n_values != 2)
+			printErrorMessage("the sensor \"crop_window\" parameter must consist of exactly two point2f values. Using default crop window.");
+	}
+	else
+	{
+		crop_window = crop_window.aroundPoints(crop_window_corners[0], crop_window_corners[1]);
+	}
+
+	imp_float diagonal_extent = parameters.getSingleFloatValue("diagonal_extent", 0.05f);
+	imp_float final_image_scale = parameters.getSingleFloatValue("final_image_scale", 1.0f);
+
+	return new Sensor(resolution,
+					  crop_window,
+					  std::move(filter),
+					  diagonal_extent,
+					  output_filename,
+					  final_image_scale);
+}
+
 } // RayImpact
 } // Impact

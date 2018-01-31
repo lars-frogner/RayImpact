@@ -1,5 +1,6 @@
 #pragma once
 #include "Sampler.hpp"
+#include "ParameterSet.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -25,6 +26,10 @@ public:
 	std::unique_ptr<Sampler> cloned();
 	std::unique_ptr<Sampler> cloned(unsigned int seed);
 };
+
+// UniformSampler creation
+
+Sampler* createUniformSampler(const ParameterSet& parameters);
 
 } // RayImpact
 } // Impact
