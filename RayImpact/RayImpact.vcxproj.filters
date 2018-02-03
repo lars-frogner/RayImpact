@@ -85,6 +85,7 @@
     <ClCompile Include="src\parsing.tab.cpp">
       <Filter>Parsing</Filter>
     </ClCompile>
+    <ClCompile Include="src\BSDF.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -166,6 +167,7 @@
     <ClInclude Include="include\parsing.tab.h">
       <Filter>Parsing</Filter>
     </ClInclude>
+    <ClInclude Include="include\BSDF.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Flex Include="src\parsing.l">
