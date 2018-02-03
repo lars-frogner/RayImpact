@@ -21,6 +21,8 @@ typedef RGBSpectrum Spectrum;
 typedef Spectrum EnergySpectrum;
 typedef Spectrum PowerSpectrum;
 typedef Spectrum RadianceSpectrum;
+typedef Spectrum ReflectanceSpectrum;
+typedef Spectrum TransmittanceSpectrum;
 
 // Global variables
 
