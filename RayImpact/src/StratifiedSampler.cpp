@@ -1,5 +1,6 @@
 #include "StratifiedSampler.hpp"
-#include <algorithm>
+#include "sampling.hpp"
+#include <cmath>
 
 namespace Impact {
 namespace RayImpact {
@@ -86,74 +87,6 @@ std::unique_ptr<Sampler> StratifiedSampler::cloned(unsigned int seed)
     sampler->rng.setSeed(seed);
 
     return std::unique_ptr<Sampler>(sampler);
-}
-
-// Utility functions for stratified sampling
-
-// Fills the given array with stratified sample values covering the unit interval
-void generateStratifiedSamples(imp_float* samples,
-                               size_t n_samples,
-                               RandomNumberGenerator& rng)
-{
-    imp_float sample_separation = 1.0f/n_samples;
-
-    for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
-    {
-        samples[sample_idx] = std::min((sample_idx + rng.uniformFloat())*sample_separation, IMP_ONE_MINUS_EPS);
-    }
-}
-
-// Fills the given array with stratified sample points covering the unit square
-void generateStratifiedSamples(Point2F* samples,
-                               size_t n_samples_x,
-                               size_t n_samples_y,
-                               RandomNumberGenerator& rng)
-{
-    imp_float sample_separation_x = 1.0f/n_samples_x;
-    imp_float sample_separation_y = 1.0f/n_samples_y;
-    size_t sample_idx = 0;
-
-    for (size_t y = 0; y < n_samples_y; y++) {
-        for (size_t x = 0; x < n_samples_x; x++)
-        {
-            samples[sample_idx].x = std::min((x + rng.uniformFloat())*sample_separation_x, IMP_ONE_MINUS_EPS);
-            samples[sample_idx].y = std::min((y + rng.uniformFloat())*sample_separation_y, IMP_ONE_MINUS_EPS);
-        
-            sample_idx++;
-        }
-    }
-}
-
-// Fills the given array with Latin hypercube sample points inside the n-dimensional unit cube
-void generateLatinHypercubeSamples(imp_float* samples,
-                                   size_t n_samples,
-                                   unsigned int n_sample_dimensions,
-                                   RandomNumberGenerator& rng)
-{
-    imp_float sample_separation = 1.0f/n_samples;
-
-    // Generate stratified sample values in the unit interval for all sample dimensions
-    for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++) {
-        for (unsigned int n = 0; n < n_sample_dimensions; n++)
-        {
-            imp_float sample_value = (sample_idx + rng.uniformFloat())*sample_separation;
-
-            samples[sample_idx*n_sample_dimensions + n] = std::min(sample_value, IMP_ONE_MINUS_EPS);
-        }
-    }
-
-    // Shuffle the sample values in each dimension
-    for (unsigned int n = 0; n < n_sample_dimensions; n++) {
-        for (size_t sample_idx = 0; sample_idx < n_samples; sample_idx++)
-        {
-            // Choose random sample higher up in the list
-            size_t sample_to_swap_with = sample_idx + rng.uniformUInt32();
-    
-            // Swap the samples
-            std::swap(samples[         sample_idx*n_sample_dimensions + n],
-                      samples[sample_to_swap_with*n_sample_dimensions + n]);
-        }
-    }
 }
 
 // StratifiedSampler creation

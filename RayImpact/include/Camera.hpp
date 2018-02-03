@@ -73,13 +73,5 @@ public:
                      const Medium* medium);
 };
 
-inline Point2F unitSquareToUnitDisk(const Point2F& sample)
-{
-    imp_float theta = sample.x*IMP_TWO_PI;
-    imp_float radius = sample.y;
-
-    return Point2F(radius*std::cos(theta), radius*std::sin(theta));
-}
-
 } // RayImpact
 } // Impact

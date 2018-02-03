@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "sampling.hpp"
 
 namespace Impact {
 namespace RayImpact {

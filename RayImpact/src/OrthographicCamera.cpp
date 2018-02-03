@@ -1,4 +1,5 @@
 #include "OrthographicCamera.hpp"
+#include "sampling.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -41,7 +42,7 @@ imp_float OrthographicCamera::generateRay(const CameraSample& sample,
     if (lens_radius > 0)
     {
         // Map [0, 1) square sample to sample on the circular lens
-        const Point2F& lens_point = lens_radius*unitSquareToUnitDisk(sample.lens_point);
+        const Point2F& lens_point = lens_radius*concentricDiskSample(sample.lens_point);
 
         // Find where the ray through the lens center intersects the plane of focus
         imp_float intersection_distance_with_plane_of_focus = focal_distance/ray->direction.z;
@@ -75,7 +76,7 @@ imp_float OrthographicCamera::generateRayWithOffsets(const CameraSample& sample,
     if (lens_radius > 0)
     {
         // Map [0, 1) square sample to sample on the circular lens
-        const Point2F& lens_point = lens_radius*unitSquareToUnitDisk(sample.lens_point);
+        const Point2F& lens_point = lens_radius*concentricDiskSample(sample.lens_point);
 
         // Find where the ray through the lens center intersects the plane of focus
         imp_float intersection_distance_with_plane_of_focus = focal_distance/ray->direction.z;

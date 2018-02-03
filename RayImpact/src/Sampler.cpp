@@ -1,4 +1,5 @@
 #include "Sampler.hpp"
+#include "sampling.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -241,10 +242,6 @@ Point2F GlobalSampler::next2DSampleComponent()
 
     return sample_component;
 }
-
-// Sampling utility functions
-
-
 
 } // RayImpact
 } // Impact
