@@ -18,7 +18,7 @@ class Scene;
 
 class BSDF{};
 class BSSRDF{};
-class TransportMode{};
+enum class TransportMode{ Radiance };
 class Material{ public: void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
                                                         RegionAllocator& allocator,
                                                         TransportMode mode,
@@ -173,6 +173,8 @@ public:
     
     void flipToSameHemisphereAs(const Vector3& other);
     void flipToSameHemisphereAs(const Normal3<T>& normal);
+
+    Vector3 reflectedAbout(const Vector3& direction) const;
 };
 
 // Normal3 declarations
@@ -729,6 +731,12 @@ inline void Vector3<T>::flipToSameHemisphereAs(const Normal3<T>& normal)
 {
     if (dot(normal) < 0)
         reverse();
+}
+
+template <typename T>
+inline Vector3<T> Vector3<T>::reflectedAbout(const Vector3& direction) const
+{
+    return (2.0f*dot(direction))*direction - *this;
 }
 
 // Normal3 method implementations
