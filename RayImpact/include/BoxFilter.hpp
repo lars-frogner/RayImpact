@@ -5,27 +5,21 @@
 namespace Impact {
 namespace RayImpact {
 
-// BoxFilter declarations
+// BoxFilter implementation
 
 class BoxFilter : public Filter {
 
 public:
 
-    BoxFilter(const Vector2F& radius);
+    BoxFilter(const Vector2F& radius)
+            : Filter::Filter(radius)
+    {}
 
-    imp_float evaluate(const Point2F& position) const;
+    imp_float evaluate(const Point2F& position) const
+    {
+        return 1.0f;
+    }
 };
-
-// BoxFilter method implementations
-
-inline BoxFilter::BoxFilter(const Vector2F& radius)
-    : Filter::Filter(radius)
-{}
-
-inline imp_float BoxFilter::evaluate(const Point2F& position) const
-{
-    return 1.0f;
-}
 
 // BoxFilter creation
 

@@ -6,28 +6,22 @@
 namespace Impact {
 namespace RayImpact {
 
-// TriangleFilter declarations
+// TriangleFilter implementation
 
 class TriangleFilter : public Filter {
 
 public:
 
-    TriangleFilter(const Vector2F& radius);
+    TriangleFilter(const Vector2F& radius)
+        : Filter::Filter(radius)
+    {}
 
-    imp_float evaluate(const Point2F& position) const;
+    imp_float evaluate(const Point2F& position) const
+    {
+        return std::max(0.0f, radius.x - std::abs(position.x))*
+               std::max(0.0f, radius.y - std::abs(position.y));
+    }
 };
-
-// TriangleFilter method implementations
-
-inline TriangleFilter::TriangleFilter(const Vector2F& radius)
-    : Filter::Filter(radius)
-{}
-
-inline imp_float TriangleFilter::evaluate(const Point2F& position) const
-{
-    return std::max(0.0f, radius.x - std::abs(position.x))*
-           std::max(0.0f, radius.y - std::abs(position.y));
-}
 
 // TriangleFilter creation
 

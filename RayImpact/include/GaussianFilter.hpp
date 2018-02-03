@@ -6,7 +6,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// GaussianFilter declarations
+// GaussianFilter implementation
 
 class GaussianFilter : public Filter {
 
@@ -19,26 +19,19 @@ private:
 public:
 
     GaussianFilter(const Vector2F& radius,
-                   imp_float sharpness);
+                   imp_float sharpness)
+        : Filter::Filter(radius),
+          sharpness(sharpness),
+          edge_value_x(std::exp(-sharpness*radius.x*radius.x)),
+          edge_value_y(std::exp(-sharpness*radius.y*radius.y))
+    {}
 
-    imp_float evaluate(const Point2F& position) const;
+    imp_float evaluate(const Point2F& position) const
+    {
+        return std::max<imp_float>(0.0f, std::exp(-sharpness*position.x*position.x) - edge_value_x)*
+               std::max<imp_float>(0.0f, std::exp(-sharpness*position.y*position.y) - edge_value_y);
+    }
 };
-
-// GaussianFilter method implementations
-
-inline GaussianFilter::GaussianFilter(const Vector2F& radius,
-                               imp_float sharpness)
-    : Filter::Filter(radius),
-      sharpness(sharpness),
-      edge_value_x(std::exp(-sharpness*radius.x*radius.x)),
-      edge_value_y(std::exp(-sharpness*radius.y*radius.y))
-{}
-
-inline imp_float GaussianFilter::evaluate(const Point2F& position) const
-{
-    return std::max<imp_float>(0.0f, std::exp(-sharpness*position.x*position.x) - edge_value_x)*
-           std::max<imp_float>(0.0f, std::exp(-sharpness*position.y*position.y) - edge_value_y);
-}
 
 // GaussianFilter creation
 
