@@ -108,15 +108,6 @@ Point2F concentricDiskSample(const Point2F& sample_point)
     return Point2F(radius*std::cos(phi), radius*std::sin(phi));
 }
 
-// Given a sample point inside the unit square, returns a uniformly sampled point inside the unit disk
-Point2F uniformDiskSample(const Point2F& sample_point)
-{
-    imp_float radius = std::sqrt(sample_point.x);
-    imp_float theta = sample_point.y*IMP_TWO_PI;
-
-    return Point2F(radius*std::cos(theta), radius*std::sin(theta));
-}
-
 // Given a sample point inside the unit square, returns a uniformly sampled direction vector in the unit hemisphere around the z-axis
 Vector3F uniformHemisphereSample(const Point2F& sample_point)
 {
