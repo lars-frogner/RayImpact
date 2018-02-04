@@ -468,17 +468,17 @@ SurfaceScatteringEvent Transformation::operator()(const SurfaceScatteringEvent& 
     transformed_event.outgoing_direction = transformation(scattering_event.outgoing_direction).normalized();
     transformed_event.surface_normal = transformation(scattering_event.surface_normal).normalized();
 
-    transformed_event.position_u_deriv = transformation(scattering_event.position_u_deriv);
-    transformed_event.position_v_deriv = transformation(scattering_event.position_v_deriv);
-    transformed_event.normal_u_deriv = transformation(scattering_event.normal_u_deriv);
-    transformed_event.normal_v_deriv = transformation(scattering_event.normal_v_deriv);
+    transformed_event.dpdu = transformation(scattering_event.dpdu);
+    transformed_event.dpdv = transformation(scattering_event.dpdv);
+    transformed_event.dndu = transformation(scattering_event.dndu);
+    transformed_event.dndv = transformation(scattering_event.dndv);
     
     transformed_event.shading.surface_normal = transformation(scattering_event.shading.surface_normal).normalized();
     
-    transformed_event.shading.position_u_deriv = transformation(scattering_event.shading.position_u_deriv);
-    transformed_event.shading.position_v_deriv = transformation(scattering_event.shading.position_v_deriv);
-    transformed_event.shading.normal_u_deriv = transformation(scattering_event.shading.normal_u_deriv);
-    transformed_event.shading.normal_v_deriv = transformation(scattering_event.shading.normal_v_deriv);
+    transformed_event.shading.dpdu = transformation(scattering_event.shading.dpdu);
+    transformed_event.shading.dpdv = transformation(scattering_event.shading.dpdv);
+    transformed_event.shading.dndu = transformation(scattering_event.shading.dndu);
+    transformed_event.shading.dndv = transformation(scattering_event.shading.dndv);
 
     transformed_event.shading.surface_normal.flipToSameHemisphereAs(transformed_event.surface_normal);
 
