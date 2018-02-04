@@ -15,6 +15,7 @@ constexpr imp_float IMP_MAX = std::numeric_limits<imp_float>::max();
 constexpr imp_float IMP_MIN = std::numeric_limits<imp_float>::min();
 constexpr imp_float IMP_LOWEST = std::numeric_limits<imp_float>::lowest();
 
+constexpr imp_float IMP_SQRT_TWO = 1.41421356237309504880;
 constexpr imp_float IMP_PI = 3.14159265358979323846;
 constexpr imp_float IMP_ONE_OVER_PI = 1/IMP_PI;
 constexpr imp_float IMP_PI_OVER_TWO = IMP_PI/2;
@@ -95,6 +96,25 @@ inline bool solveQuadraticEquation(imp_float a, imp_float b, imp_float c, imp_fl
     *x2 = (imp_float)(c/q);
 
     if (*x1 > *x2) std::swap(*x1, *x2);
+
+    return true;
+}
+
+// Solves the the linear system A[i][0]*x0 + A[i][1]*x1 = b[i], i = 0, 1 and returns false if the solution doesn't exist
+inline bool solve2x2LinearSystem(imp_float A[2][2], imp_float b[2], imp_float* x0, imp_float* x1)
+{
+    imp_float inverse_determinant = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+
+    if (std::abs(inverse_determinant) < 1e-10f)
+        return false;
+
+    inverse_determinant = 1.0f/inverse_determinant;
+
+    *x0 = (A[1][1]*b[0] - A[0][1]*b[1])*inverse_determinant;
+    *x1 = (A[0][0]*b[1] - A[1][0]*b[0])*inverse_determinant;
+
+    if (std::isnan(*x0) || std::isnan(*x1))
+        return false;
 
     return true;
 }
