@@ -72,22 +72,22 @@ void generateLatinHypercubeSamples(imp_float* samples,
 }
 
 // Given a sample point inside the unit square, returns a uniformly sampled point inside the unit disk
-Point2F uniformDiskSample(const Point2F& sample_point)
+Point2F uniformDiskSample(const Point2F& sample)
 {
-    imp_float radius = std::sqrt(sample_point.x);
-    imp_float theta = sample_point.y*IMP_TWO_PI;
+    imp_float radius = std::sqrt(sample.x);
+    imp_float theta = sample.y*IMP_TWO_PI;
 
     return Point2F(radius*std::cos(theta), radius*std::sin(theta));
 }
 
 // Given a sample point inside the unit square, returns a concentric sampled point inside the unit disk
-Point2F concentricDiskSample(const Point2F& sample_point)
+Point2F concentricDiskSample(const Point2F& sample)
 {
-    if (sample_point.x == 0 && sample_point.y == 0)
+    if (sample.x == 0 && sample.y == 0)
         return Point2F(0, 0);
 
-    imp_float a = 2*sample_point.x - 1;
-    imp_float b = 2*sample_point.y - 1;
+    imp_float a = 2*sample.x - 1;
+    imp_float b = 2*sample.y - 1;
 
     imp_float radius;
     imp_float phi;
@@ -109,19 +109,19 @@ Point2F concentricDiskSample(const Point2F& sample_point)
 }
 
 // Given a sample point inside the unit square, returns a uniformly sampled direction vector in the unit hemisphere around the z-axis
-Vector3F uniformHemisphereSample(const Point2F& sample_point)
+Vector3F uniformHemisphereSample(const Point2F& sample)
 {
-    imp_float cos_theta = sample_point.x;
+    imp_float cos_theta = sample.x;
     imp_float sin_theta = std::sqrt(std::max<imp_float>(0, 1 - cos_theta*cos_theta));
-    imp_float phi = IMP_TWO_PI*sample_point.y;
+    imp_float phi = IMP_TWO_PI*sample.y;
 
     return Vector3F(sin_theta*std::cos(phi), sin_theta*std::sin(phi), cos_theta);
 }
 
 // Given a sample point inside the unit square, returns a cosine-weighted sampled direction vector in the unit hemisphere around the z-axis
-Vector3F cosineWeightedHemisphereSample(const Point2F& sample_point)
+Vector3F cosineWeightedHemisphereSample(const Point2F& sample)
 {
-    const Point2F& disk_sample = concentricDiskSample(sample_point);
+    const Point2F& disk_sample = concentricDiskSample(sample);
 
     imp_float z = std::sqrt(std::max<imp_float>(0, 1 - disk_sample.x*disk_sample.x - disk_sample.y*disk_sample.y));
 

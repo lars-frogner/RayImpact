@@ -25,13 +25,13 @@ void generateLatinHypercubeSamples(imp_float* samples,
                                    unsigned int n_sample_dimensions,
                                    RandomNumberGenerator& rng);
 
-Point2F uniformDiskSample(const Point2F& sample_point);
+Point2F uniformDiskSample(const Point2F& sample);
 
-Point2F concentricDiskSample(const Point2F& sample_point);
+Point2F concentricDiskSample(const Point2F& sample);
 
-Vector3F uniformHemisphereSample(const Point2F& sample_point);
+Vector3F uniformHemisphereSample(const Point2F& sample);
 
-Vector3F cosineWeightedHemisphereSample(const Point2F& sample_point);
+Vector3F cosineWeightedHemisphereSample(const Point2F& sample);
 
 // Sampling utility function implementations
 
