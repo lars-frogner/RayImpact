@@ -1,7 +1,9 @@
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
 #include "Model.hpp"
+#include "BSDF.hpp"
 #include "math.hpp"
+#include <cmath>
 
 namespace Impact {
 namespace RayImpact {
@@ -62,10 +64,10 @@ bool ScatteringEvent::isOnSurface() const
 SurfaceScatteringEvent::SurfaceScatteringEvent()
     : ScatteringEvent::ScatteringEvent(),
       position_uv(),
-      position_u_deriv(),
-      position_v_deriv(),
-      normal_u_deriv(),
-      normal_v_deriv(),
+      dpdu(), dpdv(),
+      dndu(), dndv(),
+      dpdx(), dpdy(),
+      dudx(0), dvdx(0), dudy(0), dvdy(0),
       shape(nullptr),
       model(nullptr),
       bsdf(nullptr),
@@ -77,33 +79,33 @@ SurfaceScatteringEvent::SurfaceScatteringEvent(const Point3F& position,
                                                const Vector3F& position_error,
                                                const Point2F& position_uv,
                                                const Vector3F& outgoing_direction,
-                                               const Vector3F& position_u_deriv,
-                                               const Vector3F& position_v_deriv,
-                                               const Normal3F& normal_u_deriv,
-                                               const Normal3F& normal_v_deriv,
+                                               const Vector3F& dpdu,
+                                               const Vector3F& dpdv,
+                                               const Normal3F& dndu,
+                                               const Normal3F& dndv,
                                                imp_float time,
                                                const Shape* shape)
     : ScatteringEvent::ScatteringEvent(position,
                                        position_error,
                                        outgoing_direction,
-                                       Normal3F(position_u_deriv.cross(position_v_deriv).normalized()),
+                                       Normal3F(dpdu.cross(dpdv).normalized()),
                                        nullptr,
                                        time),
       position_uv(position_uv),
-      position_u_deriv(position_u_deriv),
-      position_v_deriv(position_v_deriv),
-      normal_u_deriv(normal_u_deriv),
-      normal_v_deriv(normal_v_deriv),
+      dpdu(dpdu), dpdv(dpdv),
+      dndu(dndu), dndv(dndv),
+      dpdx(), dpdy(),
+      dudx(0), dvdx(0), dudy(0), dvdy(0),
       shape(shape),
       model(nullptr),
       bsdf(nullptr),
       bssrdf(nullptr)
 {
     shading.surface_normal = surface_normal;
-    shading.position_u_deriv = position_u_deriv;
-    shading.position_v_deriv = position_v_deriv;
-    shading.normal_u_deriv = normal_u_deriv;
-    shading.normal_v_deriv = normal_v_deriv;
+    shading.dpdu = dpdu;
+    shading.dpdv = dpdv;
+    shading.dndu = dndu;
+    shading.dndv = dndv;
 
     // Reverse surface normal if either the shape is specified to
     // have reverse orientation or its transformation swaps handedness
@@ -115,18 +117,18 @@ SurfaceScatteringEvent::SurfaceScatteringEvent(const Point3F& position,
     }
 }
 
-void SurfaceScatteringEvent::setShadingGeometry(const Vector3F& position_u_deriv,
-                                                const Vector3F& position_v_deriv,
-                                                const Normal3F& normal_u_deriv,
-                                                const Normal3F& normal_v_deriv,
+void SurfaceScatteringEvent::setShadingGeometry(const Vector3F& dpdu,
+                                                const Vector3F& dpdv,
+                                                const Normal3F& dndu,
+                                                const Normal3F& dndv,
                                                 bool shading_normal_determines_orientation)
 {
-    shading.position_u_deriv = position_u_deriv;
-    shading.position_v_deriv = position_v_deriv;
-    shading.normal_u_deriv = normal_u_deriv;
-    shading.normal_v_deriv = normal_v_deriv;
+    shading.dpdu = dpdu;
+    shading.dpdv = dpdv;
+    shading.dndu = dndu;
+    shading.dndv = dndv;
 
-    shading.surface_normal = Normal3F(position_u_deriv.cross(position_v_deriv).normalized());
+    shading.surface_normal = Normal3F(dpdu.cross(dpdv).normalized());
 
     if (shape && (shape->has_reverse_orientation ^ shape->transformation_swaps_handedness))
     {
@@ -141,6 +143,103 @@ void SurfaceScatteringEvent::setShadingGeometry(const Vector3F& position_u_deriv
     {
         shading.surface_normal.flipToSameHemisphereAs(surface_normal);
     }
+}
+
+void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets& ray) const
+{
+    if (ray.has_offsets)
+    {
+        imp_float normal_distance = surface_normal.dot(static_cast<Vector3F>(position));
+
+        // Estimate the point where the x-offset ray intersects the surface
+
+        imp_float x_offset_intersect_dist = (normal_distance - surface_normal.dot(static_cast<Vector3F>(ray.x_offset_ray_origin)))
+                                             /(surface_normal.dot(ray.x_offset_ray_direction));
+
+        const Point3F& x_offset_intersect_pos = ray.x_offset_ray_origin + ray.x_offset_ray_direction*x_offset_intersect_dist;
+
+        // Estimate the point where the y-offset ray intersects the surface
+        
+        imp_float y_offset_intersect_dist = (normal_distance - surface_normal.dot(static_cast<Vector3F>(ray.y_offset_ray_origin)))
+                                             /(surface_normal.dot(ray.y_offset_ray_direction));
+
+        const Point3F& y_offset_intersect_pos = ray.y_offset_ray_origin + ray.y_offset_ray_direction*y_offset_intersect_dist;
+
+        // Compute derivatives of the scattering event position with respect to screen space x and y
+        dpdx = x_offset_intersect_pos - position;
+        dpdy = y_offset_intersect_pos - position;
+
+        // We have dpdx = dpdu*dudx + dpdv*dvdx, so dudx and dvdx can be found by solving
+        // this system of three equations. The system is overconstrained, so we ignore the
+        // equation for the dimension were the component of dpdu x dpdv = n is largest.
+        // The corresponding system with dpdy gives dudy and dvdy.
+
+        // Determine which two dimensions to use when solving for the parametric derivatives
+
+        unsigned int dimensions[2];
+
+        if (std::abs(surface_normal.x) > std::abs(surface_normal.y) && std::abs(surface_normal.x) > std::abs(surface_normal.z))
+        {
+            // x-component is largest, so use y- and z-dimension
+            dimensions[0] = 1;
+            dimensions[1] = 2;
+        }
+        else if (std::abs(surface_normal.y) > std::abs(surface_normal.z))
+        {
+            // y-component is largest, so use x- and z-dimension
+            dimensions[0] = 0;
+            dimensions[1] = 2;
+        }
+        else
+        {
+            // z-component is largest, so use x- and y-dimension
+            dimensions[0] = 0;
+            dimensions[1] = 1;
+        }
+
+        // Set coeffiecients for the two systems of equations 
+        imp_float coeffs[2][2] = {{dpdu[dimensions[0]], dpdv[dimensions[0]]},
+                                  {dpdu[dimensions[1]], dpdv[dimensions[1]]}};
+
+        // Set right-hand sides for the system of equations for dudx and dvdx
+        imp_float rhs_x[2] = {dpdx[dimensions[0]], dpdx[dimensions[1]]};
+        
+        // Set right-hand sides for the system of equations for dudy and dvdy
+        imp_float rhs_y[2] = {dpdy[dimensions[0]], dpdy[dimensions[1]]};
+
+        // Solve for dudx and dvdx
+        if (!solve2x2LinearSystem(coeffs, rhs_x, &dudx, &dvdx))
+        {
+            dudx = 0;
+            dvdx = 0;
+        }
+        
+        // Solve for dudy and dvdy
+        if (!solve2x2LinearSystem(coeffs, rhs_y, &dudy, &dvdy))
+        {
+            dudy = 0;
+            dvdy = 0;
+        }
+    }
+    else
+    {
+        dpdx = Vector3F(0, 0, 0);
+        dpdy = Vector3F(0, 0, 0);
+        dudx = 0;
+        dvdx = 0;
+        dudy = 0;
+        dvdy = 0;
+    }
+}
+
+void SurfaceScatteringEvent::generateBSDF(const RayWithOffsets& ray,
+                                          RegionAllocator& allocator,
+                                          TransportMode transport_mode,
+                                          bool allow_multiple_scattering_types)
+{
+    computeScreenSpaceDerivatives(ray);
+
+    model->generateBSDF(this, allocator, transport_mode, allow_multiple_scattering_types);
 }
 
 // Utility functions
