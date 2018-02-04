@@ -21,8 +21,8 @@ typedef RGBSpectrum Spectrum;
 typedef Spectrum EnergySpectrum;
 typedef Spectrum PowerSpectrum;
 typedef Spectrum RadianceSpectrum;
-typedef Spectrum ReflectanceSpectrum;
-typedef Spectrum TransmittanceSpectrum;
+typedef Spectrum ReflectionSpectrum;
+typedef Spectrum TransmissionSpectrum;
 
 // Global variables
 
@@ -64,16 +64,20 @@ static imp_float sampleWavelength(unsigned int sample_idx);
 
 template <unsigned int n>
 class CoefficientSpectrum {
+    
+template <unsigned int n>
+friend inline CoefficientSpectrum<n> sqrt(const CoefficientSpectrum<n>& spectrum);
 
-friend CoefficientSpectrum sqrt(const CoefficientSpectrum& spectrum);
+template <unsigned int n>
+friend inline CoefficientSpectrum<n> pow(const CoefficientSpectrum<n>& spectrum, imp_float exponent);
 
-friend CoefficientSpectrum pow(const CoefficientSpectrum& spectrum, imp_float exponent);
+template <unsigned int n>
+friend inline CoefficientSpectrum<n> exp(const CoefficientSpectrum<n>& spectrum);
 
-friend CoefficientSpectrum exp(const CoefficientSpectrum& spectrum);
-
-friend CoefficientSpectrum lerp(const CoefficientSpectrum& spectrum_1,
-                                const CoefficientSpectrum& spectrum_2,
-                                imp_float weight);
+template <unsigned int n>
+friend inline CoefficientSpectrum<n> lerp(const CoefficientSpectrum<n>& spectrum_1,
+                                          const CoefficientSpectrum<n>& spectrum_2,
+                                          imp_float weight);
 
 protected:
     
