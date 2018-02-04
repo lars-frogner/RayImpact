@@ -255,8 +255,8 @@ void SensorRegion::addSample(const Point2F& sample_position,
 
     // Precompute coordinates into the filter table for given discrete pixel offsets
 
-    int* filter_table_coords_x = allocate_on_stack(int, upper_bound_on_affected_pixels.x - lower_bound_on_affected_pixels.x);
-    int* filter_table_coords_y = allocate_on_stack(int, upper_bound_on_affected_pixels.y - lower_bound_on_affected_pixels.y);
+    int* filter_table_coords_x = allocated_on_stack(int, upper_bound_on_affected_pixels.x - lower_bound_on_affected_pixels.x);
+    int* filter_table_coords_y = allocated_on_stack(int, upper_bound_on_affected_pixels.y - lower_bound_on_affected_pixels.y);
 
     for (int x = lower_bound_on_affected_pixels.x; x < upper_bound_on_affected_pixels.x; x++)
     {
