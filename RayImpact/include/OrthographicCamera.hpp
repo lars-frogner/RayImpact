@@ -29,7 +29,7 @@ public:
 
     imp_float generateRay(const CameraSample& sample,
                           Ray* ray) const;
-    
+
     imp_float generateRayWithOffsets(const CameraSample& sample,
                                      RayWithOffsets* ray) const;
 };

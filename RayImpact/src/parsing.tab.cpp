@@ -1,19 +1,19 @@
 /* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison implementation for Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,7 +26,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -71,7 +71,7 @@ int yylex();
 void yyerror(char* s);
 
 /* Line 371 of yacc.c  */
-#line 75 "C:\\Users\\Lars\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
+#line 75 "C:\\Users\\Lars\\Dropbox (Personal)\\Programmering\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
 
 # ifndef YY_NULL
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -91,8 +91,8 @@ void yyerror(char* s);
 
 /* In a future release of Bison, this section will be replaced
    by #include "parsing.tab.h".  */
-#ifndef YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
-# define YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
+#ifndef YY_YY_C_USERS_LARS_DROPBOX_PERSONAL_PROGRAMMERING_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
+# define YY_YY_C_USERS_LARS_DROPBOX_PERSONAL_PROGRAMMERING_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -163,7 +163,7 @@ typedef union YYSTYPE
 
 
 /* Line 387 of yacc.c  */
-#line 167 "C:\\Users\\Lars\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
+#line 167 "C:\\Users\\Lars\\Dropbox (Personal)\\Programmering\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -186,12 +186,12 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_C_USERS_LARS_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED  */
+#endif /* !YY_YY_C_USERS_LARS_DROPBOX_PERSONAL_PROGRAMMERING_RENDERING_IMPACT_RAYIMPACT_INCLUDE_PARSING_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
 /* Line 390 of yacc.c  */
-#line 195 "C:\\Users\\Lars\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
+#line 195 "C:\\Users\\Lars\\Dropbox (Personal)\\Programmering\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
 
 #ifdef short
 # undef short
@@ -324,7 +324,7 @@ YYID (yyi)
 #  endif
 #  if (defined __cplusplus && ! defined EXIT_SUCCESS \
        && ! ((defined YYMALLOC || defined malloc) \
-         && (defined YYFREE || defined free)))
+	     && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   ifndef EXIT_SUCCESS
 #    define EXIT_SUCCESS 0
@@ -350,7 +350,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-     || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -375,15 +375,15 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack_alloc, Stack)                \
-    do                                    \
-      {                                    \
-    YYSIZE_T yynewbytes;                        \
-    YYCOPY (&yyptr->Stack_alloc, Stack, yysize);            \
-    Stack = &yyptr->Stack_alloc;                    \
-    yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-    yyptr += yynewbytes / sizeof (*yyptr);                \
-      }                                    \
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
+    do									\
+      {									\
+	YYSIZE_T yynewbytes;						\
+	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+	Stack = &yyptr->Stack_alloc;					\
+	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+	yyptr += yynewbytes / sizeof (*yyptr);				\
+      }									\
     while (YYID (0))
 
 #endif
@@ -426,7 +426,7 @@ union yyalloc
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   297
 
-#define YYTRANSLATE(YYX)                        \
+#define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
@@ -758,14 +758,14 @@ static const yytype_uint8 yystos[] =
       40,    38,    50,    50,    52,    53
 };
 
-#define yyerrok        (yyerrstatus = 0)
-#define yyclearin    (yychar = YYEMPTY)
-#define YYEMPTY        (-2)
-#define YYEOF        0
+#define yyerrok		(yyerrstatus = 0)
+#define yyclearin	(yychar = YYEMPTY)
+#define YYEMPTY		(-2)
+#define YYEOF		0
 
-#define YYACCEPT    goto yyacceptlab
-#define YYABORT        goto yyabortlab
-#define YYERROR        goto yyerrorlab
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT		goto yyabortlab
+#define YYERROR		goto yyerrorlab
 
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
@@ -775,7 +775,7 @@ static const yytype_uint8 yystos[] =
    in Bison 2.4.2's NEWS entry, where a plan to phase it out is
    discussed.  */
 
-#define YYFAIL        goto yyerrlab
+#define YYFAIL		goto yyerrlab
 #if defined YYFAIL
   /* This is here to suppress warnings from the GCC cpp's
      -Wunused-macros.  Normally we don't worry about that warning, but
@@ -798,13 +798,13 @@ do                                                              \
   else                                                          \
     {                                                           \
       yyerror (YY_("syntax error: cannot back up")); \
-      YYERROR;                            \
-    }                                \
+      YYERROR;							\
+    }								\
 while (YYID (0))
 
 /* Error token number */
-#define YYTERROR    1
-#define YYERRCODE    256
+#define YYTERROR	1
+#define YYERRCODE	256
 
 
 /* This macro is provided for backward compatibility. */
@@ -828,21 +828,21 @@ while (YYID (0))
 #  define YYFPRINTF fprintf
 # endif
 
-# define YYDPRINTF(Args)            \
-do {                        \
-  if (yydebug)                    \
-    YYFPRINTF Args;                \
+# define YYDPRINTF(Args)			\
+do {						\
+  if (yydebug)					\
+    YYFPRINTF Args;				\
 } while (YYID (0))
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)              \
-do {                                      \
-  if (yydebug)                                  \
-    {                                      \
-      YYFPRINTF (stderr, "%s ", Title);                      \
-      yy_symbol_print (stderr,                          \
-          Type, Value); \
-      YYFPRINTF (stderr, "\n");                          \
-    }                                      \
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
+do {									  \
+  if (yydebug)								  \
+    {									  \
+      YYFPRINTF (stderr, "%s ", Title);					  \
+      yy_symbol_print (stderr,						  \
+		  Type, Value); \
+      YYFPRINTF (stderr, "\n");						  \
+    }									  \
 } while (YYID (0))
 
 
@@ -931,10 +931,10 @@ yy_stack_print (yybottom, yytop)
   YYFPRINTF (stderr, "\n");
 }
 
-# define YY_STACK_PRINT(Bottom, Top)                \
-do {                                \
-  if (yydebug)                            \
-    yy_stack_print ((Bottom), (Top));                \
+# define YY_STACK_PRINT(Bottom, Top)				\
+do {								\
+  if (yydebug)							\
+    yy_stack_print ((Bottom), (Top));				\
 } while (YYID (0))
 
 
@@ -957,21 +957,21 @@ yy_reduce_print (yyvsp, yyrule)
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
-         yyrule - 1, yylno);
+	     yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-               &(yyvsp[(yyi + 1) - (yynrhs)])
-                              );
+		       &(yyvsp[(yyi + 1) - (yynrhs)])
+		       		       );
       YYFPRINTF (stderr, "\n");
     }
 }
 
-# define YY_REDUCE_PRINT(Rule)        \
-do {                    \
-  if (yydebug)                \
+# define YY_REDUCE_PRINT(Rule)		\
+do {					\
+  if (yydebug)				\
     yy_reduce_print (yyvsp, Rule); \
 } while (YYID (0))
 
@@ -987,7 +987,7 @@ int yydebug;
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef    YYINITDEPTH
+#ifndef	YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
@@ -1073,27 +1073,27 @@ yytnamerr (char *yyres, const char *yystr)
       char const *yyp = yystr;
 
       for (;;)
-    switch (*++yyp)
-      {
-      case '\'':
-      case ',':
-        goto do_not_strip_quotes;
+	switch (*++yyp)
+	  {
+	  case '\'':
+	  case ',':
+	    goto do_not_strip_quotes;
 
-      case '\\':
-        if (*++yyp != '\\')
-          goto do_not_strip_quotes;
-        /* Fall through.  */
-      default:
-        if (yyres)
-          yyres[yyn] = *yyp;
-        yyn++;
-        break;
+	  case '\\':
+	    if (*++yyp != '\\')
+	      goto do_not_strip_quotes;
+	    /* Fall through.  */
+	  default:
+	    if (yyres)
+	      yyres[yyn] = *yyp;
+	    yyn++;
+	    break;
 
-      case '"':
-        if (yyres)
-          yyres[yyn] = '\0';
-        return yyn;
-      }
+	  case '"':
+	    if (yyres)
+	      yyres[yyn] = '\0';
+	    return yyn;
+	  }
     do_not_strip_quotes: ;
     }
 
@@ -1397,23 +1397,23 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-    /* Give user a chance to reallocate the stack.  Use copies of
-       these so that the &'s don't force the real ones into
-       memory.  */
-    YYSTYPE *yyvs1 = yyvs;
-    yytype_int16 *yyss1 = yyss;
+	/* Give user a chance to reallocate the stack.  Use copies of
+	   these so that the &'s don't force the real ones into
+	   memory.  */
+	YYSTYPE *yyvs1 = yyvs;
+	yytype_int16 *yyss1 = yyss;
 
-    /* Each stack pointer address is followed by the size of the
-       data in use in that stack, in bytes.  This used to be a
-       conditional around just the two extra args, but that might
-       be undefined if yyoverflow is a macro.  */
-    yyoverflow (YY_("memory exhausted"),
-            &yyss1, yysize * sizeof (*yyssp),
-            &yyvs1, yysize * sizeof (*yyvsp),
-            &yystacksize);
+	/* Each stack pointer address is followed by the size of the
+	   data in use in that stack, in bytes.  This used to be a
+	   conditional around just the two extra args, but that might
+	   be undefined if yyoverflow is a macro.  */
+	yyoverflow (YY_("memory exhausted"),
+		    &yyss1, yysize * sizeof (*yyssp),
+		    &yyvs1, yysize * sizeof (*yyvsp),
+		    &yystacksize);
 
-    yyss = yyss1;
-    yyvs = yyvs1;
+	yyss = yyss1;
+	yyvs = yyvs1;
       }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
@@ -1421,22 +1421,22 @@ yyparse ()
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-    goto yyexhaustedlab;
+	goto yyexhaustedlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-    yystacksize = YYMAXDEPTH;
+	yystacksize = YYMAXDEPTH;
 
       {
-    yytype_int16 *yyss1 = yyss;
-    union yyalloc *yyptr =
-      (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
-    if (! yyptr)
-      goto yyexhaustedlab;
-    YYSTACK_RELOCATE (yyss_alloc, yyss);
-    YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+	yytype_int16 *yyss1 = yyss;
+	union yyalloc *yyptr =
+	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+	if (! yyptr)
+	  goto yyexhaustedlab;
+	YYSTACK_RELOCATE (yyss_alloc, yyss);
+	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
-    if (yyss1 != yyssa)
-      YYSTACK_FREE (yyss1);
+	if (yyss1 != yyssa)
+	  YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -1445,10 +1445,10 @@ yyparse ()
       yyvsp = yyvs + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-          (unsigned long int) yystacksize));
+		  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
-    YYABORT;
+	YYABORT;
     }
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
@@ -1857,7 +1857,7 @@ yyreduce:
 
 
 /* Line 1792 of yacc.c  */
-#line 1861 "C:\\Users\\Lars\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
+#line 1861 "C:\\Users\\Lars\\Dropbox (Personal)\\Programmering\\Rendering\\Impact\\RayImpact\\src\\parsing.tab.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1947,20 +1947,20 @@ yyerrlab:
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-     error, discard it.  */
+	 error, discard it.  */
 
       if (yychar <= YYEOF)
-    {
-      /* Return failure if at end of input.  */
-      if (yychar == YYEOF)
-        YYABORT;
-    }
+	{
+	  /* Return failure if at end of input.  */
+	  if (yychar == YYEOF)
+	    YYABORT;
+	}
       else
-    {
-      yydestruct ("Error: discarding",
-              yytoken, &yylval);
-      yychar = YYEMPTY;
-    }
+	{
+	  yydestruct ("Error: discarding",
+		      yytoken, &yylval);
+	  yychar = YYEMPTY;
+	}
     }
 
   /* Else will try to reuse lookahead token after shifting the error
@@ -1992,29 +1992,29 @@ yyerrorlab:
 | yyerrlab1 -- common code for both syntax error and YYERROR.  |
 `-------------------------------------------------------------*/
 yyerrlab1:
-  yyerrstatus = 3;    /* Each real token shifted decrements this.  */
+  yyerrstatus = 3;	/* Each real token shifted decrements this.  */
 
   for (;;)
     {
       yyn = yypact[yystate];
       if (!yypact_value_is_default (yyn))
-    {
-      yyn += YYTERROR;
-      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-        {
-          yyn = yytable[yyn];
-          if (0 < yyn)
-        break;
-        }
-    }
+	{
+	  yyn += YYTERROR;
+	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+	    {
+	      yyn = yytable[yyn];
+	      if (0 < yyn)
+		break;
+	    }
+	}
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-    YYABORT;
+	YYABORT;
 
 
       yydestruct ("Error: popping",
-          yystos[yystate], yyvsp);
+		  yystos[yystate], yyvsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -2072,7 +2072,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-          yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow

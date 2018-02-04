@@ -20,7 +20,7 @@ BoundingBoxF GeometricModel::worldSpaceBoundingBox() const
 {
     return shape->worldSpaceBoundingBox();
 }
-    
+
 bool GeometricModel::intersect(const Ray& ray,
                                SurfaceScatteringEvent* scattering_event) const
 {
@@ -38,7 +38,7 @@ bool GeometricModel::intersect(const Ray& ray,
 
     return true;
 }
-    
+
 bool GeometricModel::hasIntersection(const Ray& ray) const
 {
     return shape->hasIntersection(ray);
@@ -80,14 +80,14 @@ BoundingBoxF TransformedModel::worldSpaceBoundingBox() const
 {
     return model_to_world.encompassMotionInBoundingBox(model->worldSpaceBoundingBox());
 }
-    
+
 bool TransformedModel::intersect(const Ray& ray,
                                  SurfaceScatteringEvent* scattering_event) const
 {
     // Find transformation matrix at the time of the ray
     Transformation interpolated_model_to_world;
     model_to_world.computeInterpolatedTransformation(&interpolated_model_to_world, ray.time);
-    
+
     // Transform ray from world space to model space
     const Ray& model_space_ray = interpolated_model_to_world.inverted()(ray);
 
@@ -97,13 +97,13 @@ bool TransformedModel::intersect(const Ray& ray,
 
     // Return the intersection distance via the ray max_distance attribute
     ray.max_distance = model_space_ray.max_distance;
-    
+
     // Transform scattering event from model space to world space
     *scattering_event = interpolated_model_to_world(*scattering_event);
 
     return true;
 }
-    
+
 bool TransformedModel::hasIntersection(const Ray& ray) const
 {
     Transformation interpolated_model_to_world;

@@ -8,7 +8,7 @@ namespace Impact {
 namespace RayImpact {
 
 // MicrofacetDistribution method implementations
-    
+
 imp_float MicrofacetDistribution::visibleFraction(const Vector3F& direction) const
 {
     return 1.0f/(1 + maskedAreaFraction(direction));

@@ -241,7 +241,7 @@ public:
 class SpecularBSDF : public BXDF {
 
 private:
-    
+
     const ReflectionSpectrum reflectance; // Fraction of incident light that is reflected (disregarding Fresnel effects)
     const TransmissionSpectrum transmittance; // Fraction of incident light that is transmitted (disregarding Fresnel effects)
     const imp_float refractive_index_outside; // Index of refraction of the medium on the outside of the object
@@ -366,7 +366,7 @@ public:
 class MicrofacetBTDF : public BXDF {
 
 private:
-    
+
     const TransmissionSpectrum transmittance; // Fraction of incident light that is transmitted (disregarding Fresnel effects)
     const imp_float refractive_index_outside; // Index of refraction of the medium on the outside of the object
     const imp_float refractive_index_inside; // Index of refraction of the medium on the inside of the object
@@ -393,7 +393,7 @@ class BSDF {
 private:
 
     friend class MixedMaterial;
-    
+
     const Normal3F geometric_normal; // Geometric surface normal
 
     const Normal3F shading_normal; // Shading surface normal

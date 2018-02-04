@@ -5,7 +5,7 @@ namespace Impact {
 namespace RayImpact {
 
 // Material method implementations
-    
+
 void Material::performBumpMapping(const std::shared_ptr< Texture<imp_float> >& bump_map,
                                   SurfaceScatteringEvent* scattering_event) const
 {

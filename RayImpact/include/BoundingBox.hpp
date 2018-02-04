@@ -10,7 +10,7 @@
 
 namespace Impact {
 namespace RayImpact {
-    
+
 // Constant used in ray-box intersection testing
 constexpr imp_float maxDistanceSafetyFactor = 1 + 2*errorPowerBound(3);
 
@@ -24,10 +24,10 @@ public:
     Point3<T> upper_corner; // Corner with the highest coordinate values
 
     BoundingBox();
-    
+
     explicit BoundingBox(const Point3<T>& lower_corner,
                          const Point3<T>& upper_corner);
-    
+
     explicit BoundingBox(const Point3<T>& point);
 
     static BoundingBox aroundPoints(const Point3<T>& point_1,
@@ -188,7 +188,7 @@ inline bool BoundingBox<T>::containsExclusive(const Point3<T>& point) const
            (point.z >= lower_corner.z && point.z < upper_corner.z);
 }
 
-// Returns bounding box expanded uniformly by twice the given amount 
+// Returns bounding box expanded uniformly by twice the given amount
 template <typename T>
 template <typename U>
 inline BoundingBox<T> BoundingBox<T>::expanded(U amount) const
@@ -415,7 +415,7 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         min_dist_temp = (upper_corner.z - ray.origin.z)*inverse_direction.z;
         max_dist_temp = (lower_corner.z - ray.origin.z)*inverse_direction.z;
     }
-    
+
     max_dist_temp *= maxDistanceSafetyFactor;
 
     if (min_dist > max_dist_temp || min_dist_temp > max_dist)

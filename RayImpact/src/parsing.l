@@ -22,7 +22,7 @@
     for (int i = 0; i < yyleng; i++) \
         yylval.s[i] = yytext[i]; \
     yylval.s[yyleng] = '\0'
-    
+
 %}
 
 %option yylineno

@@ -18,7 +18,7 @@ namespace RayImpact {
 class Model {
 
 public:
-    
+
     virtual BoundingBoxF worldSpaceBoundingBox() const = 0;
 
     virtual bool intersect(const Ray& ray,
@@ -55,10 +55,10 @@ public:
                    const MediumInterface& medium_interface);
 
     BoundingBoxF worldSpaceBoundingBox() const;
-    
+
     bool intersect(const Ray& ray,
                    SurfaceScatteringEvent* scattering_event) const;
-    
+
     bool hasIntersection(const Ray& ray) const;
 
     const AreaLight* getAreaLight() const;
@@ -86,10 +86,10 @@ public:
                      const AnimatedTransformation& model_to_world);
 
     BoundingBoxF worldSpaceBoundingBox() const;
-    
+
     bool intersect(const Ray& ray,
                    SurfaceScatteringEvent* scattering_event) const;
-    
+
     bool hasIntersection(const Ray& ray) const;
 
     const AreaLight* getAreaLight() const;

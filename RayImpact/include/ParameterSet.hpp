@@ -31,7 +31,7 @@ public:
 class ParameterSet {
 
 private:
-    
+
     std::vector< std::shared_ptr< Parameter<bool> > > bool_params;
     std::vector< std::shared_ptr< Parameter<int> > > int_params;
     std::vector< std::shared_ptr< Parameter<imp_float> > > float_params;

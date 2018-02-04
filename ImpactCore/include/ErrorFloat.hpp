@@ -33,7 +33,7 @@ public:
     ErrorFloat();
 
     ErrorFloat(imp_float value);
-    
+
     ErrorFloat(imp_float value, imp_float error);
 
     ErrorFloat(const ErrorFloat& other);
@@ -46,9 +46,9 @@ public:
     ErrorFloat operator-(const ErrorFloat& other) const;
     ErrorFloat operator*(const ErrorFloat& other) const;
     ErrorFloat operator/(const ErrorFloat& other) const;
-    
+
     ErrorFloat operator-() const;
-    
+
     ErrorFloat& operator+=(const ErrorFloat& other);
     ErrorFloat& operator-=(const ErrorFloat& other);
     ErrorFloat& operator*=(const ErrorFloat& other);
@@ -65,7 +65,7 @@ public:
     imp_float lowerBound() const;
 
     imp_float absoluteError() const;
-    
+
     #ifndef NDEBUG
     imp_float relativeError() const;
     long double preciseValue() const;
@@ -81,7 +81,7 @@ inline ErrorFloat sqrt(const ErrorFloat& float_with_error)
     ErrorFloat result;
 
     result.value = std::sqrt(float_with_error.value);
-    
+
     #ifndef NDEBUG
     result.precise_value = std::sqrt(float_with_error.precise_value);
     #endif
@@ -109,14 +109,14 @@ inline ErrorFloat abs(const ErrorFloat& float_with_error)
         ErrorFloat result;
 
         result.value = std::abs(float_with_error.value);
-    
+
         #ifndef NDEBUG
         result.precise_value = std::abs(float_with_error.precise_value);
         #endif
 
         result.lower_bound = 0.0;
         result.upper_bound = std::max(-float_with_error.lower_bound, float_with_error.upper_bound);
-        
+
         result.verifyBounds();
 
         return result;
@@ -129,7 +129,7 @@ inline std::ostream& operator<<(std::ostream& stream, const ErrorFloat& float_wi
                            float_with_error.value,
                            float_with_error.lower_bound,
                            float_with_error.upper_bound);
-    
+
     #ifndef NDEBUG
     stream << formatString(", precise = %f", float_with_error.precise_value);
     #endif
@@ -208,7 +208,7 @@ inline ErrorFloat::ErrorFloat(imp_float value, imp_float error)
     #ifndef NDEBUG
     precise_value = static_cast<long double>(value);
     #endif
-    
+
     verifyBounds();
 }
 
@@ -217,7 +217,7 @@ inline ErrorFloat::ErrorFloat(const ErrorFloat& other)
     other.verifyBounds();
 
     value = other.value;
-    
+
     #ifndef NDEBUG
     precise_value = other.precise_value;
     #endif
@@ -238,7 +238,7 @@ inline ErrorFloat& ErrorFloat::operator=(const ErrorFloat& other)
     if (&other != this)
     {
         value = other.value;
-    
+
         #ifndef NDEBUG
         precise_value = other.precise_value;
         #endif
@@ -255,7 +255,7 @@ inline ErrorFloat ErrorFloat::operator+(const ErrorFloat& other) const
     ErrorFloat result;
 
     result.value = value + other.value;
-    
+
     #ifndef NDEBUG
     result.precise_value = precise_value + other.precise_value;
     #endif
@@ -273,11 +273,11 @@ inline ErrorFloat ErrorFloat::operator-(const ErrorFloat& other) const
     ErrorFloat result;
 
     result.value = value - other.value;
-    
+
     #ifndef NDEBUG
     result.precise_value = precise_value - other.precise_value;
     #endif
-    
+
     result.lower_bound = closestLowerFloat(lower_bound - other.upper_bound);
     result.upper_bound = closestHigherFloat(upper_bound - other.lower_bound);
 
@@ -291,11 +291,11 @@ inline ErrorFloat ErrorFloat::operator*(const ErrorFloat& other) const
     ErrorFloat result;
 
     result.value = value*other.value;
-    
+
     #ifndef NDEBUG
     result.precise_value = precise_value*other.precise_value;
     #endif
-    
+
     imp_float product_1 = lower_bound*other.lower_bound;
     imp_float product_2 = lower_bound*other.upper_bound;
     imp_float product_3 = upper_bound*other.lower_bound;
@@ -314,7 +314,7 @@ inline ErrorFloat ErrorFloat::operator/(const ErrorFloat& other) const
     ErrorFloat result;
 
     result.value = value/other.value;
-    
+
     #ifndef NDEBUG
     result.precise_value = precise_value/other.precise_value;
     #endif
@@ -345,11 +345,11 @@ inline ErrorFloat ErrorFloat::operator-() const
     ErrorFloat result;
 
     result.value = -value;
-    
+
     #ifndef NDEBUG
     result.precise_value = -precise_value;
     #endif
-    
+
     result.lower_bound = -upper_bound;
     result.upper_bound = -lower_bound;
 

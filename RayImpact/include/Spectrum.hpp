@@ -46,13 +46,13 @@ static bool samplesAreSorted(const imp_float* wavelengths,
 
 static void sortSamples(std::vector<imp_float>& wavelengths,
                         std::vector<imp_float>& values);
-    
+
 template <typename T>
 static imp_float averageSamples(const T* wavelengths,
                                 const T* values,
                                 unsigned int n_samples,
                                 T start_wavelength, T end_wavelength);
-    
+
 static imp_float interpolateSamples(const imp_float* wavelengths,
                                     const imp_float* values,
                                     unsigned int n_samples,
@@ -64,7 +64,7 @@ static imp_float sampleWavelength(unsigned int sample_idx);
 
 template <unsigned int n>
 class CoefficientSpectrum {
-    
+
 template <unsigned int n>
 friend inline CoefficientSpectrum<n> sqrt(const CoefficientSpectrum<n>& spectrum);
 
@@ -80,16 +80,16 @@ friend inline CoefficientSpectrum<n> lerp(const CoefficientSpectrum<n>& spectrum
                                           imp_float weight);
 
 protected:
-    
+
     CoefficientSpectrum();
 
     imp_float coefficients[n]; // Coefficients for the SPD basis functions
 
 public:
     static const unsigned int n_coefficients = n;
-    
+
     CoefficientSpectrum(imp_float initial_value);
-    
+
     imp_float operator[](unsigned int idx) const;
     imp_float& operator[](unsigned int idx);
 
@@ -99,21 +99,21 @@ public:
     CoefficientSpectrum operator*(imp_float constant) const;
     CoefficientSpectrum operator/(const CoefficientSpectrum& other) const;
     CoefficientSpectrum operator/(imp_float constant) const;
-    
+
     CoefficientSpectrum operator-() const;
 
     CoefficientSpectrum& operator+=(const CoefficientSpectrum& other);
     CoefficientSpectrum& operator-=(const CoefficientSpectrum& other);
     CoefficientSpectrum& operator*=(const CoefficientSpectrum& other);
     CoefficientSpectrum& operator/=(const CoefficientSpectrum& other);
-    
+
     bool operator==(const CoefficientSpectrum& other) const;
     bool operator!=(const CoefficientSpectrum& other) const;
 
     bool isBlack() const;
 
     bool hasNaNs() const;
-    
+
     CoefficientSpectrum clamped(imp_float lower_limit = 0,
                                 imp_float upper_limit = IMP_INFINITY) const;
 };
@@ -129,16 +129,16 @@ public:
     RGBSpectrum();
 
     RGBSpectrum(imp_float initial_value);
-    
+
     RGBSpectrum(const imp_float* wavelengths,
                 const imp_float* values,
                 unsigned int n_samples);
-    
+
     RGBSpectrum(const imp_float rgb[3],
                 SpectrumType type = SpectrumType::Reflectance);
-    
+
     RGBSpectrum(const CoefficientSpectrum& other);
-    
+
     explicit RGBSpectrum(const SampledSpectrum& other,
                          SpectrumType type = SpectrumType::Reflectance);
 
@@ -148,16 +148,16 @@ public:
 
     static RGBSpectrum fromRGBValues(const imp_float rgb[3],
                                      SpectrumType type = SpectrumType::Reflectance);
-    
+
     static RGBSpectrum fromTristimulusValues(const imp_float xyz[3],
                                              SpectrumType type = SpectrumType::Reflectance);
 
     void computeRGBValues(imp_float rgb[3]) const;
 
     void computeTristimulusValues(imp_float xyz[3]) const;
-    
+
     imp_float tristimulusY() const;
-    
+
     const RGBSpectrum& toRGBSpectrum() const;
 
     SampledSpectrum toSampledSpectrum(SpectrumType type = SpectrumType::Reflectance) const;
@@ -174,20 +174,20 @@ private:
     static void initializeBaseColorSPDs();
 
 public:
-    
+
     SampledSpectrum();
 
     SampledSpectrum(imp_float inital_value);
-    
+
     SampledSpectrum(const imp_float* wavelengths,
                     const imp_float* values,
                     unsigned int n_samples);
-    
+
     SampledSpectrum(const imp_float rgb[3],
                     SpectrumType type = SpectrumType::Reflectance);
-    
+
     SampledSpectrum(const CoefficientSpectrum& other);
-    
+
     explicit SampledSpectrum(const RGBSpectrum& other,
                              SpectrumType type = SpectrumType::Reflectance);
 
@@ -197,20 +197,20 @@ public:
 
     static SampledSpectrum fromRGBValues(const imp_float rgb[3],
                                          SpectrumType type = SpectrumType::Reflectance);
-    
+
     static SampledSpectrum fromTristimulusValues(const imp_float xyz[3],
                                                  SpectrumType type = SpectrumType::Reflectance);
 
     void computeRGBValues(imp_float rgb[3]) const;
 
     void computeTristimulusValues(imp_float xyz[3]) const;
-    
+
     imp_float tristimulusY() const;
 
     RGBSpectrum toRGBSpectrum() const;
 
     const SampledSpectrum& toSampledSpectrum(SpectrumType type = SpectrumType::Reflectance) const;
-    
+
     static void initialize();
 };
 
@@ -295,7 +295,7 @@ inline imp_float CoefficientSpectrum<n>::operator[](unsigned int idx) const
     imp_assert(idx < n);
     return coefficients[idx];
 }
-    
+
 template <unsigned int n>
 inline imp_float& CoefficientSpectrum<n>::operator[](unsigned int idx)
 {

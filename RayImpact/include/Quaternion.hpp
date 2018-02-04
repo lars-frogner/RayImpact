@@ -16,20 +16,20 @@ public:
     imp_float w; // Real component of the quaternion
 
     Quaternion();
-    
+
     Quaternion(const Vector3F& imag, imp_float w);
 
     Quaternion(imp_float x, imp_float y, imp_float z, imp_float w);
-    
+
     Quaternion operator+(const Quaternion& other) const;
     Quaternion operator-(const Quaternion& other) const;
     Quaternion operator*(const Quaternion& other) const;
-    
+
     Quaternion operator-() const;
 
     Quaternion operator*(imp_float factor) const;
     Quaternion operator/(imp_float divisor) const;
-    
+
     Quaternion& operator+=(const Quaternion& other);
     Quaternion& operator-=(const Quaternion& other);
     Quaternion& operator*=(const Quaternion& other);

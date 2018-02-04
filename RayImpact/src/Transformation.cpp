@@ -7,7 +7,7 @@ namespace Impact {
 namespace RayImpact {
 
 // Transformation method implementations
-    
+
 // Identity transformation
 Transformation::Transformation()
     : matrix(),
@@ -31,7 +31,7 @@ Transformation Transformation::translation(const Vector3F& displacement)
                      0, 1, 0, displacement.y,
                      0, 0, 1, displacement.z,
                      0, 0, 0,               1);
-    
+
     Matrix4x4 matrix_inverse(1, 0, 0, -displacement.x,
                              0, 1, 0, -displacement.y,
                              0, 0, 1, -displacement.z,
@@ -50,7 +50,7 @@ Transformation Transformation::scaling(imp_float scale_x,
                            0, scale_y,         0, 0,
                            0,        0, scale_z, 0,
                            0,        0,         0, 1);
-    
+
     Matrix4x4 matrix_inverse(1.0f/scale_x,              0,            0, 0,
                                         0, 1.0f/scale_y,            0, 0,
                                         0,              0, 1.0f/scale_z, 0,
@@ -65,7 +65,7 @@ Transformation Transformation::rotationFromXToY(imp_float angle)
 
     imp_float cos_angle = std::cos(angle_rad);
     imp_float sin_angle = std::sin(angle_rad);
-    
+
     Matrix4x4 matrix(cos_angle, -sin_angle, 0, 0,
                      sin_angle,  cos_angle, 0, 0,
                              0,             0, 1, 0,
@@ -80,7 +80,7 @@ Transformation Transformation::rotationFromYToZ(imp_float angle)
 
     imp_float cos_angle = std::cos(angle_rad);
     imp_float sin_angle = std::sin(angle_rad);
-    
+
     Matrix4x4 matrix(1,            0,            0, 0,
                      0, cos_angle, -sin_angle, 0,
                      0, sin_angle,    cos_angle, 0,
@@ -95,7 +95,7 @@ Transformation Transformation::rotationFromZToX(imp_float angle)
 
     imp_float cos_angle = std::cos(angle_rad);
     imp_float sin_angle = std::sin(angle_rad);
-    
+
     Matrix4x4 matrix( cos_angle,  0, sin_angle, 0,
                               0,  1,         0, 0,
                      -sin_angle,  0, cos_angle, 0,
@@ -107,7 +107,7 @@ Transformation Transformation::rotationFromZToX(imp_float angle)
 Transformation Transformation::rotation(const Vector3F& axis, imp_float angle)
 {
     imp_float angle_rad = degreesToRadians(angle);
-    
+
     imp_float cos_angle = std::cos(angle_rad);
     imp_float sin_angle = std::sin(angle_rad);
 
@@ -118,7 +118,7 @@ Transformation Transformation::rotation(const Vector3F& axis, imp_float angle)
     matrix.a11 = (unit_axis.x*unit_axis.x) + (1 - (unit_axis.x*unit_axis.x))*cos_angle;
     matrix.a12 = (unit_axis.x*unit_axis.y)*(1 - cos_angle) - (unit_axis.z*sin_angle);
     matrix.a13 = (unit_axis.x*unit_axis.z)*(1 - cos_angle) + (unit_axis.y*sin_angle);
-    
+
     matrix.a21 = (unit_axis.y*unit_axis.x)*(1 - cos_angle) + (unit_axis.z*sin_angle);
     matrix.a22 = (unit_axis.y*unit_axis.y) + (1 - (unit_axis.y*unit_axis.y))*cos_angle;
     matrix.a23 = (unit_axis.y*unit_axis.z)*(1 - cos_angle) - (unit_axis.x*sin_angle);
@@ -138,14 +138,14 @@ Transformation Transformation::rotation(const Quaternion& quaternion)
     matrix.a12 =     2*(quaternion.imag.x*quaternion.imag.y + quaternion.imag.z*quaternion.w);
     matrix.a13 =     2*(quaternion.imag.x*quaternion.imag.z - quaternion.imag.y*quaternion.w);
 
-    matrix.a21 =     2*(quaternion.imag.x*quaternion.imag.y - quaternion.imag.z*quaternion.w); 
+    matrix.a21 =     2*(quaternion.imag.x*quaternion.imag.y - quaternion.imag.z*quaternion.w);
     matrix.a22 = 1 - 2*(quaternion.imag.x*quaternion.imag.x + quaternion.imag.z*quaternion.imag.z);
     matrix.a23 =     2*(quaternion.imag.y*quaternion.imag.z + quaternion.imag.x*quaternion.w);
 
-    matrix.a31 =     2*(quaternion.imag.x*quaternion.imag.z + quaternion.imag.y*quaternion.w);    
+    matrix.a31 =     2*(quaternion.imag.x*quaternion.imag.z + quaternion.imag.y*quaternion.w);
     matrix.a32 =     2*(quaternion.imag.y*quaternion.imag.z - quaternion.imag.x*quaternion.w);
     matrix.a33 = 1 - 2*(quaternion.imag.x*quaternion.imag.x + quaternion.imag.y*quaternion.imag.y);
-        
+
     return Transformation(matrix, matrix.inverted());
 }
 
@@ -162,15 +162,15 @@ Transformation Transformation::worldToCamera(const Point3F& camera_position,
     camera_to_world_matrix.a11 = camera_x_axis.x;
     camera_to_world_matrix.a21 = camera_x_axis.y;
     camera_to_world_matrix.a31 = camera_x_axis.z;
-    
+
     camera_to_world_matrix.a12 = camera_y_axis.x;
     camera_to_world_matrix.a22 = camera_y_axis.y;
     camera_to_world_matrix.a32 = camera_y_axis.z;
-    
+
     camera_to_world_matrix.a13 = camera_z_axis.x;
     camera_to_world_matrix.a23 = camera_z_axis.y;
     camera_to_world_matrix.a33 = camera_z_axis.z;
-    
+
     camera_to_world_matrix.a14 = camera_position.x;
     camera_to_world_matrix.a24 = camera_position.y;
     camera_to_world_matrix.a34 = camera_position.z;
@@ -226,7 +226,7 @@ bool Transformation::operator<(const Transformation& other) const
     if (matrix.a13 > other.matrix.a13) return false;
     if (matrix.a14 < other.matrix.a14) return true;
     if (matrix.a14 > other.matrix.a14) return false;
-    
+
     if (matrix.a21 < other.matrix.a21) return true;
     if (matrix.a21 > other.matrix.a21) return false;
     if (matrix.a22 < other.matrix.a22) return true;
@@ -235,7 +235,7 @@ bool Transformation::operator<(const Transformation& other) const
     if (matrix.a23 > other.matrix.a23) return false;
     if (matrix.a24 < other.matrix.a24) return true;
     if (matrix.a24 > other.matrix.a24) return false;
-    
+
     if (matrix.a31 < other.matrix.a31) return true;
     if (matrix.a31 > other.matrix.a31) return false;
     if (matrix.a32 < other.matrix.a32) return true;
@@ -244,7 +244,7 @@ bool Transformation::operator<(const Transformation& other) const
     if (matrix.a33 > other.matrix.a33) return false;
     if (matrix.a34 < other.matrix.a34) return true;
     if (matrix.a34 > other.matrix.a34) return false;
-    
+
     if (matrix.a41 < other.matrix.a41) return true;
     if (matrix.a41 > other.matrix.a41) return false;
     if (matrix.a42 < other.matrix.a42) return true;
@@ -301,12 +301,12 @@ Point3F Transformation::operator()(const Point3F& point, const Vector3F& point_e
     *transformed_point_error = Vector3F(std::abs(matrix.a11*point.x) + std::abs(matrix.a12*point.y) + std::abs(matrix.a13*point.z) + std::abs(matrix.a14),
                                         std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
                                         std::abs(matrix.a31*point.x) + std::abs(matrix.a32*point.y) + std::abs(matrix.a33*point.z) + std::abs(matrix.a34))
-                               *errorPowerBound(3) + 
+                               *errorPowerBound(3) +
                                Vector3F(std::abs(matrix.a11)*point_error.x + std::abs(matrix.a12)*point_error.y + std::abs(matrix.a13)*point_error.z + std::abs(matrix.a14),
                                         std::abs(matrix.a21)*point_error.x + std::abs(matrix.a22)*point_error.y + std::abs(matrix.a23)*point_error.z + std::abs(matrix.a24),
                                         std::abs(matrix.a31)*point_error.x + std::abs(matrix.a32)*point_error.y + std::abs(matrix.a33)*point_error.z + std::abs(matrix.a34))
                                *(errorPowerBound(3) + 1);
-    
+
     return Point3F(matrix.a11*point.x + matrix.a12*point.y + matrix.a13*point.z + matrix.a14,
                    matrix.a21*point.x + matrix.a22*point.y + matrix.a23*point.z + matrix.a24,
                    matrix.a31*point.x + matrix.a32*point.y + matrix.a33*point.z + matrix.a34);
@@ -433,7 +433,7 @@ BoundingBoxF Transformation::operator()(const BoundingBoxF& box) const
     Vector3F transformed_width_vector (matrix.a11*diagonal.x, matrix.a21*diagonal.x, matrix.a31*diagonal.x);
     Vector3F transformed_height_vector(matrix.a12*diagonal.y, matrix.a22*diagonal.y, matrix.a22*diagonal.y);
     Vector3F transformed_depth_vector (matrix.a13*diagonal.z, matrix.a23*diagonal.z, matrix.a33*diagonal.z);
-    
+
     const Point3F& corner_1 = (*this)(box.lower_corner);
     const Point3F& corner_2 = corner_1 + transformed_width_vector;
     const Point3F& corner_3 = corner_1 + transformed_height_vector;
@@ -460,7 +460,7 @@ BoundingBoxF Transformation::operator()(const BoundingBoxF& box) const
 SurfaceScatteringEvent Transformation::operator()(const SurfaceScatteringEvent& scattering_event) const
 {
     SurfaceScatteringEvent transformed_event(scattering_event);
-    
+
     const Transformation& transformation = *this;
 
     transformed_event.position = transformation(scattering_event.position, scattering_event.position_error, &(transformed_event.position_error));
@@ -472,9 +472,9 @@ SurfaceScatteringEvent Transformation::operator()(const SurfaceScatteringEvent& 
     transformed_event.dpdv = transformation(scattering_event.dpdv);
     transformed_event.dndu = transformation(scattering_event.dndu);
     transformed_event.dndv = transformation(scattering_event.dndv);
-    
+
     transformed_event.shading.surface_normal = transformation(scattering_event.shading.surface_normal).normalized();
-    
+
     transformed_event.shading.dpdu = transformation(scattering_event.shading.dpdu);
     transformed_event.shading.dpdv = transformation(scattering_event.shading.dpdv);
     transformed_event.shading.dndu = transformation(scattering_event.shading.dndu);

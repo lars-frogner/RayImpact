@@ -18,17 +18,17 @@ private:
 public:
 
     RandomNumberGenerator();
-    
+
     RandomNumberGenerator(unsigned int seed);
 
     void setSeed(unsigned int seed);
-    
+
     void setRandomSeed();
 
     imp_float uniformFloat();
-    
+
     uint32_t uniformUInt32();
-    
+
     uint32_t uniformUInt32(uint32_t upper_limit);
 };
 

@@ -43,7 +43,7 @@ public:
                                            imp_float time) const;
 
     Point3F operator()(const Point3F& point, imp_float time) const;
-    
+
     Vector3F operator()(const Vector3F& vector, imp_float time) const;
 
     Ray operator()(const Ray& ray) const;

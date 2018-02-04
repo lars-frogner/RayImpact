@@ -14,7 +14,7 @@ StratifiedSampler::StratifiedSampler(unsigned int n_horizontal_samples_per_pixel
       n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
       n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
 {}
-    
+
 void StratifiedSampler::setPixel(const Point2I& pixel)
 {
     PixelSampler::setPixel(pixel);
@@ -30,7 +30,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
                      n_samples_per_pixel,
                      rng);
     }
-    
+
     // Generate 2D sample components
     for (size_t i = 0; i < sample_components_2D.size(); i++)
     {
@@ -45,7 +45,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
     }
 
     // Generate 1D sample component arrays
-    for (size_t i = 0; i < sample_component_arrays_1D.size(); i++) {    
+    for (size_t i = 0; i < sample_component_arrays_1D.size(); i++) {
         for (size_t j = 0; j < n_samples_per_pixel; j++)
         {
             size_t array_size = sizes_of_1D_component_arrays[i];
@@ -59,7 +59,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
     }
 
     // Generate 2D sample component arrays
-    for (size_t i = 0; i < sample_component_arrays_2D.size(); i++) {    
+    for (size_t i = 0; i < sample_component_arrays_2D.size(); i++) {
         for (size_t j = 0; j < n_samples_per_pixel; j++)
         {
             size_t array_size = sizes_of_2D_component_arrays[i];
@@ -74,7 +74,7 @@ void StratifiedSampler::setPixel(const Point2I& pixel)
 std::unique_ptr<Sampler> StratifiedSampler::cloned()
 {
     StratifiedSampler* sampler = new StratifiedSampler(*this);
-    
+
     sampler->rng.setRandomSeed();
 
     return std::unique_ptr<Sampler>(sampler);
@@ -83,7 +83,7 @@ std::unique_ptr<Sampler> StratifiedSampler::cloned()
 std::unique_ptr<Sampler> StratifiedSampler::cloned(unsigned int seed)
 {
     StratifiedSampler* sampler = new StratifiedSampler(*this);
-    
+
     sampler->rng.setSeed(seed);
 
     return std::unique_ptr<Sampler>(sampler);

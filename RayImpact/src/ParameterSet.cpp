@@ -19,7 +19,7 @@ namespace RayImpact {
         } \
     } \
     return false
-    
+
 #define get_single_parameter_value(param_vector) \
     for (const auto& param : param_vector) \
     { \
@@ -30,7 +30,7 @@ namespace RayImpact {
         } \
     } \
     return default_value
-    
+
 #define get_parameter_values(param_vector) \
     for (const auto& param : param_vector) \
     { \
@@ -280,12 +280,12 @@ void ParameterSet::constructSpectrumParameterFromTristimulus(const std::string& 
     {
         spectra[i] = Spectrum::fromTristimulusValues(xyz_values + 3*i);
     }
-    
+
     addSpectrumParameter(name, std::move(spectra), n_xyz_triples);
 }
 
 void ParameterSet::constructSpectrumParameterFromSamples(const std::string& name, const imp_float* wavelengths,
-                                                         const imp_float* values, const int* n_samples,    
+                                                         const imp_float* values, const int* n_samples,
                                                          unsigned int n_sample_arrays)
 {
     std::unique_ptr<Spectrum[]> spectra(new Spectrum[n_sample_arrays]);
@@ -299,7 +299,7 @@ void ParameterSet::constructSpectrumParameterFromSamples(const std::string& name
                                            n_samples[i]);
         cumulative_n_samples += n_samples[i];
     }
-    
+
     addSpectrumParameter(name, std::move(spectra), n_sample_arrays);
 }
 

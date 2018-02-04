@@ -27,13 +27,13 @@ static std::condition_variable pending_loops_condition;
 class ParallelForLoop {
 
 public:
-    
+
     std::function<void (uint64_t)> loop_body_1D; // Loop body function for 1D loops
     std::function<void (uint32_t, uint32_t)> loop_body_2D; // Loop body function for 2D loops
     uint64_t max_loop_index; // One more than the largest loop index to execute
     uint64_t max_inner_loop_index; // One more than the largest inner loop index to execute
     const unsigned int chunk_size; // Minimum number of contiguous loop iterations to perform at a time
-    
+
     uint64_t next_loop_index; // Next loop index to execute
     unsigned int number_of_active_workers; // Number of threads currently executing iterations of the loop
     ParallelForLoop* next_loop; // Pointer to next loop in the list of unfinished loops
@@ -83,7 +83,7 @@ bool ParallelForLoop::isFinished() const
 
 static void threadExecutionFunction(unsigned int id)
 {
-    // Update globally visible thread id 
+    // Update globally visible thread id
     IMP_THREAD_ID = id;
 
     // Initialize a lock object associated with the loops mutex
@@ -108,7 +108,7 @@ static void threadExecutionFunction(unsigned int id)
 
             // Set next loop index to be executed in the loop
             loop.next_loop_index = end_index;
-            
+
             // If the end of the loop will be reached when this thread is done,
             // move the next unfinished loop to the front of the list
             if (loop.next_loop_index == loop.max_loop_index)
@@ -137,7 +137,7 @@ static void threadExecutionFunction(unsigned int id)
 
             // Wait here until ownership of the mutex lock can be reaquired
             lock.lock();
-        
+
             // Inform that this thread is not working on the loop anymore
             loop.number_of_active_workers--;
 
@@ -170,15 +170,15 @@ void cleanupParallel()
 {
     if (threads.empty())
         return;
-    
+
     // Take ownership of the loops mutex lock (subsequent threads trying
     // to take ownership will hold until ownership is released)
     pending_loops_mutex.lock();
-    
+
     // Make worker threads return from threadExecutionFunction
     terminate_threads = true;
     pending_loops_condition.notify_all();
-    
+
     // Release ownership of the loops mutex lock
     pending_loops_mutex.unlock();
 
@@ -218,14 +218,14 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
     // Take ownership of the loops mutex lock (subsequent threads trying
     // to take ownership will hold until ownership is released)
     pending_loops_mutex.lock();
-    
+
     // Append the loop to the beginning of the list of unfinished loops
     loop.next_loop = pending_loops;
     pending_loops = &loop;
-    
+
     // Release ownership of the loops mutex lock
     pending_loops_mutex.unlock();
-    
+
     // Initialize a lock object associated with the loops mutex and take ownership of the lock
     std::unique_lock<std::mutex> lock(pending_loops_mutex);
 
@@ -269,7 +269,7 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
 
         // Wait here until ownership of the mutex lock can be reaquired
         lock.lock();
-        
+
         // Inform that this thread is not working on the loop anymore
         loop.number_of_active_workers--;
     }
@@ -298,14 +298,14 @@ void parallelFor2D(const std::function<void (uint32_t, uint32_t)>& loop_body,
     // Take ownership of the loops mutex lock (subsequent threads trying
     // to take ownership will hold until ownership is released)
     pending_loops_mutex.lock();
-    
+
     // Append the loop to the beginning of the list of unfinished loops
     loop.next_loop = pending_loops;
     pending_loops = &loop;
-    
+
     // Release ownership of the loops mutex lock
     pending_loops_mutex.unlock();
-    
+
     // Initialize a lock object associated with the loops mutex and take ownership of the lock
     std::unique_lock<std::mutex> lock(pending_loops_mutex);
 
@@ -349,7 +349,7 @@ void parallelFor2D(const std::function<void (uint32_t, uint32_t)>& loop_body,
 
         // Wait here until ownership of the mutex lock can be reaquired
         lock.lock();
-        
+
         // Inform that this thread is not working on the loop anymore
         loop.number_of_active_workers--;
     }

@@ -60,7 +60,7 @@ void Sampler::createArraysForNext1DSampleComponent(unsigned int n_values)
     sizes_of_1D_component_arrays.push_back(n_values);
     sample_component_arrays_1D.push_back(std::vector<imp_float>(n_values*n_samples_per_pixel));
 }
-    
+
 void Sampler::createArraysForNext2DSampleComponent(unsigned int n_values)
 {
     sizes_of_2D_component_arrays.push_back(n_values);
@@ -177,7 +177,7 @@ void GlobalSampler::setPixel(const Point2I& pixel)
         {
             size_t global_sample_idx = pixelToGlobalSampleIndex(pixel_sample_idx);
 
-            sample_component_arrays_1D[array_dimension][pixel_sample_idx] = 
+            sample_component_arrays_1D[array_dimension][pixel_sample_idx] =
                 valueOfGlobalSampleDimension(global_sample_idx, array_start_dimension + array_dimension);
         }
     }

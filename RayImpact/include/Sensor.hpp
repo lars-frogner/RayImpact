@@ -100,7 +100,7 @@ public:
                    imp_float sample_weight = 1);
 
     const BoundingRectangleI& pixelBounds() const;
-    
+
     const RawPixel& rawPixel(const Point2I& pixel_position) const;
 
     RawPixel& rawPixel(const Point2I& pixel_position);

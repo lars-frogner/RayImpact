@@ -20,7 +20,7 @@ bool writePFM(const std::string& filename,
     unsigned int pixel_idx;
 
     // Loop through image row by row from bottom to top and store values in output buffer
-    for (int j = (int)height - 1; j >= 0; j--) {    
+    for (int j = (int)height - 1; j >= 0; j--) {
         for (int i = 0; i < (int)width; i++)
         {
             pixel_idx = 3*(j*width + i);
@@ -30,7 +30,7 @@ bool writePFM(const std::string& filename,
             output_buffer[idx++] = (float)pixel_values[pixel_idx + 2];
         }
     }
-    
+
     // Open file for output
     std::ofstream file;
     file.open(filename.c_str(), std::ios::binary);
@@ -40,7 +40,7 @@ bool writePFM(const std::string& filename,
         printErrorMessage("cannot open file \"%s\" for output", filename);
         return false;
     }
-    
+
     // Write header
     file << "PF" << std::endl;
     file << width << " " << height << std::endl;

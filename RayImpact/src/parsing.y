@@ -87,7 +87,7 @@ argument:
         { addBoolParameter(nextPositionalArgumentID()); }
   | int
         { addIntParameter(nextPositionalArgumentID()); }
-  |    float
+  | float
         { addFloatParameter(nextPositionalArgumentID()); }
   | string
         { addStringParameter(nextPositionalArgumentID()); }
@@ -180,17 +180,17 @@ float_array_elements:
     float_array_elements DELIM float
   | float
   ;
-  
+
 string_array_elements:
     string_array_elements DELIM string
   | string
   ;
-  
+
 vector2_array_elements:
     vector2_array_elements DELIM vector2
   | vector2
   ;
-  
+
 vector3_array_elements:
     vector3_array_elements DELIM vector3
   | vector3

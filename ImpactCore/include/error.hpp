@@ -5,12 +5,12 @@
 #include <string>
 
 namespace Impact {
-    
+
 // Prints a message to stdout
 inline void printInfoMessage(const char* format, ...)
 {
     va_list arguments;
-    
+
     va_start(arguments, format);
 
     std::string modified_format(format);
@@ -67,7 +67,7 @@ inline void printErrorMessage(const char* format, ...)
 inline void printSevereMessage(const char* format, ...)
 {
     va_list arguments;
-    
+
     va_start(arguments, format);
 
     std::string modified_format(format);

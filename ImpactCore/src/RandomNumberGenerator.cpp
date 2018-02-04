@@ -30,12 +30,12 @@ imp_float RandomNumberGenerator::uniformFloat()
 {
     return uniform_continuous_distribution(generator);
 }
-    
+
 uint32_t RandomNumberGenerator::uniformUInt32()
 {
     return uniform_discrete_distribution(generator);
 }
-    
+
 // Returns a random unsigned integer in the range [0, upper_limit-1]
 uint32_t RandomNumberGenerator::uniformUInt32(uint32_t upper_limit)
 {

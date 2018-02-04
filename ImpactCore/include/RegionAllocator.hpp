@@ -17,7 +17,7 @@ private:
     size_t current_block_size; // Size of the current block (usually equal to block_size)
     std::list< std::pair<size_t, uint8_t*> > used_blocks; // List of used blocks and their sizes
     std::list< std::pair<size_t, uint8_t*> > available_blocks; // List of allocated but unused blocks and their sizes
-    
+
 public:
 
     RegionAllocator(size_t block_size = 262144);

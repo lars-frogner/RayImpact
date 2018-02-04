@@ -18,7 +18,7 @@ Quaternion::Quaternion(const Vector3F& imag, imp_float w)
 Quaternion::Quaternion(imp_float x, imp_float y, imp_float z, imp_float w)
     : imag(x, y, z), w(w)
 {}
-    
+
 Quaternion Quaternion::operator+(const Quaternion& other) const
 {
     return Quaternion(imag + other.imag, w + other.w);
@@ -34,7 +34,7 @@ Quaternion Quaternion::operator*(const Quaternion& other) const
     return Quaternion(imag.cross(other.imag) + other.imag*w + imag*other.w,
                       w*other.w - imag.dot(other.imag));
 }
-    
+
 Quaternion Quaternion::operator-() const
 {
     return Quaternion(-imag, -w);
@@ -50,7 +50,7 @@ Quaternion Quaternion::operator/(imp_float divisor) const
     imp_float factor = 1.0f/divisor;
     return Quaternion(imag*factor, w*factor);
 }
-    
+
 Quaternion& Quaternion::operator+=(const Quaternion& other)
 {
     imag += other.imag;

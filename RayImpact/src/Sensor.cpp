@@ -146,7 +146,7 @@ void Sensor::setPixels(const EnergySpectrum* pixel_values)
         Pixel& pixel = pixels[i];
 
         pixel_values[i].computeTristimulusValues(pixel.xyz_values);
-        
+
         pixel.sum_of_filter_weights = 1.0f;
 
         pixel.xyz_sums_of_splats[0] = 0;
@@ -244,7 +244,7 @@ void SensorRegion::addSample(const Point2F& sample_position,
 {
     // Convert continuous sample position to the space of discrete pixel positions by subtracting 0.5
     const Point2F discrete_sample_position = sample_position - Vector2F(0.5f, 0.5f);
-    
+
     // Compute the bounds on pixels that can be affected by the sample
 
     Point2I lower_bound_on_affected_pixels = static_cast<Point2I>(ceil(discrete_sample_position - filter_radius));

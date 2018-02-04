@@ -45,7 +45,7 @@ inline void shuffleArray(T* elements,
     {
         // Choose random element higher up in the list
         size_t element_to_swap_with = element + rng.uniformUInt32((uint32_t)(n_elements - element));
-    
+
         // Swap the elements
         std::swap(elements[element], elements[element_to_swap_with]);
     }
@@ -62,7 +62,7 @@ inline void shuffleArray(T* elements,
     {
         // Choose random element higher up in the list
         size_t element_to_swap_with = element + rng.uniformUInt32(n_elements - element);
-    
+
         // Swap the elements
         for (unsigned int n = 0; n < n_element_dimensions; n++)
         {

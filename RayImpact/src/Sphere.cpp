@@ -69,7 +69,7 @@ bool Sphere::intersect(const Ray& ray,
     ErrorFloat origin_x(transformed_ray.origin.x, transformed_ray_origin_error.x);
     ErrorFloat origin_y(transformed_ray.origin.y, transformed_ray_origin_error.y);
     ErrorFloat origin_z(transformed_ray.origin.z, transformed_ray_origin_error.z);
-    
+
     ErrorFloat direction_x(transformed_ray.direction.x, transformed_ray_direction_error.x);
     ErrorFloat direction_y(transformed_ray.direction.y, transformed_ray_direction_error.y);
     ErrorFloat direction_z(transformed_ray.direction.z, transformed_ray_direction_error.z);
@@ -94,7 +94,7 @@ bool Sphere::intersect(const Ray& ray,
     if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
         longest_intersect_dist.lowerBound() < 0)
         return false;
-    
+
     ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
     if (relevant_intersect_dist.lowerBound() <= 0)
@@ -120,7 +120,7 @@ bool Sphere::intersect(const Ray& ray,
 
     // Compute azimuthal angle of intersection point
     imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
     // Remap from [-pi, pi] to [0, 2*pi]
     if (intersection_phi < 0)
         intersection_phi += IMP_TWO_PI;
@@ -144,7 +144,7 @@ bool Sphere::intersect(const Ray& ray,
         // We now have to try again with the furthest intersection point
 
         relevant_intersect_dist = longest_intersect_dist;
-        
+
         intersection_point = transformed_ray(static_cast<imp_float>(relevant_intersect_dist));
 
         intersection_point = intersection_point*(radius/distanceBetween(intersection_point, Point3F(0, 0, 0)));
@@ -153,7 +153,7 @@ bool Sphere::intersect(const Ray& ray,
             intersection_point.z = 1e-5f*radius;
 
         intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
         if (intersection_phi < 0)
             intersection_phi += IMP_TWO_PI;
 
@@ -166,7 +166,7 @@ bool Sphere::intersect(const Ray& ray,
     }
 
     // Compute u and v coordinates of the intersection point
-    
+
     imp_float theta_range = theta_max - theta_min;
     imp_float intersection_theta = std::acos(clamp(intersection_point.y/radius, -1.0f, 1.0f));
 
@@ -229,7 +229,7 @@ bool Sphere::hasIntersection(const Ray& ray,
     ErrorFloat origin_x(transformed_ray.origin.x, transformed_ray_origin_error.x);
     ErrorFloat origin_y(transformed_ray.origin.y, transformed_ray_origin_error.y);
     ErrorFloat origin_z(transformed_ray.origin.z, transformed_ray_origin_error.z);
-    
+
     ErrorFloat direction_x(transformed_ray.direction.x, transformed_ray_direction_error.x);
     ErrorFloat direction_y(transformed_ray.direction.y, transformed_ray_direction_error.y);
     ErrorFloat direction_z(transformed_ray.direction.z, transformed_ray_direction_error.z);
@@ -254,7 +254,7 @@ bool Sphere::hasIntersection(const Ray& ray,
     if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
         longest_intersect_dist.lowerBound() < 0)
         return false;
-    
+
     ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
     if (relevant_intersect_dist.lowerBound() <= 0)
@@ -284,7 +284,7 @@ bool Sphere::hasIntersection(const Ray& ray,
 
         // Compute azimuthal angle of intersection point
         intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
         // Remap from [-pi, pi] to [0, 2*pi]
         if (intersection_phi < 0)
             intersection_phi += IMP_TWO_PI;
@@ -313,7 +313,7 @@ bool Sphere::hasIntersection(const Ray& ray,
         // We now have to try again with the furthest intersection point
 
         relevant_intersect_dist = longest_intersect_dist;
-        
+
         intersection_point = transformed_ray(static_cast<imp_float>(relevant_intersect_dist));
 
         intersection_point = intersection_point*(radius/distanceBetween(intersection_point, Point3F(0, 0, 0)));
@@ -326,7 +326,7 @@ bool Sphere::hasIntersection(const Ray& ray,
 
             // Compute azimuthal angle of intersection point
             intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
             // Remap from [-pi, pi] to [0, 2*pi]
             if (intersection_phi < 0)
                 intersection_phi += IMP_TWO_PI;

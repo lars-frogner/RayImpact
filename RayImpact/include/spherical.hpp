@@ -6,7 +6,7 @@
 
 namespace Impact {
 namespace RayImpact {
-    
+
 // Theta is the angle with respect to the positive z-axis,
 // and phi is the angle in the xy-plane with respect to the
 // positive x-axis. The (x, y, z) systemn is right-handed.

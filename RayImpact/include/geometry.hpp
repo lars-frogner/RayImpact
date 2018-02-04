@@ -21,7 +21,7 @@ class Medium{};
 class MediumInterface{ public: const Medium* outside; };
 
 // Forward declarations
-    
+
 template <typename T>
 class Vector2;
 
@@ -59,7 +59,7 @@ template <typename T>
 class Vector2 {
 
 private:
-    
+
     bool hasNaNs() const;
 
 public:
@@ -76,7 +76,7 @@ public:
     Vector2 operator-(const Vector2& other) const;
     Vector2 operator*(T factor) const;
     Vector2 operator/(T divisor) const;
-    
+
     Vector2 operator-() const;
 
     Vector2& operator+=(const Vector2& other);
@@ -107,7 +107,7 @@ template <typename T>
 class Vector3 {
 
 private:
-    
+
     bool hasNaNs() const;
 
 public:
@@ -126,7 +126,7 @@ public:
     Vector3 operator-(const Vector3& other) const;
     Vector3 operator*(T factor) const;
     Vector3 operator/(T divisor) const;
-    
+
     Vector3 operator-() const;
 
     Vector3& operator+=(const Vector3& other);
@@ -139,7 +139,7 @@ public:
 
     T absDot(const Vector3& other) const;
     T absDot(const Normal3<T>& normal) const;
-    
+
     Vector3 cross(const Vector3& other) const;
 
     T squaredLength() const;
@@ -162,7 +162,7 @@ public:
     void normalize();
 
     void reverse();
-    
+
     void flipToSameHemisphereAs(const Vector3& other);
     void flipToSameHemisphereAs(const Normal3<T>& normal);
 
@@ -175,7 +175,7 @@ template <typename T>
 class Normal3 {
 
 private:
-    
+
     bool hasNaNs() const;
 
 public:
@@ -194,7 +194,7 @@ public:
     Normal3 operator-(const Normal3& other) const;
     Normal3 operator*(T factor) const;
     Normal3 operator/(T divisor) const;
-    
+
     Normal3 operator-() const;
 
     Normal3& operator+=(const Normal3& other);
@@ -239,7 +239,7 @@ template <typename T>
 class Point2 {
 
 private:
-    
+
     bool hasNaNs() const;
 
 public:
@@ -259,20 +259,20 @@ public:
 
     T operator[](unsigned int dimension) const;
     T& operator[](unsigned int dimension);
-    
+
     Point2 operator+(const Vector2<T>& vector) const;
     Point2 operator-(const Vector2<T>& vector) const;
 
     Point2& operator+=(const Vector2<T>& vector);
     Point2& operator-=(const Vector2<T>& vector);
-    
+
     Vector2<T> operator-(const Point2& other) const;
-    
+
     // Addition of points and multiplication of points with scalars
     // is only geometrically correct if the weights sum to one.
     Point2 operator+(const Point2& other) const;
     Point2 operator*(T weight) const;
-    
+
     bool operator==(const Point2& other) const;
     bool operator!=(const Point2& other) const;
 
@@ -291,7 +291,7 @@ template <typename T>
 class Point3 {
 
 private:
-    
+
     bool hasNaNs() const;
 
 public:
@@ -309,15 +309,15 @@ public:
 
     T operator[](unsigned int dimension) const;
     T& operator[](unsigned int dimension);
-    
+
     Point3 operator+(const Vector3<T>& vector) const;
     Point3 operator-(const Vector3<T>& vector) const;
 
     Point3& operator+=(const Vector3<T>& vector);
     Point3& operator-=(const Vector3<T>& vector);
-    
+
     Vector3<T> operator-(const Point3& other) const;
-    
+
     // Addition of points and multiplication of points with scalars
     // is only geometrically correct if the weights sum to one.
     Point3 operator+(const Point3& other) const;

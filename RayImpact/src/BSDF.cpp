@@ -6,7 +6,7 @@ namespace Impact {
 namespace RayImpact {
 
 // BXDF method implementations
-    
+
 BXDF::BXDF(BXDFType type)
     : type(type)
 {}
@@ -431,7 +431,7 @@ Spectrum MicrofacetBTDF::evaluate(const Vector3F& outgoing_direction,
     imp_float incident_dot_half = incident_direction.dot(half_vector);
 
     imp_float denom_factor = outgoing_dot_half + refractive_index_ratio*incident_dot_half;
-    
+
     imp_float num_factor = (transport_mode == TransportMode::Radiance)? 1.0f : refractive_index_ratio*refractive_index_ratio;
 
     return transmittance*
@@ -517,7 +517,7 @@ Spectrum BSDF::reduced(const Vector3F& outgoing_direction,
                        BXDFType type /* = BSDF_ALL */) const
 {
     Spectrum result(0.0f);
-    
+
     for (unsigned int i = 0; i < n_bxdfs; i++)
     {
         if (bxdfs[i]->containedIn(type))
@@ -533,7 +533,7 @@ Spectrum BSDF::reduced(unsigned int n_samples,
                        BXDFType type /* = BSDF_ALL */) const
 {
     Spectrum result(0.0f);
-    
+
     for (unsigned int i = 0; i < n_bxdfs; i++)
     {
         if (bxdfs[i]->containedIn(type))
@@ -555,7 +555,7 @@ imp_float fresnelReflectance(imp_float cos_incident_angle,
 
     imp_float refractive_index_incident_medium;
     imp_float refractive_index_transmitted_medium;
-    
+
     // Check whether the ray is entering the object from the outside
     if (cos_incident_angle > 0)
     {
@@ -587,7 +587,7 @@ imp_float fresnelReflectance(imp_float cos_incident_angle,
                                       (refractive_index_incident_medium*cos_transmitted_angle))/
                                      ((refractive_index_transmitted_medium*cos_incident_angle) +
                                       (refractive_index_incident_medium*cos_transmitted_angle));
-    
+
     // Compute Fresnel reflectance for perpendicular polarized light
     imp_float reflectance_perpendicular = ((refractive_index_incident_medium*cos_incident_angle) -
                                            (refractive_index_transmitted_medium*cos_transmitted_angle))/

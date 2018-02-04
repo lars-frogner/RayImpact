@@ -36,7 +36,7 @@ imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
 
     ray->x_offset_ray_origin = x_offset_ray.origin;
     ray->x_offset_ray_direction = x_offset_ray.direction;
-    
+
      // Offset sensor point by one pixel in the y-direction
     CameraSample y_offset_sample = sample;
     y_offset_sample.sensor_point.y += 1.0f;

@@ -1,7 +1,7 @@
 #include "string_util.hpp"
 #include "error.hpp"
 #include <vector>
-#include <algorithm> 
+#include <algorithm>
 #include <cctype>
 #include <locale>
 #include <iterator>

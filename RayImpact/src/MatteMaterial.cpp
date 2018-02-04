@@ -7,7 +7,7 @@ namespace Impact {
 namespace RayImpact {
 
 // MatteMaterial method implementations
-    
+
 MatteMaterial::MatteMaterial(const std::shared_ptr< Texture<ReflectionSpectrum> >& reflectance_texture,
                              const std::shared_ptr< Texture<imp_float> >& slope_deviation_texture,
                              const std::shared_ptr< Texture<imp_float> >& bump_map)

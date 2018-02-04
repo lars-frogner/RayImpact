@@ -49,7 +49,7 @@ public:
     virtual unsigned int roundedArraySize(unsigned int n_values) const;
 
     void createArraysForNext1DSampleComponent(unsigned int n_values);
-    
+
     void createArraysForNext2DSampleComponent(unsigned int n_values);
 
     const imp_float* arrayOfNext1DSampleComponent(unsigned int n_values);

@@ -37,9 +37,9 @@ public:
                     imp_float time);
 
     Ray spawnRay(const Vector3F& direction) const;
-    
+
     Ray spawnRayTo(const Point3F& end_point) const;
-    
+
     Ray spawnRayTo(const ScatteringEvent& other) const;
 
     const Medium* getMediumInDirection(const Vector3F& direction) const {return nullptr;}
@@ -70,7 +70,7 @@ public:
     BSSRDF* bssrdf; // The BSSRDF associated with the surface
 
     // Versions of surface normal and derivatives for lighting calculations
-    struct 
+    struct
     {
         Normal3F surface_normal;
         Vector3F dpdu;

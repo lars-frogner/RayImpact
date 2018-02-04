@@ -5,7 +5,7 @@ namespace Impact {
 namespace RayImpact {
 
 // UniformSampler method implementations
-    
+
 UniformSampler::UniformSampler(unsigned int n_horizontal_samples_per_pixel,
                                unsigned int n_vertical_samples_per_pixel,
                                unsigned int n_sampled_dimensions)
@@ -13,7 +13,7 @@ UniformSampler::UniformSampler(unsigned int n_horizontal_samples_per_pixel,
       n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
       n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
 {}
-    
+
 void UniformSampler::setPixel(const Point2I& pixel)
 {
     PixelSampler::setPixel(pixel);
@@ -30,7 +30,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
             sample_components_1D[k][i] = (i + 0.5f)*sample_separation;
         }
     }
-    
+
     // Generate 2D sample components
     for (size_t k = 0; k < sample_components_2D.size(); k++)
     {
@@ -49,7 +49,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
 
     // Generate 1D sample component arrays
     for (size_t k = 0; k < sample_component_arrays_1D.size(); k++)
-    {    
+    {
         size_t array_size = sizes_of_1D_component_arrays[k];
 
         size_t idx = 0;
@@ -67,11 +67,11 @@ void UniformSampler::setPixel(const Point2I& pixel)
 
     // Generate 2D sample component arrays
     for (size_t k = 0; k < sample_component_arrays_2D.size(); k++)
-    {    
+    {
         size_t array_size = sizes_of_2D_component_arrays[k];
 
         size_t idx = 0;
-        
+
         for (size_t j = 0; j < n_vertical_samples_per_pixel; j++) {
             for (size_t i = 0; i < n_horizontal_samples_per_pixel; i++)
             {
@@ -82,7 +82,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
                 {
                     sample_component_arrays_2D[k][idx].x = sample_x;
                     sample_component_arrays_2D[k][idx].y = sample_y;
-                    
+
                     idx++;
                 }
             }
@@ -93,7 +93,7 @@ void UniformSampler::setPixel(const Point2I& pixel)
 std::unique_ptr<Sampler> UniformSampler::cloned()
 {
     UniformSampler* sampler = new UniformSampler(*this);
-    
+
     sampler->rng.setRandomSeed();
 
     return std::unique_ptr<Sampler>(sampler);
@@ -102,7 +102,7 @@ std::unique_ptr<Sampler> UniformSampler::cloned()
 std::unique_ptr<Sampler> UniformSampler::cloned(unsigned int seed)
 {
     UniformSampler* sampler = new UniformSampler(*this);
-    
+
     sampler->rng.setSeed(seed);
 
     return std::unique_ptr<Sampler>(sampler);

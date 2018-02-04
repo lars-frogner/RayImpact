@@ -58,7 +58,7 @@ RadianceSpectrum SampleIntegrator::specularlyReflectedRadiance(const RayWithOffs
 
             const Normal3F& dndx = scattering_event.shading.dndu*scattering_event.dudx +
                                    scattering_event.shading.dndv*scattering_event.dvdx;
-            
+
             const Normal3F& dndy = scattering_event.shading.dndu*scattering_event.dudy +
                                    scattering_event.shading.dndv*scattering_event.dvdy;
 
@@ -124,7 +124,7 @@ RadianceSpectrum SampleIntegrator::specularlyTransmittedRadiance(const RayWithOf
 
             const Normal3F& dndx = scattering_event.shading.dndu*scattering_event.dudx +
                                    scattering_event.shading.dndv*scattering_event.dvdx;
-            
+
             const Normal3F& dndy = scattering_event.shading.dndu*scattering_event.dudy +
                                    scattering_event.shading.dndv*scattering_event.dvdy;
 
@@ -186,7 +186,7 @@ void SampleIntegrator::render(const Scene& scene)
     {
         // Create thread-private allocator
         RegionAllocator allocator;
-        
+
         // Create thread-private sampler
         unsigned int seed = region_j*n_sensor_regions_x + region_i;
         std::unique_ptr<Sampler> region_sampler = sampler->cloned(seed);
@@ -195,7 +195,7 @@ void SampleIntegrator::render(const Scene& scene)
 
         Point2I lower_region_sampling_bounds(sensor_sampling_bounds.lower_corner.x + region_i*sensor_region_extent,
                                              sensor_sampling_bounds.lower_corner.y + region_j*sensor_region_extent);
-        
+
         Point2I upper_region_sampling_bounds(std::min<int>(lower_region_sampling_bounds.x + sensor_region_extent, sensor_sampling_bounds.upper_corner.x),
                                              std::min<int>(lower_region_sampling_bounds.y + sensor_region_extent, sensor_sampling_bounds.upper_corner.y));
 

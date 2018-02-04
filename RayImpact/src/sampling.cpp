@@ -4,7 +4,7 @@ namespace Impact {
 namespace RayImpact {
 
 // Sampling utility function implementations
-    
+
 // Fills the given array with stratified sample values covering the unit interval
 void generateStratifiedSamples(imp_float* samples,
                                size_t n_samples,
@@ -33,7 +33,7 @@ void generateStratifiedSamples(Point2F* samples,
         {
             samples[sample_idx].x = std::min((x + rng.uniformFloat())*sample_separation_x, IMP_ONE_MINUS_EPS);
             samples[sample_idx].y = std::min((y + rng.uniformFloat())*sample_separation_y, IMP_ONE_MINUS_EPS);
-        
+
             sample_idx++;
         }
     }
@@ -63,7 +63,7 @@ void generateLatinHypercubeSamples(imp_float* samples,
         {
             // Choose random sample higher up in the list
             size_t sample_to_swap_with = sample_idx + rng.uniformUInt32();
-    
+
             // Swap the samples
             std::swap(samples[         sample_idx*n_sample_dimensions + n],
                       samples[sample_to_swap_with*n_sample_dimensions + n]);

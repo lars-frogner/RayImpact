@@ -7,7 +7,7 @@ namespace Impact {
 namespace RayImpact {
 
 // MixedMaterial method implementations
-    
+
 MixedMaterial::MixedMaterial(const std::shared_ptr<Material>& material_1,
                              const std::shared_ptr<Material>& material_2,
                              const std::shared_ptr< Texture<Spectrum> >& mixing_ratio_texture)

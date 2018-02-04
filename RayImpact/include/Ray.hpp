@@ -45,7 +45,7 @@ public:
     Vector3F y_offset_ray_direction; // Direction of y-offset ray
 
     RayWithOffsets();
-    
+
     RayWithOffsets(const Point3F& origin,
                    const Vector3F& direction,
                    imp_float max_distance = IMP_INFINITY,

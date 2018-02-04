@@ -5,7 +5,7 @@
 namespace Impact {
 
 extern unsigned int IMP_N_THREADS; // The number of threads used for parallelization
-    
+
 extern thread_local unsigned int IMP_THREAD_ID; // Unique thread identifier
 
 void initializeParallel(unsigned int n_threads);

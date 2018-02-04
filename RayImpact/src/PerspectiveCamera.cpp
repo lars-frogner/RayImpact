@@ -15,7 +15,7 @@ PerspectiveCamera::PerspectiveCamera(const AnimatedTransformation& camera_to_wor
                                      imp_float field_of_view,
                                      Sensor* sensor,
                                      const Medium* medium)
-    : ProjectiveCamera::ProjectiveCamera(camera_to_world, 
+    : ProjectiveCamera::ProjectiveCamera(camera_to_world,
                                          Transformation::perspective(field_of_view, 0.01f, 1000.0f),
                                          screen_window,
                                          shutter_opening_time,
@@ -35,10 +35,10 @@ imp_float PerspectiveCamera::generateRay(const CameraSample& sample,
                                          Ray* ray) const
 {
     Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0);
-    
+
     // Find sensor point in camera space
     const Point3F& sensor_point = raster_to_camera(sensor_point_in_raster_space);
-    
+
     // Ray starts at the origin and points towards the sensor point at the near plane in camera space
     *ray = Ray(Point3F(0, 0, 0), Vector3F(sensor_point).normalized());
 
@@ -69,7 +69,7 @@ imp_float PerspectiveCamera::generateRayWithOffsets(const CameraSample& sample,
                                                     RayWithOffsets* ray) const
 {
     Point3F sensor_point_in_raster_space(sample.sensor_point.x, sample.sensor_point.y, 0);
-    
+
     // Find sensor point in camera space
     const Point3F& sensor_point = raster_to_camera(sensor_point_in_raster_space);
 
@@ -94,22 +94,22 @@ imp_float PerspectiveCamera::generateRayWithOffsets(const CameraSample& sample,
 
         // Compute intersection distance for the x-offset ray
         intersection_distance_with_plane_of_focus = focal_distance/x_offset_direction.z;
-        
+
         // Compute intersection point for the x-offset ray
         intersection_point_with_plane_of_focus = Point3F(0, 0, 0) + x_offset_direction*intersection_distance_with_plane_of_focus;
-        
+
         ray->x_offset_ray_origin = ray->origin;
         ray->x_offset_ray_direction = (intersection_point_with_plane_of_focus - ray->x_offset_ray_origin).normalized();
-    
+
         // Compute direction for y-offset ray through the lens center
         const Vector3F& y_offset_direction = Vector3F(sensor_point + vertical_pixel_offset).normalized();
 
         // Compute intersection distance for the y-offset ray
         intersection_distance_with_plane_of_focus = focal_distance/y_offset_direction.z;
-        
+
         // Compute intersection point for the y-offset ray
         intersection_point_with_plane_of_focus = Point3F(0, 0, 0) + y_offset_direction*intersection_distance_with_plane_of_focus;
-        
+
         ray->y_offset_ray_origin = ray->origin;
         ray->y_offset_ray_direction = (intersection_point_with_plane_of_focus - ray->y_offset_ray_origin).normalized();
     }
@@ -121,7 +121,7 @@ imp_float PerspectiveCamera::generateRayWithOffsets(const CameraSample& sample,
         ray->y_offset_ray_origin = ray->origin;
         ray->y_offset_ray_direction = (Vector3F(sensor_point) + vertical_pixel_offset).normalized();
     }
-    
+
     ray->has_offsets = true;
     ray->time = ::Impact::lerp(shutter_opening_time, shutter_closing_time, sample.time);
     ray->medium = medium;

@@ -64,7 +64,7 @@ bool Disk::intersect(const Ray& ray,
     // The ray misses if it points exactly along the disk plane
     if (transformed_ray.direction.y == 0)
         return false;
-    
+
     // Compute distance to intersection with disk plane
     imp_float plane_intersection_distance = (y - transformed_ray.origin.y)/transformed_ray.direction.y;
 
@@ -75,7 +75,7 @@ bool Disk::intersect(const Ray& ray,
 
     // Compute intersection point
     Point3F intersection_point = transformed_ray(static_cast<imp_float>(plane_intersection_distance));
-    
+
     // Compute squared distance from intersection to disk center in disk plane
     imp_float squared_intersection_radius = intersection_point.x*intersection_point.x + intersection_point.z*intersection_point.z;
 
@@ -89,11 +89,11 @@ bool Disk::intersect(const Ray& ray,
 
     // Compute azimuthal angle of intersection point
     imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
     // Remap from [-pi, pi] to [0, 2*pi]
     if (intersection_phi < 0)
         intersection_phi += IMP_TWO_PI;
-    
+
     if (intersection_phi > phi_max)
         return false;
 
@@ -148,7 +148,7 @@ bool Disk::hasIntersection(const Ray& ray,
     // The ray misses if it points exactly along the disk plane
     if (transformed_ray.direction.y == 0)
         return false;
-    
+
     // Compute distance to intersection with disk plane
     imp_float plane_intersection_distance = (y - transformed_ray.origin.y)/transformed_ray.direction.y;
 
@@ -159,7 +159,7 @@ bool Disk::hasIntersection(const Ray& ray,
 
     // Compute intersection point
     Point3F intersection_point = transformed_ray(static_cast<imp_float>(plane_intersection_distance));
-    
+
     // Compute squared distance from intersection to disk center in disk plane
     imp_float squared_intersection_radius = intersection_point.x*intersection_point.x + intersection_point.z*intersection_point.z;
 
@@ -175,11 +175,11 @@ bool Disk::hasIntersection(const Ray& ray,
 
         // Compute azimuthal angle of intersection point
         imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
         // Remap from [-pi, pi] to [0, 2*pi]
         if (intersection_phi < 0)
             intersection_phi += IMP_TWO_PI;
-    
+
         if (intersection_phi > phi_max)
             return false;
     }

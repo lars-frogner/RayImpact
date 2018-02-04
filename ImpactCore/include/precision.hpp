@@ -32,7 +32,7 @@ inline int machineIsBigEndian()
 
     } bint = {0x01020304};
 
-    return bint.c[0] == 1; 
+    return bint.c[0] == 1;
 }
 
 // Implement precision utility functions for float and double
@@ -92,7 +92,7 @@ inline imp_float closestLowerFloat(imp_float value)
         value = -0.0;
 
     imp_float_bits bits = floatToBits(value);
-    
+
     // Incrementing or decrementing the bit pattern yields
     // the representation of the closest lower value
     if (value <= 0.0)

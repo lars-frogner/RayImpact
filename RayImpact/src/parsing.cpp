@@ -246,7 +246,7 @@ void addTristimulusSpectrumParameter(const char* name)
 void addSampledSpectrumParameter(const char* name)
 {
     imp_assert(float_array.size() % 2 == 0 && !float_array.empty());
-    
+
     unsigned int n_samples_total;
 
     if (int_array.empty())
@@ -515,7 +515,7 @@ void callAPIFunction(const char* name)
         resetArguments();
         return;
     }
-    
+
     parameter_set.warnAboutUnusedParameters();
     resetArguments();
 }
@@ -530,7 +530,7 @@ int parseFile(const char* filename)
             return 0;
         }
     }
-        
+
     if (parsing_output_filename != "stdout")
     {
         if (fopen_s(&yyout, parsing_output_filename.c_str(), "w") != 0)
@@ -541,10 +541,10 @@ int parseFile(const char* filename)
     }
 
     yyparse();
-    
+
     if (yyin)
         fclose(yyin);
-        
+
     if (yyout)
         fclose(yyout);
 

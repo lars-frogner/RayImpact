@@ -67,7 +67,7 @@ bool Cylinder::intersect(const Ray& ray,
     ErrorFloat origin_x(transformed_ray.origin.x, transformed_ray_origin_error.x);
     ErrorFloat origin_y(transformed_ray.origin.y, transformed_ray_origin_error.y);
     ErrorFloat origin_z(transformed_ray.origin.z, transformed_ray_origin_error.z);
-    
+
     ErrorFloat direction_x(transformed_ray.direction.x, transformed_ray_direction_error.x);
     ErrorFloat direction_y(transformed_ray.direction.y, transformed_ray_direction_error.y);
     ErrorFloat direction_z(transformed_ray.direction.z, transformed_ray_direction_error.z);
@@ -92,7 +92,7 @@ bool Cylinder::intersect(const Ray& ray,
     if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
         longest_intersect_dist.lowerBound() < 0)
         return false;
-    
+
     ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
     if (relevant_intersect_dist.lowerBound() <= 0)
@@ -116,7 +116,7 @@ bool Cylinder::intersect(const Ray& ray,
 
     // Compute azimuthal angle of intersection point
     imp_float intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
     // Remap from [-pi, pi] to [0, 2*pi]
     if (intersection_phi < 0)
         intersection_phi += IMP_TWO_PI;
@@ -140,15 +140,15 @@ bool Cylinder::intersect(const Ray& ray,
         // We now have to try again with the furthest intersection point
 
         relevant_intersect_dist = longest_intersect_dist;
-        
+
         intersection_point = transformed_ray(static_cast<imp_float>(relevant_intersect_dist));
-        
+
         inverse_intersection_radius = 1.0f/std::sqrt(intersection_point.x*intersection_point.x + intersection_point.z*intersection_point.z);
         intersection_point.x *= radius*inverse_intersection_radius;
         intersection_point.z *= radius*inverse_intersection_radius;
 
         intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
         if (intersection_phi < 0)
             intersection_phi += IMP_TWO_PI;
 
@@ -161,7 +161,7 @@ bool Cylinder::intersect(const Ray& ray,
     }
 
     // Compute u and v coordinates of the intersection point
-    
+
     imp_float y_range = y_max - y_min;
 
     imp_float u = intersection_phi/phi_max;
@@ -226,7 +226,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
     ErrorFloat origin_x(transformed_ray.origin.x, transformed_ray_origin_error.x);
     ErrorFloat origin_y(transformed_ray.origin.y, transformed_ray_origin_error.y);
     ErrorFloat origin_z(transformed_ray.origin.z, transformed_ray_origin_error.z);
-    
+
     ErrorFloat direction_x(transformed_ray.direction.x, transformed_ray_direction_error.x);
     ErrorFloat direction_y(transformed_ray.direction.y, transformed_ray_direction_error.y);
     ErrorFloat direction_z(transformed_ray.direction.z, transformed_ray_direction_error.z);
@@ -251,7 +251,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
     if (shortest_intersect_dist.upperBound() > transformed_ray.max_distance ||
         longest_intersect_dist.lowerBound() < 0)
         return false;
-    
+
     ErrorFloat relevant_intersect_dist = shortest_intersect_dist;
 
     if (relevant_intersect_dist.lowerBound() <= 0)
@@ -279,7 +279,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
     {
         // Compute azimuthal angle of intersection point
         intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
         // Remap from [-pi, pi] to [0, 2*pi]
         if (intersection_phi < 0)
             intersection_phi += IMP_TWO_PI;
@@ -308,7 +308,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
         // We now have to try again with the furthest intersection point
 
         relevant_intersect_dist = longest_intersect_dist;
-        
+
         intersection_point = transformed_ray(static_cast<imp_float>(relevant_intersect_dist));
 
         inverse_intersection_radius = 1.0f/std::sqrt(intersection_point.x*intersection_point.x + intersection_point.z*intersection_point.z);
@@ -319,7 +319,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
         {
             // Compute azimuthal angle of intersection point
             intersection_phi = std::atan2(intersection_point.x, intersection_point.z);
-    
+
             // Remap from [-pi, pi] to [0, 2*pi]
             if (intersection_phi < 0)
                 intersection_phi += IMP_TWO_PI;

@@ -159,7 +159,7 @@ void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets&
         const Point3F& x_offset_intersect_pos = ray.x_offset_ray_origin + ray.x_offset_ray_direction*x_offset_intersect_dist;
 
         // Estimate the point where the y-offset ray intersects the surface
-        
+
         imp_float y_offset_intersect_dist = (normal_distance - surface_normal.dot(static_cast<Vector3F>(ray.y_offset_ray_origin)))
                                              /(surface_normal.dot(ray.y_offset_ray_direction));
 
@@ -197,13 +197,13 @@ void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets&
             dimensions[1] = 1;
         }
 
-        // Set coeffiecients for the two systems of equations 
+        // Set coeffiecients for the two systems of equations
         imp_float coeffs[2][2] = {{dpdu[dimensions[0]], dpdv[dimensions[0]]},
                                   {dpdu[dimensions[1]], dpdv[dimensions[1]]}};
 
         // Set right-hand sides for the system of equations for dudx and dvdx
         imp_float rhs_x[2] = {dpdx[dimensions[0]], dpdx[dimensions[1]]};
-        
+
         // Set right-hand sides for the system of equations for dudy and dvdy
         imp_float rhs_y[2] = {dpdy[dimensions[0]], dpdy[dimensions[1]]};
 
@@ -213,7 +213,7 @@ void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets&
             dudx = 0;
             dvdx = 0;
         }
-        
+
         // Solve for dudy and dvdy
         if (!solve2x2LinearSystem(coeffs, rhs_y, &dudy, &dvdy))
         {

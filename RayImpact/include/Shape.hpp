@@ -24,7 +24,7 @@ public:
           bool has_reverse_orientation);
 
     virtual BoundingBoxF objectSpaceBoundingBox() const = 0;
-    
+
     virtual BoundingBoxF worldSpaceBoundingBox() const;
 
     virtual bool intersect(const Ray& ray,

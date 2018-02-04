@@ -34,7 +34,7 @@ public:
 
     BeckmannDistribution(imp_float slope_deviation_x,
                          imp_float slope_deviation_y);
-    
+
     static imp_float roughnessToDeviation(imp_float roughness);
 
     imp_float areaWithMicroNormal(const Vector3F& micro_normal) const;
@@ -55,7 +55,7 @@ public:
 
     TrowbridgeReitzDistribution(imp_float slope_deviation_x,
                                 imp_float slope_deviation_y);
-    
+
     static imp_float roughnessToDeviation(imp_float roughness);
 
     imp_float areaWithMicroNormal(const Vector3F& micro_normal) const;

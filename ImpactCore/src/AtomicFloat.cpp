@@ -25,10 +25,10 @@ void AtomicFloat::add(imp_float value)
     imp_float_bits new_bits;
 
     do {
-    
+
         // Compute the sum
         new_bits = floatToBits(bitsToFloat(old_bits) + value);
-        
+
       // Try assigning new_bits to bits. If bits has been changed
       // by another thread and thus differs from old_bits,
       // old_bits is updated with the current value of bits,

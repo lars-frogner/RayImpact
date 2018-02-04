@@ -9,14 +9,14 @@ template <typename T, unsigned int log2_block_extent>
 class BlockedArray {
 
 private:
-    
+
     T* data; // Array of data, arranged in square blocks with extent 2^log2_block_extent
     unsigned int total_width; // Total number of values along the horizontal dimension
     unsigned int total_height; // Total number of values along the vertical dimension
     unsigned int n_blocks_horizontally; // Number of blocks horizontally
 
     constexpr unsigned int blockExtent() const;
-    
+
     constexpr unsigned int blockSize() const;
 
     unsigned int roundedUp(unsigned int x) const;
@@ -26,7 +26,7 @@ private:
     unsigned int get1DOffsetInBlock(unsigned int coordinate) const;
 
     unsigned int getTotalOffset(unsigned int x, unsigned int y) const;
-    
+
 public:
 
     BlockedArray(unsigned int width, unsigned int height,
@@ -39,7 +39,7 @@ public:
     BlockedArray& operator=(const BlockedArray& other) = delete;
 
     unsigned int width() const;
-    
+
     unsigned int height() const;
 
     T& operator()(unsigned int x, unsigned int y);

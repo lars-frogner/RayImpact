@@ -78,11 +78,11 @@ void AnimatedTransformation::decompose(const Matrix4x4& matrix,
         imp_float norm_1 = std::abs(rotation_matrix.a11 - averaged_matrix.a11) +
                            std::abs(rotation_matrix.a12 - averaged_matrix.a12) +
                            std::abs(rotation_matrix.a13 - averaged_matrix.a13);
-        
+
         imp_float norm_2 = std::abs(rotation_matrix.a21 - averaged_matrix.a21) +
                            std::abs(rotation_matrix.a22 - averaged_matrix.a22) +
                            std::abs(rotation_matrix.a23 - averaged_matrix.a23);
-        
+
         imp_float norm_3 = std::abs(rotation_matrix.a31 - averaged_matrix.a31) +
                            std::abs(rotation_matrix.a32 - averaged_matrix.a32) +
                            std::abs(rotation_matrix.a33 - averaged_matrix.a33);
@@ -94,7 +94,7 @@ void AnimatedTransformation::decompose(const Matrix4x4& matrix,
     } while (++count < 100 && norm > 0.0001f);
 
     *rotation_component = Transformation::quaternionFromMatrix(rotation_matrix);
-    
+
     // Compute scaling component as the non-translation matrix without the rotation component
     *scaling_component = rotation_matrix.inverted()*matrix_without_translation;
 }
@@ -120,7 +120,7 @@ void AnimatedTransformation::computeInterpolatedTransformation(Transformation* i
     const Quaternion& rotation_component = slerp(rotation_components[0], rotation_components[1], weight);
 
     Matrix4x4 scaling_component;
-    
+
     scaling_component.a11 = ::Impact::lerp(scaling_components[0].a11, scaling_components[1].a11, weight);
     scaling_component.a12 = ::Impact::lerp(scaling_components[0].a12, scaling_components[1].a12, weight);
     scaling_component.a13 = ::Impact::lerp(scaling_components[0].a13, scaling_components[1].a13, weight);
@@ -151,7 +151,7 @@ Point3F AnimatedTransformation::operator()(const Point3F& point, imp_float time)
 
     return transformation(point);
 }
-    
+
 Vector3F AnimatedTransformation::operator()(const Vector3F& vector, imp_float time) const
 {
     if (!is_animated || time <= start_time)

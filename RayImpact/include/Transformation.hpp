@@ -32,9 +32,9 @@ protected:
 public:
 
     Transformation();
-    
+
     explicit Transformation(const Matrix4x4& matrix);
-    
+
     Transformation(const Matrix4x4& matrix,
                    const Matrix4x4& matrix_inverse);
 
@@ -43,15 +43,15 @@ public:
     static Transformation scaling(imp_float scale_x,
                                   imp_float scale_y,
                                   imp_float scale_z);
-    
+
     static Transformation rotationFromXToY(imp_float angle);
     static Transformation rotationFromYToZ(imp_float angle);
     static Transformation rotationFromZToX(imp_float angle);
-    
+
     static Transformation rotation(const Vector3F& axis, imp_float angle);
 
     static Transformation rotation(const Quaternion& quaternion);
-    
+
     static Transformation worldToCamera(const Point3F& camera_position,
                                         const Vector3F& up_vector,
                                         const Point3F& look_point);
@@ -65,7 +65,7 @@ public:
 
     bool operator==(const Transformation& other) const;
     bool operator!=(const Transformation& other) const;
-    
+
     bool operator<(const Transformation& other) const;
 
     Transformation operator*(const Transformation& other) const;
@@ -93,7 +93,7 @@ public:
     bool hasScaling() const;
 
     bool swapsHandedness() const;
-    
+
     Transformation transposed() const;
 
     Transformation inverted() const;

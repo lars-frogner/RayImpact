@@ -193,12 +193,12 @@ public:
             // Add the newly stored transformation to the cache
             cache[transformation] = std::make_pair(transformation_ptr, inverse_transformation_ptr);
         }
-            
+
         // Set return pointers
-        
+
         if (stored_transformation)
             *stored_transformation = transformation_ptr;
-            
+
         if (stored_inverse_transformation)
             *stored_inverse_transformation = inverse_transformation_ptr;
     }
@@ -901,7 +901,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 
         // Make sure the transformation is stored in the cache and retrieve its pointers
         transformation_cache.lookup(current_transformations[0], &model_to_world, &world_to_model);
-        
+
         std::vector< std::shared_ptr<Shape> > shapes = createShapes(type,
                                                                     model_to_world,
                                                                     world_to_model,
@@ -947,7 +947,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
         Transformation* identity;
 
         transformation_cache.lookup(Transformation(), &identity, nullptr);
-        
+
         std::vector< std::shared_ptr<Shape> > shapes = createShapes(type,
                                                                     identity,
                                                                     identity,
@@ -957,7 +957,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
             return;
 
         // Create geometric model(s) for the shape(s)
-        
+
         std::shared_ptr<Material> material = current_graphics_state.createMaterial(parameters);
 
         parameters.warnAboutUnusedParameters();
@@ -970,7 +970,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
         // Create animated model for the geometric model(s)
 
         Transformation* model_to_world[2];
-        
+
         transformation_cache.lookup(current_transformations[0], &model_to_world[0], nullptr);
         transformation_cache.lookup(current_transformations[1], &model_to_world[1], nullptr);
 
@@ -1001,7 +1001,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
     else
     {
         configurations->models.insert(configurations->models.end(), models.begin(), models.end());
-        
+
         if (!area_lights.empty())
             configurations->lights.insert(configurations->lights.end(), area_lights.begin(), area_lights.end());
     }
@@ -1055,7 +1055,7 @@ void RIMP_CreateObjectInstance(const std::string& name)
 
     if (object_models.empty())
         return;
-    
+
     // Create aggregate from the models in the object if there is more than one
     if (object_models.size() > 1)
     {
@@ -1068,9 +1068,9 @@ void RIMP_CreateObjectInstance(const std::string& name)
         object_models.clear();
         object_models.push_back(aggregate);
     }
-    
+
     Transformation* object_to_world[2];
-        
+
     transformation_cache.lookup(current_transformations[0], &object_to_world[0], nullptr);
     transformation_cache.lookup(current_transformations[1], &object_to_world[1], nullptr);
 

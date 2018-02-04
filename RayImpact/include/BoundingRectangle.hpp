@@ -21,10 +21,10 @@ public:
     Point2<T> upper_corner; // Corner with the highest coordinate values
 
     BoundingRectangle();
-    
+
     explicit BoundingRectangle(const Point2<T>& lower_corner,
                                const Point2<T>& upper_corner);
-    
+
     explicit BoundingRectangle(const Point2<T>& point);
 
     static BoundingRectangle aroundPoints(const Point2<T>& point_1,
@@ -50,10 +50,10 @@ public:
     T area() const;
 
     unsigned int maxDimension() const;
-    
+
     Vector2<T> getLocalCoordinate(const Point2<T>& global_coord) const;
     Point2<T> getGlobalCoordinate(const Vector2<T>& local_coord) const;
-    
+
     void enclose(const Point2<T>& point);
 };
 
@@ -67,7 +67,7 @@ typedef BoundingRectangle<int> BoundingRectangleI;
 class BoundingRectangleIteratorI : public std::forward_iterator_tag {
 
 private:
-    
+
     const BoundingRectangleI* bounding_rectangle; // The bounding rectangle to iterate over
     Point2I point; // The current point in the bounding rectangle
 
@@ -203,7 +203,7 @@ inline bool BoundingRectangle<T>::isDegenerate() const
     return (lower_corner.x > upper_corner.x) || (lower_corner.y > upper_corner.y);
 }
 
-// Returns bounding rectangle expanded uniformly by twice the given amount 
+// Returns bounding rectangle expanded uniformly by twice the given amount
 template <typename T>
 template <typename U>
 inline BoundingRectangle<T> BoundingRectangle<T>::expanded(U amount) const

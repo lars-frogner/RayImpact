@@ -7,7 +7,7 @@ namespace Impact {
 namespace RayImpact {
 
 // PlasticMaterial method implementations
-    
+
 PlasticMaterial::PlasticMaterial(const std::shared_ptr< Texture<ReflectionSpectrum> >& diffuse_reflectance_texture,
                                  const std::shared_ptr< Texture<ReflectionSpectrum> >& glossy_reflectance_texture,
                                  const std::shared_ptr< Texture<imp_float> >& roughness_texture,

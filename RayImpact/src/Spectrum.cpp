@@ -62,7 +62,7 @@ RGBSpectrum::RGBSpectrum()
 RGBSpectrum::RGBSpectrum(imp_float initial_value)
     : CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
 {}
-    
+
 RGBSpectrum::RGBSpectrum(const imp_float* wavelengths,
                          const imp_float* values,
                          unsigned int n_samples)
@@ -75,11 +75,11 @@ RGBSpectrum::RGBSpectrum(const imp_float rgb[3],
 {
     *this = RGBSpectrum::fromRGBValues(rgb, type);
 }
-    
+
 RGBSpectrum::RGBSpectrum(const CoefficientSpectrum& other)
     : CoefficientSpectrum<3>::CoefficientSpectrum(other)
 {}
-    
+
 RGBSpectrum::RGBSpectrum(const SampledSpectrum& other,
                          SpectrumType type /* = SpectrumType::Reflectance */)
 {
@@ -201,17 +201,17 @@ SampledSpectrum::SampledSpectrum(const imp_float* wavelengths,
     *this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
 }
 
-    
+
 SampledSpectrum::SampledSpectrum(const imp_float rgb[3],
                                  SpectrumType type /* = SpectrumType::Reflectance */)
 {
     *this = SampledSpectrum::fromRGBValues(rgb, type);
 }
-    
+
 SampledSpectrum::SampledSpectrum(const CoefficientSpectrum& other)
     : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(other)
 {}
-    
+
 SampledSpectrum::SampledSpectrum(const RGBSpectrum& other,
                                  SpectrumType type /* = SpectrumType::Reflectance */)
 {
@@ -575,7 +575,7 @@ void sortSamples(std::vector<imp_float>& wavelengths,
         values[i] = combined[i].second;
     }
 }
-    
+
 // Computes the average of the sample values in the given wavelength range
 template <typename T>
 imp_float averageSamples(const T* wavelengths,
@@ -602,7 +602,7 @@ imp_float averageSamples(const T* wavelengths,
         summed_value += values[n_samples-1]*(end_wavelength - wavelengths[n_samples-1]);
 
     unsigned int sample_idx = 0;
-    
+
     // Advance to first sample index inside the wavelength range
     while (start_wavelength > wavelengths[sample_idx])
         sample_idx++;
@@ -620,7 +620,7 @@ imp_float averageSamples(const T* wavelengths,
 
     return (imp_float)(summed_value/(end_wavelength - start_wavelength));
 }
-    
+
 // Interpolates the given sample values at the given wavelength
 imp_float interpolateSamples(const imp_float* wavelengths,
                              const imp_float* values,
@@ -654,7 +654,7 @@ imp_float sampleWavelength(unsigned int sample_idx)
 
 // Initializations of the CIE mathcing curve samples
 
-extern const imp_float CIE_wavelengths[n_CIE_samples] = 
+extern const imp_float CIE_wavelengths[n_CIE_samples] =
 {
     360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374,
     375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389,
@@ -690,7 +690,7 @@ extern const imp_float CIE_wavelengths[n_CIE_samples] =
     825, 826, 827, 828, 829, 830
 };
 
-extern const imp_float CIE_X_values[n_CIE_samples] = 
+extern const imp_float CIE_X_values[n_CIE_samples] =
 {
     0.0001299000f,   0.0001458470f,   0.0001638021f,   0.0001840037f,
     0.0002066902f,   0.0002321000f,   0.0002607280f,   0.0002930750f,
@@ -812,7 +812,7 @@ extern const imp_float CIE_X_values[n_CIE_samples] =
     0.000001439440f, 0.000001341977f, 0.000001251141f
 };
 
-extern const imp_float CIE_Y_values[n_CIE_samples] = 
+extern const imp_float CIE_Y_values[n_CIE_samples] =
 {
     0.000003917000f,  0.000004393581f,  0.000004929604f,  0.000005532136f,
     0.000006208245f,  0.000006965000f,  0.000007813219f,  0.000008767336f,
@@ -934,7 +934,7 @@ extern const imp_float CIE_Y_values[n_CIE_samples] =
     0.0000005198080f, 0.0000004846123f, 0.0000004518100f
 };
 
-extern const imp_float CIE_Z_values[n_CIE_samples] = 
+extern const imp_float CIE_Z_values[n_CIE_samples] =
 {
     0.0006061000f,     0.0006808792f,      0.0007651456f,   0.0008600124f,
     0.0009665928f,     0.001086000f,      0.001220586f,    0.001372729f,
