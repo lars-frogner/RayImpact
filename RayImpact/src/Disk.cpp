@@ -107,12 +107,12 @@ bool Disk::intersect(const Ray& ray,
 
     // Compute u and v derivatives of the intersection point
 
-    const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
+    const Vector3F& dpdu = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
-    const Vector3F& position_v_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-radius_range/intersection_radius);
+    const Vector3F& dpdv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-radius_range/intersection_radius);
 
-    // normal_u_deriv = (0, 0, 0)
-    // normal_v_deriv = (0, 0, 0)
+    // dndu = (0, 0, 0)
+    // dndv = (0, 0, 0)
 
     // Project the intersection point onto the disk (required in case the computed result has inaccuracies)
     intersection_point.y = y;
@@ -124,10 +124,8 @@ bool Disk::intersect(const Ray& ray,
                                                                   Vector3F(0, 0, 0),
                                                                   Point2F(u, v),
                                                                   -transformed_ray.direction,
-                                                                  position_u_deriv,
-                                                                  position_v_deriv,
-                                                                  Normal3F(0, 0, 0),
-                                                                  Normal3F(0, 0, 0),
+                                                                  dpdu, dpdv,
+                                                                  Normal3F(0, 0, 0), Normal3F(0, 0, 0),
                                                                   transformed_ray.time,
                                                                   this));
 

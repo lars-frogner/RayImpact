@@ -54,17 +54,17 @@ const Material* GeometricModel::getMaterial() const
     return material.get();
 }
 
-void GeometricModel::computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                                RegionAllocator& allocator,
-                                                TransportMode mode,
-                                                bool allow_multiple_lobes) const
+void GeometricModel::generateBSDF(SurfaceScatteringEvent* scattering_event,
+                                  RegionAllocator& allocator,
+                                  TransportMode transport_mode,
+                                  bool allow_multiple_scattering_types) const
 {
     if (material)
     {
-        material->computeScatteringFunctions(scattering_event,
-                                             allocator,
-                                             mode,
-                                             allow_multiple_lobes);
+        material->generateBSDF(scattering_event,
+                               allocator,
+                               transport_mode,
+                               allow_multiple_scattering_types);
     }
 }
 
@@ -124,12 +124,12 @@ const Material* TransformedModel::getMaterial() const
     return nullptr;
 }
 
-void TransformedModel::computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                                  RegionAllocator& allocator,
-                                                  TransportMode mode,
-                                                  bool allow_multiple_lobes) const
+void TransformedModel::generateBSDF(SurfaceScatteringEvent* scattering_event,
+                                    RegionAllocator& allocator,
+                                    TransportMode transport_mode,
+                                    bool allow_multiple_scattering_types) const
 {
-    printSevereMessage("\"computeScatteringFunctions()\" method of TransformedModel was called");
+    printSevereMessage("\"generateBSDF()\" method of TransformedModel was called");
 }
 
 } // RayImpact

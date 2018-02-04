@@ -7,6 +7,7 @@
 #include "AnimatedTransformation.hpp"
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
+#include "Material.hpp"
 #include <memory>
 
 namespace Impact {
@@ -29,10 +30,10 @@ public:
 
     virtual const Material* getMaterial() const = 0;
 
-    virtual void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                            RegionAllocator& allocator,
-                                            TransportMode mode,
-                                            bool allow_multiple_lobes) const = 0;
+    virtual void generateBSDF(SurfaceScatteringEvent* scattering_event,
+                              RegionAllocator& allocator,
+                              TransportMode transport_mode,
+                              bool allow_multiple_scattering_types) const = 0;
 };
 
 // GeometricModel declarations
@@ -64,10 +65,10 @@ public:
 
     const Material* getMaterial() const;
 
-    void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                    RegionAllocator& allocator,
-                                    TransportMode mode,
-                                    bool allow_multiple_lobes) const;
+    void generateBSDF(SurfaceScatteringEvent* scattering_event,
+                      RegionAllocator& allocator,
+                      TransportMode transport_mode,
+                      bool allow_multiple_scattering_types) const;
 };
 
 // TransformedModel declarations
@@ -95,10 +96,10 @@ public:
 
     const Material* getMaterial() const;
 
-    void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                    RegionAllocator& allocator,
-                                    TransportMode mode,
-                                    bool allow_multiple_lobes) const;
+    void generateBSDF(SurfaceScatteringEvent* scattering_event,
+                      RegionAllocator& allocator,
+                      TransportMode transport_mode,
+                      bool allow_multiple_scattering_types) const;
 };
 
 } // RayImpact

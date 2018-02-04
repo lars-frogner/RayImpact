@@ -179,25 +179,21 @@ bool Sphere::intersect(const Ray& ray,
     imp_float cos_phi = intersection_point.z*inverse_zx_radius;
     imp_float sin_phi = intersection_point.x*inverse_zx_radius;
 
-    const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
+    const Vector3F& dpdu = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
-    const Vector3F& position_v_deriv = Vector3F(intersection_point.y*cos_phi, -radius*std::sin(intersection_theta), intersection_point.y*sin_phi)*theta_range;
+    const Vector3F& dpdv = Vector3F(intersection_point.y*cos_phi, -radius*std::sin(intersection_theta), intersection_point.y*sin_phi)*theta_range;
 
     // Compute u and v derivatives of the surface normal
 
-    const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
-    const Vector3F& position_uv_deriv = Vector3F(-sin_phi, 0, cos_phi)*(theta_range*phi_max*intersection_point.y);
-    const Vector3F& position_v2_deriv = Vector3F(intersection_point.x, intersection_point.y, intersection_point.z)*(-theta_range*theta_range);
+    const Vector3F& d2pdu2 = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
+    const Vector3F& d2pdudv = Vector3F(-sin_phi, 0, cos_phi)*(theta_range*phi_max*intersection_point.y);
+    const Vector3F& d2pdv2 = Vector3F(intersection_point.x, intersection_point.y, intersection_point.z)*(-theta_range*theta_range);
 
-    Normal3F normal_u_deriv, normal_v_deriv;
+    Normal3F dndu, dndv;
 
-    computeNormalDerivatives(position_u_deriv,
-                             position_v_deriv,
-                             position_u2_deriv,
-                             position_uv_deriv,
-                             position_v2_deriv,
-                             &normal_u_deriv,
-                             &normal_v_deriv);
+    computeNormalDerivatives(dpdu, dpdv,
+                             d2pdu2, d2pdudv, d2pdv2,
+                             &dndu, &dndv);
 
     // Compute error for intersection point
     const Vector3F& intersection_point_error = abs(static_cast<Vector3F>(intersection_point))*errorPowerBound(5);
@@ -207,10 +203,8 @@ bool Sphere::intersect(const Ray& ray,
                                                                   intersection_point_error,
                                                                   Point2F(u, v),
                                                                   -transformed_ray.direction,
-                                                                  position_u_deriv,
-                                                                  position_v_deriv,
-                                                                  normal_u_deriv,
-                                                                  normal_v_deriv,
+                                                                  dpdu, dpdv,
+                                                                  dndu, dndv,
                                                                   transformed_ray.time,
                                                                   this));
 

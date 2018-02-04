@@ -40,34 +40,34 @@ public:
 
 // Utility function for shapes
 
-// Computes parametric derivatives of the surface normal
-inline void computeNormalDerivatives(const Vector3F& position_u_deriv,
-                                     const Vector3F& position_v_deriv,
-                                     const Vector3F& position_u2_deriv,
-                                     const Vector3F& position_uv_deriv,
-                                     const Vector3F& position_v2_deriv,
-                                     Normal3F* normal_u_deriv,
-                                     Normal3F* normal_v_deriv)
+// Computes derivatives of the surface normal with respect to the surface parameters
+inline void computeNormalDerivatives(const Vector3F& dpdu,
+                                     const Vector3F& dpdv,
+                                     const Vector3F& d2pdu2,
+                                     const Vector3F& d2pdudv,
+                                     const Vector3F& d2pdv2,
+                                     Normal3F* dndu,
+                                     Normal3F* dndv)
 {
     // Uses the Weingarten equations
 
-    imp_float E = position_u_deriv.squaredLength();
-    imp_float F = position_u_deriv.dot(position_v_deriv);
-    imp_float G = position_v_deriv.squaredLength();
+    imp_float E = dpdu.squaredLength();
+    imp_float F = dpdu.dot(dpdv);
+    imp_float G = dpdv.squaredLength();
 
-    const Vector3F& surface_normal = position_u_deriv.cross(position_v_deriv).normalized();
+    const Vector3F& surface_normal = dpdu.cross(dpdv).normalized();
 
-    imp_float e = surface_normal.dot(position_u2_deriv);
-    imp_float f = surface_normal.dot(position_uv_deriv);
-    imp_float g = surface_normal.dot(position_v2_deriv);
+    imp_float e = surface_normal.dot(d2pdu2);
+    imp_float f = surface_normal.dot(d2pdudv);
+    imp_float g = surface_normal.dot(d2pdv2);
 
     imp_float normal_deriv_norm = 1.0f/(E*G - F*F);
 
-    *normal_u_deriv = Normal3F(position_u_deriv*((f*F - e*G)*normal_deriv_norm) +
-                               position_v_deriv*((e*F - f*E)*normal_deriv_norm));
+    *dndu = Normal3F(dpdu*((f*F - e*G)*normal_deriv_norm) +
+                     dpdv*((e*F - f*E)*normal_deriv_norm));
 
-    *normal_v_deriv = Normal3F(position_u_deriv*((g*F - f*G)*normal_deriv_norm) +
-                               position_v_deriv*((f*F - g*E)*normal_deriv_norm));
+    *dndv = Normal3F(dpdu*((g*F - f*G)*normal_deriv_norm) +
+                     dpdv*((f*F - g*E)*normal_deriv_norm));
 }
 
 } // RayImpact

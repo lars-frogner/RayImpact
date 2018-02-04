@@ -169,28 +169,28 @@ bool Cylinder::intersect(const Ray& ray,
 
     // Compute u and v derivatives of the intersection point
 
-    const Vector3F& position_u_deriv = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
+    const Vector3F& dpdu = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
 
-    const Vector3F& position_v_deriv = Vector3F(0, y_range, 0);
+    const Vector3F& dpdv = Vector3F(0, y_range, 0);
 
     // Compute u and v derivatives of the surface normal
 
-    const Vector3F& position_u2_deriv = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
-    //                position_uv_deriv = (0, 0, 0)
-    //                position_v2_deriv = (0, 0, 0)
+    const Vector3F& d2pdu2 = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
+    //              d2pdudv = (0, 0, 0)
+    //              d2pdv2 = (0, 0, 0)
 
-    imp_float E = position_u_deriv.squaredLength();
-    //          F = 0
-    //          G = y_range^2;
+    imp_float E = dpdu.squaredLength();
+    //        F = 0
+    //        G = y_range^2;
 
-    const Vector3F& surface_normal = position_u_deriv.cross(position_v_deriv).normalized();
+    const Vector3F& surface_normal = dpdu.cross(dpdv).normalized();
 
-    imp_float e = surface_normal.dot(position_u2_deriv);
-    //          f = 0
-    //          g = 0
+    imp_float e = surface_normal.dot(d2pdu2);
+    //        f = 0
+    //        g = 0
 
-    const Normal3F& normal_u_deriv = Normal3F(position_u_deriv*(-e/E));
-    //                normal_v_deriv = (0, 0, 0)
+    const Normal3F& dndu = Normal3F(dpdu*(-e/E));
+    //              dndv = (0, 0, 0)
 
     // Compute error for intersection point
     const Vector3F& intersection_point_error = Vector3F(std::abs(intersection_point.x), 0, std::abs(intersection_point.z))*errorPowerBound(3);
@@ -200,10 +200,8 @@ bool Cylinder::intersect(const Ray& ray,
                                                                   intersection_point_error,
                                                                   Point2F(u, v),
                                                                   -transformed_ray.direction,
-                                                                  position_u_deriv,
-                                                                  position_v_deriv,
-                                                                  normal_u_deriv,
-                                                                  Normal3F(0, 0, 0),
+                                                                  dpdu, dpdv,
+                                                                  dndu, Normal3F(0, 0, 0),
                                                                   transformed_ray.time,
                                                                   this));
 
