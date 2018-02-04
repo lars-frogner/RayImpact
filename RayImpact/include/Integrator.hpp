@@ -5,6 +5,7 @@
 #include "Camera.hpp"
 #include "Spectrum.hpp"
 #include "Ray.hpp"
+#include "ScatteringEvent.hpp"
 #include <memory>
 
 namespace Impact {
@@ -43,6 +44,20 @@ public:
                                               Sampler& sampler,
                                               RegionAllocator& allocator,
                                               unsigned int scattering_count = 0) const = 0;
+
+    RadianceSpectrum specularlyReflectedRadiance(const RayWithOffsets& outgoing_ray,
+                                                 const SurfaceScatteringEvent& scattering_event,
+                                                 const Scene& scene,
+                                                 Sampler& sampler,
+                                                 RegionAllocator& allocator,
+                                                 unsigned int scattering_count) const;
+
+    RadianceSpectrum specularlyTransmittedRadiance(const RayWithOffsets& outgoing_ray,
+                                                   const SurfaceScatteringEvent& scattering_event,
+                                                   const Scene& scene,
+                                                   Sampler& sampler,
+                                                   RegionAllocator& allocator,
+                                                   unsigned int scattering_count) const;
 
     void render(const Scene& scene);
 };

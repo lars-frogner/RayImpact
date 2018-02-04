@@ -4,6 +4,7 @@
 #include "geometry.hpp"
 #include "BoundingRectangle.hpp"
 #include "Sensor.hpp"
+#include "BSDF.hpp"
 #include <algorithm>
 #include <cmath>
 
@@ -19,6 +20,151 @@ SampleIntegrator::SampleIntegrator(std::shared_ptr<const Camera> camera,
 
 void SampleIntegrator::preprocess(const Scene& scene, Sampler& sampler)
 {}
+
+RadianceSpectrum SampleIntegrator::specularlyReflectedRadiance(const RayWithOffsets& outgoing_ray,
+                                                               const SurfaceScatteringEvent& scattering_event,
+                                                               const Scene& scene,
+                                                               Sampler& sampler,
+                                                               RegionAllocator& allocator,
+                                                               unsigned int scattering_count) const
+{
+    const Vector3F& outgoing_direction = scattering_event.outgoing_direction;
+    Vector3F incident_direction;
+
+    imp_float pdf_value;
+
+    BXDFType type = BXDFType(BSDF_REFLECTION | BSDF_SPECULAR);
+
+    const Spectrum& bsdf_value = scattering_event.bsdf->sample(outgoing_direction,
+                                                               &incident_direction,
+                                                               sampler.next2DSampleComponent(),
+                                                               &pdf_value,
+                                                               type);
+
+    const Normal3F& shading_normal = scattering_event.shading.surface_normal;
+
+    imp_float abs_cos_theta_incident = incident_direction.absDot(shading_normal);
+
+    if (pdf_value > 0 && !bsdf_value.isBlack() && abs_cos_theta_incident != 0)
+    {
+        RayWithOffsets incident_ray = scattering_event.spawnRay(incident_direction);
+
+        if (outgoing_ray.has_offsets)
+        {
+            incident_ray.has_offsets = true;
+
+            incident_ray.x_offset_ray_origin = scattering_event.position + scattering_event.dpdx;
+            incident_ray.y_offset_ray_origin = scattering_event.position + scattering_event.dpdy;
+
+            const Normal3F& dndx = scattering_event.shading.dndu*scattering_event.dudx +
+                                   scattering_event.shading.dndv*scattering_event.dvdx;
+            
+            const Normal3F& dndy = scattering_event.shading.dndu*scattering_event.dudy +
+                                   scattering_event.shading.dndv*scattering_event.dvdy;
+
+            const Vector3F& dwodx = -outgoing_ray.x_offset_ray_direction - outgoing_direction;
+            const Vector3F& dwody = -outgoing_ray.y_offset_ray_direction - outgoing_direction;
+
+            imp_float dwodotndx = dwodx.dot(shading_normal) + outgoing_direction.dot(dndx);
+            imp_float dwodotndy = dwody.dot(shading_normal) + outgoing_direction.dot(dndy);
+
+            imp_float cos_theta_outgoing = outgoing_direction.dot(shading_normal);
+
+            incident_ray.x_offset_ray_direction = incident_direction -
+                                                  dwodx +
+                                                  2.0f*Vector3F(cos_theta_outgoing*dndx + dwodotndx*shading_normal);
+
+            incident_ray.y_offset_ray_direction = incident_direction -
+                                                  dwody +
+                                                  2.0f*Vector3F(cos_theta_outgoing*dndy + dwodotndy*shading_normal);
+        }
+
+        return bsdf_value*
+               incidentRadiance(incident_ray, scene, sampler, allocator, scattering_count + 1)*
+               (abs_cos_theta_incident/pdf_value);
+    }
+    else
+        return Spectrum(0.0f);
+}
+
+RadianceSpectrum SampleIntegrator::specularlyTransmittedRadiance(const RayWithOffsets& outgoing_ray,
+                                                                 const SurfaceScatteringEvent& scattering_event,
+                                                                 const Scene& scene,
+                                                                 Sampler& sampler,
+                                                                 RegionAllocator& allocator,
+                                                                 unsigned int scattering_count) const
+{
+    const Vector3F& outgoing_direction = scattering_event.outgoing_direction;
+    Vector3F incident_direction;
+
+    imp_float pdf_value;
+
+    BXDFType type = BXDFType(BSDF_TRANSMISSION | BSDF_SPECULAR);
+
+    const Spectrum& bsdf_value = scattering_event.bsdf->sample(outgoing_direction,
+                                                               &incident_direction,
+                                                               sampler.next2DSampleComponent(),
+                                                               &pdf_value,
+                                                               type);
+
+    const Normal3F& shading_normal = scattering_event.shading.surface_normal;
+
+    imp_float abs_cos_theta_incident = incident_direction.absDot(shading_normal);
+
+    if (pdf_value > 0 && !bsdf_value.isBlack() && abs_cos_theta_incident != 0)
+    {
+        RayWithOffsets incident_ray = scattering_event.spawnRay(incident_direction);
+
+        if (outgoing_ray.has_offsets)
+        {
+            incident_ray.has_offsets = true;
+
+            incident_ray.x_offset_ray_origin = scattering_event.position + scattering_event.dpdx;
+            incident_ray.y_offset_ray_origin = scattering_event.position + scattering_event.dpdy;
+
+            const Normal3F& dndx = scattering_event.shading.dndu*scattering_event.dudx +
+                                   scattering_event.shading.dndv*scattering_event.dvdx;
+            
+            const Normal3F& dndy = scattering_event.shading.dndu*scattering_event.dudy +
+                                   scattering_event.shading.dndv*scattering_event.dvdy;
+
+            const Vector3F& dwodx = -outgoing_ray.x_offset_ray_direction - outgoing_direction;
+            const Vector3F& dwody = -outgoing_ray.y_offset_ray_direction - outgoing_direction;
+
+            imp_float dwodotndx = dwodx.dot(shading_normal) + outgoing_direction.dot(dndx);
+            imp_float dwodotndy = dwody.dot(shading_normal) + outgoing_direction.dot(dndy);
+
+            imp_float cos_theta_outgoing = outgoing_direction.dot(shading_normal);
+            imp_float cos_theta_incident = incident_direction.dot(shading_normal);
+
+            imp_float refractive_index = scattering_event.bsdf->refractive_index_outside;
+
+            if (cos_theta_outgoing < 0)
+                refractive_index = 1.0f/refractive_index;
+
+            imp_float mu = -refractive_index*cos_theta_outgoing - cos_theta_incident;
+
+            imp_float dmu_fac = refractive_index + refractive_index*refractive_index*cos_theta_outgoing/cos_theta_incident;
+
+            imp_float dmudx = dmu_fac*dwodotndx;
+            imp_float dmudy = dmu_fac*dwodotndy;
+
+            incident_ray.x_offset_ray_direction = incident_direction +
+                                                  refractive_index*dwodx -
+                                                  Vector3F(mu*dndx + dmudx*shading_normal);
+
+            incident_ray.y_offset_ray_direction = incident_direction +
+                                                  refractive_index*dwody -
+                                                  Vector3F(mu*dndy + dmudy*shading_normal);
+        }
+
+        return bsdf_value*
+               incidentRadiance(incident_ray, scene, sampler, allocator, scattering_count + 1)*
+               (abs_cos_theta_incident/pdf_value);
+    }
+    else
+        return Spectrum(0.0f);
+}
 
 void SampleIntegrator::render(const Scene& scene)
 {
