@@ -22,6 +22,9 @@
     <Filter Include="Parsing">
       <UniqueIdentifier>{29488a34-1eb2-49e3-b8cf-a44ce3ca1a22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{40cd985a-57c4-4208-9e01-2ced6e828960}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ray.cpp">
@@ -86,6 +89,18 @@
       <Filter>Parsing</Filter>
     </ClCompile>
     <ClCompile Include="src\BSDF.cpp" />
+    <ClCompile Include="src\sampling.cpp" />
+    <ClCompile Include="src\MicrofacetDistribution.cpp" />
+    <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\MatteMaterial.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlasticMaterial.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MixedMaterial.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -168,6 +183,19 @@
       <Filter>Parsing</Filter>
     </ClInclude>
     <ClInclude Include="include\BSDF.hpp" />
+    <ClInclude Include="include\sampling.hpp" />
+    <ClInclude Include="include\MicrofacetDistribution.hpp" />
+    <ClInclude Include="include\Material.hpp" />
+    <ClInclude Include="include\MatteMaterial.hpp">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlasticMaterial.hpp">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MixedMaterial.hpp">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Flex Include="src\parsing.l">

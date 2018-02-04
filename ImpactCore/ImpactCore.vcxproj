@@ -36,7 +36,6 @@
   <ItemGroup>
     <ClCompile Include="src\AtomicFloat.cpp" />
     <ClCompile Include="src\image_util.cpp" />
-    <ClCompile Include="src\math.cpp" />
     <ClCompile Include="src\Matrix4x4.cpp" />
     <ClCompile Include="src\parallel.cpp" />
     <ClCompile Include="src\RandomNumberGenerator.cpp" />

@@ -68,9 +68,6 @@
     <ClCompile Include="src\Matrix4x4.cpp">
       <Filter>Linear algebra</Filter>
     </ClCompile>
-    <ClCompile Include="src\math.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="src\string_util.cpp">
       <Filter>Utility</Filter>
     </ClCompile>

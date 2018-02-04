@@ -26,6 +26,10 @@
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\Disk.cpp" />
     <ClCompile Include="src\Integrator.cpp" />
+    <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\MatteMaterial.cpp" />
+    <ClCompile Include="src\MicrofacetDistribution.cpp" />
+    <ClCompile Include="src\MixedMaterial.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OrthographicCamera.cpp" />
     <ClCompile Include="src\ParameterSet.cpp" />
@@ -33,6 +37,7 @@
     <ClCompile Include="src\parsing.flex.cpp" />
     <ClCompile Include="src\parsing.tab.cpp" />
     <ClCompile Include="src\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\PlasticMaterial.cpp" />
     <ClCompile Include="src\Quaternion.cpp" />
     <ClCompile Include="src\RandomSampler.cpp" />
     <ClCompile Include="src\Ray.cpp" />
@@ -62,12 +67,17 @@
     <ClInclude Include="include\GaussianFilter.hpp" />
     <ClInclude Include="include\geometry.hpp" />
     <ClInclude Include="include\Integrator.hpp" />
+    <ClInclude Include="include\Material.hpp" />
+    <ClInclude Include="include\MatteMaterial.hpp" />
+    <ClInclude Include="include\MicrofacetDistribution.hpp" />
+    <ClInclude Include="include\MixedMaterial.hpp" />
     <ClInclude Include="include\Model.hpp" />
     <ClInclude Include="include\OrthographicCamera.hpp" />
     <ClInclude Include="include\ParameterSet.hpp" />
     <ClInclude Include="include\parsing.h" />
     <ClInclude Include="include\parsing.tab.h" />
     <ClInclude Include="include\PerspectiveCamera.hpp" />
+    <ClInclude Include="include\PlasticMaterial.hpp" />
     <ClInclude Include="include\Quaternion.hpp" />
     <ClInclude Include="include\RandomSampler.hpp" />
     <ClInclude Include="include\Ray.hpp" />
@@ -82,6 +92,7 @@
     <ClInclude Include="include\Sphere.hpp" />
     <ClInclude Include="include\spherical.hpp" />
     <ClInclude Include="include\StratifiedSampler.hpp" />
+    <ClInclude Include="include\Texture.hpp" />
     <ClInclude Include="include\Transformation.hpp" />
     <ClInclude Include="include\TriangleFilter.hpp" />
     <ClInclude Include="include\UniformSampler.hpp" />
