@@ -1,4 +1,5 @@
 #pragma once
+#include "RegionAllocator.hpp"
 #include <stdlib.h>
 #include <malloc.h>
 
@@ -36,6 +37,8 @@ inline T* allocateAligned(size_t count)
     return (T*)(allocateAligned(count*sizeof(T)));
 }
 
-#define allocate_on_stack(type, count) (type*)alloca((count)*sizeof(type))
+#define allocated_on_stack(type, count) (type*)alloca((count)*sizeof(type))
+
+#define allocated_in_region(allocator, type) new (allocator.allocate(sizeof(type))) type
 
 } // Impact
