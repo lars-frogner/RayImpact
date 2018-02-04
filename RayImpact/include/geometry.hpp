@@ -6,23 +6,15 @@
 #include <algorithm>
 #include <ostream>
 
-#include "RegionAllocator.hpp"
-
 namespace Impact {
 namespace RayImpact {
 
 // Forward declarations
 
-class SurfaceScatteringEvent;
 class Scene;
 
-class BSDF{};
 class BSSRDF{};
 enum class TransportMode{ Radiance };
-class Material{ public: void computeScatteringFunctions(SurfaceScatteringEvent* scattering_event,
-                                                        RegionAllocator& allocator,
-                                                        TransportMode mode,
-                                                        bool allow_multiple_lobes) const {} };
 class Light{ public: void preprocess(const Scene& scene) const {} };
 class AreaLight : public Light {};
 class Medium{};
