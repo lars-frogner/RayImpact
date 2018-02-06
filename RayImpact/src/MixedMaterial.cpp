@@ -21,8 +21,8 @@ void MixedMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                  TransportMode transport_mode,
                                  bool allow_multiple_scattering_types) const
 {
-    const Spectrum& material_1_weight = mixing_ratio_texture->evaluate(*scattering_event).clamped();
-    const Spectrum& material_2_weight = (Spectrum(1.0f) - material_1_weight).clamped();
+    const Spectrum& material_2_weight = mixing_ratio_texture->evaluate(*scattering_event).clamped();
+    const Spectrum& material_1_weight = (Spectrum(1.0f) - material_2_weight).clamped();
 
     SurfaceScatteringEvent scattering_event_copy(*scattering_event);
 
