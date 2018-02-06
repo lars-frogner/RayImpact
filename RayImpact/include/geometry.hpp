@@ -1299,6 +1299,31 @@ inline void coordinateSystem(const Vector3<T>& axis_1,
     *axis_3 = axis_1.cross(*axis_2);
 }
 
+// Computes the direction of light after refraction at an optical interface (returns false for total internal reflection)
+inline bool refract(const Vector3F& incident_direction,
+                    const Normal3F& incident_surface_normal,
+                    imp_float refractive_index_incident_medium,
+                    imp_float refractive_index_transmitted_medium,
+                    Vector3F* transmitted_direction)
+{
+    imp_float refractive_index_ratio = refractive_index_incident_medium/refractive_index_transmitted_medium;
+
+    imp_float cos_incident_angle = incident_direction.dot(incident_surface_normal);
+    imp_float sin_sq_incident_angle = std::max<imp_float>(0, 1 - cos_incident_angle*cos_incident_angle);
+    imp_float sin_sq_transmitted_angle = refractive_index_ratio*refractive_index_ratio*sin_sq_incident_angle;
+
+    // Total internal reflection
+    if (sin_sq_transmitted_angle >= 1)
+        return false;
+
+    imp_float cos_transmitted_angle = std::sqrt(1 - sin_sq_transmitted_angle);
+
+    *transmitted_direction = (refractive_index_ratio*cos_incident_angle - cos_transmitted_angle)*Vector3F(incident_surface_normal) -
+                             refractive_index_ratio*incident_direction;
+
+    return true;
+}
+
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Vector3<T>& vector)
 {

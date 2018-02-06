@@ -2,6 +2,8 @@
 #include "memory.hpp"
 #include "math.hpp"
 #include "BSDF.hpp"
+#include "LambertianBRDF.hpp"
+#include "OrenNayarBRDF.hpp"
 
 namespace Impact {
 namespace RayImpact {

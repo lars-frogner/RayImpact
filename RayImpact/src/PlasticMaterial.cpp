@@ -1,7 +1,8 @@
 #include "PlasticMaterial.hpp"
 #include "memory.hpp"
 #include "MicrofacetDistribution.hpp"
-#include "BSDF.hpp"
+#include "LambertianBRDF.hpp"
+#include "MicrofacetBRDF.hpp"
 
 namespace Impact {
 namespace RayImpact {
