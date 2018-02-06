@@ -17,12 +17,13 @@ constexpr imp_float IMP_LOWEST = std::numeric_limits<imp_float>::lowest();
 
 constexpr imp_float IMP_SQRT_TWO = 1.41421356237309504880;
 constexpr imp_float IMP_PI = 3.14159265358979323846;
-constexpr imp_float IMP_ONE_OVER_PI = 1/IMP_PI;
+constexpr imp_float IMP_TWO_PI = 2*IMP_PI;
+constexpr imp_float IMP_FOUR_PI = 4*IMP_PI;
 constexpr imp_float IMP_PI_OVER_TWO = IMP_PI/2;
 constexpr imp_float IMP_PI_OVER_FOUR = IMP_PI/4;
 constexpr imp_float IMP_THREE_PI_OVER_TWO = 3*IMP_PI_OVER_TWO;
-constexpr imp_float IMP_TWO_PI = 2*IMP_PI;
-constexpr imp_float IMP_FOUR_PI = 4*IMP_PI;
+constexpr imp_float IMP_ONE_OVER_PI = 1/IMP_PI;
+constexpr imp_float IMP_ONE_OVER_TWO_PI = 1/IMP_TWO_PI;
 constexpr imp_float IMP_DEG_TO_RAD = IMP_PI/180;
 constexpr imp_float IMP_RAD_TO_DEG = 180/IMP_PI;
 
