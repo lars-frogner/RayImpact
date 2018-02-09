@@ -3,11 +3,37 @@
 #include "math.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "geometry.hpp"
+#include <vector>
 #include <algorithm>
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
+
+// DistributionFunction1D declarations
+
+class DistributionFunction1D {
+
+public:
+
+    std::vector<imp_float> values; // Values of the distribution function
+    std::vector<imp_float> cdf_values; // Values of the corresponding cumulative distribution function
+    imp_float integral; // Integral of the distribution function
+
+    DistributionFunction1D(const imp_float* values, unsigned int n_values);
+
+    unsigned int size() const;
+
+    imp_float continuousSample(imp_float uniform_sample,
+                               imp_float* pdf_value,
+                               unsigned int* offset = nullptr) const;
+
+    unsigned int discreteSample(imp_float uniform_sample,
+                                imp_float* pdf_value = nullptr,
+                                imp_float* shift = nullptr) const;
+
+    imp_float discretePDF(unsigned int idx) const;
+};
 
 // Sampling utility function declarations
 
@@ -25,13 +51,15 @@ void generateLatinHypercubeSamples(imp_float* samples,
                                    unsigned int n_sample_dimensions,
                                    RandomNumberGenerator& rng);
 
-Point2F uniformDiskSample(const Point2F& sample);
+Point2F rejectionDiskSample(RandomNumberGenerator& rng);
 
-Point2F concentricDiskSample(const Point2F& sample);
+Point2F uniformDiskSample(const Point2F& uniform_sample);
 
-Vector3F uniformHemisphereSample(const Point2F& sample);
+Point2F concentricDiskSample(const Point2F& uniform_sample);
 
-Vector3F cosineWeightedHemisphereSample(const Point2F& sample);
+Vector3F uniformHemisphereSample(const Point2F& uniform_sample);
+
+Vector3F cosineWeightedHemisphereSample(const Point2F& uniform_sample);
 
 // Sampling utility function implementations
 
