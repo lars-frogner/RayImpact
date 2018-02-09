@@ -652,6 +652,45 @@ imp_float sampleWavelength(unsigned int sample_idx)
                           static_cast<imp_float>(sample_idx)/static_cast<imp_float>(n_spectral_samples));
 }
 
+void computeBlackbodySpectrum(const imp_float* wavelengths,
+                              unsigned int n_values,
+                              imp_float temperature,
+                              imp_float* radiances)
+{
+    const imp_float c = 299792458; // Speed of light [m/s]
+    const imp_float h = 6.62606957e-34; // Planck constant [m^2 kg/s]
+    const imp_float kB = 1.3806488e-23; // Boltzmann constant [m^2 kg/(s^2 K)]
+
+    const imp_float c1 = 2*h*c*c;
+    const imp_float c2 = c*h/(kB*temperature);
+
+    for (unsigned int i = 0; i < n_values; i++)
+    {
+        imp_float wavelength = 1e-9f*wavelengths[i]; // Wavelength [m]
+        imp_float wavelength5 = (wavelength*wavelength)*(wavelength*wavelength)*wavelength;
+
+        radiances[i] = c1/(wavelength5*(std::exp(c2/wavelength) - 1));
+    }
+}
+
+void computeNormalizedBlackbodySpectrum(const imp_float* wavelengths,
+                                        unsigned int n_values,
+                                        imp_float temperature,
+                                        imp_float* radiances)
+{
+    computeBlackbodySpectrum(wavelengths, n_values, temperature, radiances);
+    
+    imp_float max_radiance;
+    const imp_float wavelength_of_max = 1e9f*2.8977721e-3f/temperature;
+
+    computeBlackbodySpectrum(&wavelength_of_max, 1, temperature, &max_radiance);
+
+    const imp_float norm = 1.0f/max_radiance;
+    
+    for (unsigned int i = 0; i < n_values; i++)
+        radiances[i] *= norm;
+}
+
 // Initializations of the CIE mathcing curve samples
 
 extern const imp_float CIE_wavelengths[n_CIE_samples] =

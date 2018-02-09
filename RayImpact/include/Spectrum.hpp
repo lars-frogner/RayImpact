@@ -20,6 +20,7 @@ typedef RGBSpectrum Spectrum;
 
 typedef Spectrum EnergySpectrum;
 typedef Spectrum PowerSpectrum;
+typedef Spectrum IntensitySpectrum;
 typedef Spectrum RadianceSpectrum;
 typedef Spectrum ReflectionSpectrum;
 typedef Spectrum TransmissionSpectrum;
@@ -59,6 +60,16 @@ static imp_float interpolateSamples(const imp_float* wavelengths,
                                     imp_float wavelength);
 
 static imp_float sampleWavelength(unsigned int sample_idx);
+
+void computeBlackbodySpectrum(const imp_float* wavelengths,
+                              unsigned int n_values,
+                              imp_float temperature,
+                              imp_float* radiances);
+
+void computeNormalizedBlackbodySpectrum(const imp_float* wavelengths,
+                                        unsigned int n_values,
+                                        imp_float temperature,
+                                        imp_float* radiances);
 
 // CoefficientSpectrum declarations
 
