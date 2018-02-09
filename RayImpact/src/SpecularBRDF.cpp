@@ -2,7 +2,7 @@
 
 namespace Impact {
 namespace RayImpact {
-    
+
 // SpecularBRDF method implementations
 
 SpecularBRDF::SpecularBRDF(const ReflectionSpectrum& reflectance,

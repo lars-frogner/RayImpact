@@ -42,7 +42,7 @@ Point2F SphericalMapper::textureCoordinate(const SurfaceScatteringEvent& scatter
                                            Vector2F* dstdx, Vector2F* dstdy) const
 {
     const Point2F& texture_coordinate = projectedToSphere(scattering_event.position);
-    
+
     const imp_float delta = 0.1f;
     const imp_float inv_delta = 1.0f/delta;
 
@@ -82,7 +82,7 @@ Point2F CylindricalMapper::textureCoordinate(const SurfaceScatteringEvent& scatt
                                              Vector2F* dstdx, Vector2F* dstdy) const
 {
     const Point2F& texture_coordinate = projectedToCylinder(scattering_event.position);
-    
+
     const imp_float delta = 0.1f;
     const imp_float inv_delta = 1.0f/delta;
 
@@ -116,7 +116,7 @@ Point2F PlanarMapper::textureCoordinate(const SurfaceScatteringEvent& scattering
                                         Vector2F* dstdx, Vector2F* dstdy) const
 {
     const Vector3F& position_vector = static_cast<Vector3F>(scattering_event.position);
-    
+
     *dstdx = Vector2F(scattering_event.dpdx.dot(s_tangent), scattering_event.dpdx.dot(t_tangent));
     *dstdy = Vector2F(scattering_event.dpdy.dot(s_tangent), scattering_event.dpdy.dot(t_tangent));
 

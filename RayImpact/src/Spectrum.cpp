@@ -679,14 +679,14 @@ void computeNormalizedBlackbodySpectrum(const imp_float* wavelengths,
                                         imp_float* radiances)
 {
     computeBlackbodySpectrum(wavelengths, n_values, temperature, radiances);
-    
+
     imp_float max_radiance;
     const imp_float wavelength_of_max = 1e9f*2.8977721e-3f/temperature;
 
     computeBlackbodySpectrum(&wavelength_of_max, 1, temperature, &max_radiance);
 
     const imp_float norm = 1.0f/max_radiance;
-    
+
     for (unsigned int i = 0; i < n_values; i++)
         radiances[i] *= norm;
 }

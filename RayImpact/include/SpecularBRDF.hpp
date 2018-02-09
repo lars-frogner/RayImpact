@@ -4,7 +4,7 @@
 
 namespace Impact {
 namespace RayImpact {
-    
+
 // SpecularBRDF declarations
 
 class SpecularBRDF : public BXDF {

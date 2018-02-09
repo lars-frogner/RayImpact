@@ -425,7 +425,7 @@ std::shared_ptr< Texture<imp_float> > TextureParameterSet::getFloatTexture(const
 
     if (texture_name == "")
         texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
-        
+
     if (texture_name != "")
     {
         auto float_texture = float_textures.find(texture_name);
@@ -451,7 +451,7 @@ std::shared_ptr< Texture<imp_float> > TextureParameterSet::getFloatTexture(const
 
     if (texture_name == "")
         texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
-        
+
     if (texture_name != "")
     {
         auto float_texture = float_textures.find(texture_name);
@@ -469,7 +469,7 @@ std::shared_ptr< Texture<Spectrum> > TextureParameterSet::getSpectrumTexture(con
 
     if (texture_name == "")
         texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
-        
+
     if (texture_name != "")
     {
         auto spectrum_texture = spectrum_textures.find(texture_name);
@@ -495,7 +495,7 @@ std::shared_ptr< Texture<Spectrum> > TextureParameterSet::getSpectrumTexture(con
 
     if (texture_name == "")
         texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
-        
+
     if (texture_name != "")
     {
         auto spectrum_texture = spectrum_textures.find(texture_name);
@@ -503,7 +503,7 @@ std::shared_ptr< Texture<Spectrum> > TextureParameterSet::getSpectrumTexture(con
         if (spectrum_texture != spectrum_textures.end())
             texture = spectrum_texture->second;
     }
-    
+
     return texture;
 }
 

@@ -24,7 +24,7 @@ Light::Light(LightFlags flags,
 
 void Light::preprocess(const Scene& scene)
 {}
-   
+
 RadianceSpectrum Light::emittedRadianceFromDirection(const RayWithOffsets& ray) const
 {
     return RadianceSpectrum(0.0f);

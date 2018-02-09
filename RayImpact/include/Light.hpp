@@ -57,7 +57,7 @@ protected:
 public:
 
     const LightFlags flags; // Flags specifying properties of the light
-    
+
     const MediumInterface medium_interface; // Interface between the media on the inside and outside of the light
 
     const unsigned int n_samples; // Number of samples to take of the light surface

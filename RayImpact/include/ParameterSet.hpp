@@ -151,7 +151,7 @@ public:
     const Vector3F& getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const;
     const Normal3F& getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const;
     const Spectrum& getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const;
-    
+
     void warnAboutUnusedParameters() const;
 };
 

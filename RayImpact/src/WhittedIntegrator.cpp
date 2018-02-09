@@ -37,7 +37,7 @@ RadianceSpectrum WhittedIntegrator::incidentRadiance(const RayWithOffsets& outgo
     scattering_event.generateBSDF(outgoing_ray, allocator);
 
     total_incident_radiance += scattering_event.emittedRadiance(outgoing_direction);
-    
+
     for (const auto& light : scene.lights)
     {
         Vector3F incident_direction;

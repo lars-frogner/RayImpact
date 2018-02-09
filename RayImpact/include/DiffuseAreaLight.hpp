@@ -12,7 +12,7 @@ namespace RayImpact {
 class DiffuseAreaLight : public AreaLight {
 
 private:
-    
+
     const RadianceSpectrum emitted_radiance; // The radiance emitted from each point on the surface
     std::shared_ptr<Shape> shape; // The shape representing the emitting surface
     const imp_float surface_area; // The total area of the surface

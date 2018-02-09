@@ -88,7 +88,7 @@ public:
 class PlanarMapper : public TextureMapper2D {
 
 private:
-    
+
     const Vector3F s_tangent; // Tangent vector specifying the s-axis in the projection plane
     const Vector3F t_tangent; // Tangent vector specifying the t-axis in the projection plane
     const imp_float s_offset; // Offset to apply when computing texture coordinate s

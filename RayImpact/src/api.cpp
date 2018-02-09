@@ -468,7 +468,7 @@ std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
 std::shared_ptr<Material> createMaterial(const std::string& type, const TextureParameterSet& parameters)
 {
     Material* material;
-    
+
     if (type == "matte")
     {
         material = createMatteMaterial(parameters);
@@ -555,7 +555,7 @@ std::shared_ptr< Texture<imp_float> > createFloatTexture(const std::string& type
     }
 
     parameters.warnAboutUnusedParameters();
-    
+
     return std::shared_ptr< Texture<imp_float> >(texture);
 }
 
@@ -587,7 +587,7 @@ std::shared_ptr< Texture<Spectrum> > createSpectrumTexture(const std::string& ty
     }
 
     parameters.warnAboutUnusedParameters();
-    
+
     return std::shared_ptr< Texture<Spectrum> >(texture);
 }
 
@@ -1093,7 +1093,7 @@ void RIMP_DefineTexture(const std::string& name,
 void RIMP_UseMaterial(const std::string& type, const ParameterSet& parameters)
 {
     verify_in_scene_descript_state("UseMaterial");
-    
+
     current_graphics_state.material_type = type;
     current_graphics_state.material_parameters = parameters;
 
@@ -1110,7 +1110,7 @@ void RIMP_DefineMaterial(const std::string& name, const std::string& type, const
                                            current_graphics_state.spectrum_textures,
                                            parameters,
                                            no_parameters);
-    
+
     current_graphics_state.current_defined_material = createMaterial(type, texture_parameters);
 
     current_graphics_state.defined_materials[name] = current_graphics_state.current_defined_material;
