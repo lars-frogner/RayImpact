@@ -1,4 +1,6 @@
 #include "ParameterSet.hpp"
+#include "Texture.hpp"
+#include "ConstantTexture.hpp"
 #include "error.hpp"
 
 namespace Impact {
@@ -175,38 +177,47 @@ int ParameterSet::getSingleIntValue(const std::string& name, int default_value) 
 {
     get_single_parameter_value(int_params);
 }
+
 imp_float ParameterSet::getSingleFloatValue(const std::string& name, imp_float default_value) const
 {
     get_single_parameter_value(float_params);
 }
+
 const std::string& ParameterSet::getSingleStringValue(const std::string& name, const std::string& default_value) const
 {
     get_single_parameter_value(string_params);
 }
+
 const std::string& ParameterSet::getSingleTextureNameValue(const std::string& name, const std::string& default_value) const
 {
     get_single_parameter_value(texture_name_params);
 }
+
 const Point2F& ParameterSet::getSinglePoint2FValue(const std::string& name, const Point2F& default_value) const
 {
     get_single_parameter_value(point2f_params);
 }
+
 const Vector2F& ParameterSet::getSingleVector2FValue(const std::string& name, const Vector2F& default_value) const
 {
     get_single_parameter_value(vector2f_params);
 }
+
 const Point3F& ParameterSet::getSinglePoint3FValue(const std::string& name, const Point3F& default_value) const
 {
     get_single_parameter_value(point3f_params);
 }
+
 const Vector3F& ParameterSet::getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const
 {
     get_single_parameter_value(vector3f_params);
 }
+
 const Normal3F& ParameterSet::getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const
 {
     get_single_parameter_value(normal3f_params);
 }
+
 const Spectrum& ParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
 {
     get_single_parameter_value(spectrum_params);
@@ -394,6 +405,162 @@ void ParameterSet::clearParameters()
     vector3f_params.clear();
     normal3f_params.clear();
     spectrum_params.clear();
+}
+
+// TextureParameterSet method implementations
+
+TextureParameterSet::TextureParameterSet(std::map< std::string, std::shared_ptr< Texture<imp_float> > >& float_textures,
+                                         std::map< std::string, std::shared_ptr< Texture<Spectrum> > >& spectrum_textures,
+                                         const ParameterSet& geometry_parameters,
+                                         const ParameterSet& material_parameters)
+    : float_textures(float_textures),
+      spectrum_textures(spectrum_textures),
+      geometry_parameters(geometry_parameters),
+      material_parameters(material_parameters)
+{}
+
+std::shared_ptr< Texture<imp_float> > TextureParameterSet::getFloatTexture(const std::string& name, imp_float default_value) const
+{
+    std::string texture_name = geometry_parameters.getSingleTextureNameValue(name, "");
+
+    if (texture_name == "")
+        texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
+        
+    if (texture_name != "")
+    {
+        auto float_texture = float_textures.find(texture_name);
+
+        if (float_texture != float_textures.end())
+            return float_texture->second;
+        else
+            printErrorMessage("couldn't find float texture named \"%s\" for parameter \"%s\"",
+                              texture_name.c_str(), name.c_str());
+    }
+
+    imp_float value = material_parameters.getSingleFloatValue(name, default_value);
+    value = geometry_parameters.getSingleFloatValue(name, value);
+
+    return std::make_shared< ConstantTexture<imp_float> >(value);
+}
+
+std::shared_ptr< Texture<imp_float> > TextureParameterSet::getFloatTexture(const std::string& name) const
+{
+    std::shared_ptr< Texture<imp_float> > texture;
+
+    std::string texture_name = geometry_parameters.getSingleTextureNameValue(name, "");
+
+    if (texture_name == "")
+        texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
+        
+    if (texture_name != "")
+    {
+        auto float_texture = float_textures.find(texture_name);
+
+        if (float_texture != float_textures.end())
+            texture = float_texture->second;
+    }
+
+    return texture;
+}
+
+std::shared_ptr< Texture<Spectrum> > TextureParameterSet::getSpectrumTexture(const std::string& name, const Spectrum& default_value) const
+{
+    std::string texture_name = geometry_parameters.getSingleTextureNameValue(name, "");
+
+    if (texture_name == "")
+        texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
+        
+    if (texture_name != "")
+    {
+        auto spectrum_texture = spectrum_textures.find(texture_name);
+
+        if (spectrum_texture != spectrum_textures.end())
+            return spectrum_texture->second;
+        else
+            printErrorMessage("Couldn't find spectrum texture named \"%s\" for parameter \"%s\"",
+                              texture_name.c_str(), name.c_str());
+    }
+
+    Spectrum value = material_parameters.getSingleSpectrumValue(name, default_value);
+    value = geometry_parameters.getSingleSpectrumValue(name, value);
+
+    return std::make_shared< ConstantTexture<Spectrum> >(value);
+}
+
+std::shared_ptr< Texture<Spectrum> > TextureParameterSet::getSpectrumTexture(const std::string& name) const
+{
+    std::shared_ptr< Texture<Spectrum> > texture;
+
+    std::string texture_name = geometry_parameters.getSingleTextureNameValue(name, "");
+
+    if (texture_name == "")
+        texture_name = material_parameters.getSingleTextureNameValue(texture_name, "");
+        
+    if (texture_name != "")
+    {
+        auto spectrum_texture = spectrum_textures.find(texture_name);
+
+        if (spectrum_texture != spectrum_textures.end())
+            texture = spectrum_texture->second;
+    }
+    
+    return texture;
+}
+
+bool TextureParameterSet::getSingleBoolValue(const std::string& name, bool default_value) const
+{
+    return geometry_parameters.getSingleBoolValue(name, material_parameters.getSingleBoolValue(name, default_value));
+}
+
+int TextureParameterSet::getSingleIntValue(const std::string& name, int default_value) const
+{
+    return geometry_parameters.getSingleIntValue(name, material_parameters.getSingleIntValue(name, default_value));
+}
+
+imp_float TextureParameterSet::getSingleFloatValue(const std::string& name, imp_float default_value) const
+{
+    return geometry_parameters.getSingleFloatValue(name, material_parameters.getSingleFloatValue(name, default_value));
+}
+
+const std::string& TextureParameterSet::getSingleStringValue(const std::string& name, const std::string& default_value) const
+{
+    return geometry_parameters.getSingleStringValue(name, material_parameters.getSingleStringValue(name, default_value));
+}
+
+const Point2F& TextureParameterSet::getSinglePoint2FValue(const std::string& name, const Point2F& default_value) const
+{
+    return geometry_parameters.getSinglePoint2FValue(name, material_parameters.getSinglePoint2FValue(name, default_value));
+}
+
+const Vector2F& TextureParameterSet::getSingleVector2FValue(const std::string& name, const Vector2F& default_value) const
+{
+    return geometry_parameters.getSingleVector2FValue(name, material_parameters.getSingleVector2FValue(name, default_value));
+}
+
+const Point3F& TextureParameterSet::getSinglePoint3FValue(const std::string& name, const Point3F& default_value) const
+{
+    return geometry_parameters.getSinglePoint3FValue(name, material_parameters.getSinglePoint3FValue(name, default_value));
+}
+
+const Vector3F& TextureParameterSet::getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const
+{
+    return geometry_parameters.getSingleVector3FValue(name, material_parameters.getSingleVector3FValue(name, default_value));
+}
+
+const Normal3F& TextureParameterSet::getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const
+{
+    return geometry_parameters.getSingleNormal3FValue(name, material_parameters.getSingleNormal3FValue(name, default_value));
+}
+
+const Spectrum& TextureParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
+{
+    return geometry_parameters.getSingleSpectrumValue(name, material_parameters.getSingleSpectrumValue(name, default_value));
+}
+
+void TextureParameterSet::warnAboutUnusedParameters() const
+{
+    geometry_parameters.warnAboutUnusedParameters();
+    material_parameters.warnAboutUnusedParameters();
 }
 
 } // Impact

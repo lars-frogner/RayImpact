@@ -44,7 +44,7 @@ using namespace RayImpact;
     value = parameter_set.getBoolValues(nextPositionalArgumentID(), &n_values); \
     if (!value || (is_single && n_values != 1)) \
     { \
-        printErrorMessage("argument number %d (bool%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", name); \
+        printErrorMessage("argument number %d (bool%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
         resetArguments(); \
         return; \
     } \
@@ -54,7 +54,7 @@ using namespace RayImpact;
     value = parameter_set.getIntValues(nextPositionalArgumentID(), &n_values); \
     if (!value || (is_single && n_values != 1)) \
     { \
-        printErrorMessage("argument number %d (int%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", name); \
+        printErrorMessage("argument number %d (int%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
         resetArguments(); \
         return; \
     } \
@@ -64,7 +64,7 @@ using namespace RayImpact;
     value = parameter_set.getFloatValues(nextPositionalArgumentID(), &n_values); \
     if (!value || (is_single && n_values != 1)) \
     { \
-        printErrorMessage("argument number %d (float%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", name); \
+        printErrorMessage("argument number %d (float%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
         resetArguments(); \
         return; \
     } \
@@ -74,7 +74,7 @@ using namespace RayImpact;
     value = parameter_set.getStringValues(nextPositionalArgumentID(), &n_values); \
     if (!value || (is_single && n_values != 1)) \
     { \
-        printErrorMessage("argument number %d (string%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", name); \
+        printErrorMessage("argument number %d (string%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
         resetArguments(); \
         return; \
     } \
@@ -84,7 +84,7 @@ using namespace RayImpact;
     value = parameter_set.getVector2FValues(nextPositionalArgumentID(), &n_values); \
     if (!value || n_values != 1) \
     { \
-        printErrorMessage("argument number %d (float pair) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, name); \
+        printErrorMessage("argument number %d (float pair) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, func_name); \
         resetArguments(); \
         return; \
     } \
@@ -94,7 +94,7 @@ using namespace RayImpact;
     value = parameter_set.getVector3FValues(nextPositionalArgumentID(), &n_values); \
     if (!value || n_values != 1) \
     { \
-        printErrorMessage("argument number %d (float triplet) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, name); \
+        printErrorMessage("argument number %d (float triplet) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, func_name); \
         resetArguments(); \
         return; \
     } \
@@ -297,13 +297,13 @@ void resetArguments()
     positional_arg = 0;
 }
 
-void callAPIFunction(const char* name)
+void callAPIFunction(const char* func_name)
 {
-    std::string function_name(name);
+    std::string function_name(func_name);
     positional_arg = 0;
     unsigned int n_values;
 
-    printInfoMessage("Calling \"%s\"", name);
+    printInfoMessage("Calling \"%s\"", func_name);
 
     if (function_name == "SetOption")
     {
@@ -375,7 +375,7 @@ void callAPIFunction(const char* name)
         find_next_float_arg(matrix_elements, false);
         if (n_values != 16)
         {
-            printErrorMessage("argument number %d (float array) to \"%s\" must have size 16. Ignoring call.", positional_arg, name);
+            printErrorMessage("argument number %d (float array) to \"%s\" must have size 16. Ignoring call.", positional_arg, func_name);
             resetArguments();
             return;
         }
@@ -387,7 +387,7 @@ void callAPIFunction(const char* name)
         find_next_float_arg(matrix_elements, false);
         if (n_values != 16)
         {
-            printErrorMessage("argument number %d (float array) to \"%s\" must have size 16. Ignoring call.", positional_arg, name);
+            printErrorMessage("argument number %d (float array) to \"%s\" must have size 16. Ignoring call.", positional_arg, func_name);
             resetArguments();
             return;
         }
@@ -399,11 +399,11 @@ void callAPIFunction(const char* name)
         find_next_string_arg(name, true);
         RIMP_DefineCoordinateSystem(*name);
     }
-    else if (function_name == "UseCoordinateSystem")
+    else if (function_name == "UseDefinedCoordinateSystem")
     {
         const std::string* name;
         find_next_string_arg(name, true);
-        RIMP_UseCoordinateSystem(*name);
+        RIMP_DefineCoordinateSystem(*name);
     }
     else if (function_name == "DefineMedium")
     {
@@ -483,6 +483,48 @@ void callAPIFunction(const char* name)
     {
         RIMP_EndTransformation();
     }
+    else if (function_name == "DefineTexture")
+    {
+        const std::string* name;
+        const std::string* texture_data_type;
+        const std::string* texture_type;
+        find_next_string_arg(name, true);
+        find_next_string_arg(texture_data_type, true);
+        find_next_string_arg(texture_type, true);
+        RIMP_DefineTexture(*name, *texture_data_type, *texture_type, parameter_set);
+    }
+    else if (function_name == "UseMaterial")
+    {
+        const std::string* type;
+        find_next_string_arg(type, true);
+        RIMP_UseMaterial(*type, parameter_set);
+    }
+    else if (function_name == "DefineMaterial")
+    {
+        const std::string* name;
+        const std::string* type;
+        find_next_string_arg(name, true);
+        find_next_string_arg(type, true);
+        RIMP_DefineMaterial(*name, *type, parameter_set);
+    }
+    else if (function_name == "UseDefinedMaterial")
+    {
+        const std::string* name;
+        find_next_string_arg(name, true);
+        RIMP_UseDefinedMaterial(*name);
+    }
+    else if (function_name == "CreateLight")
+    {
+        const std::string* type;
+        find_next_string_arg(type, true);
+        RIMP_CreateLight(*type, parameter_set);
+    }
+    else if (function_name == "CreateAreaLight")
+    {
+        const std::string* type;
+        find_next_string_arg(type, true);
+        RIMP_CreateAreaLight(*type, parameter_set);
+    }
     else if (function_name == "CreateModel")
     {
         const std::string* type;
@@ -511,7 +553,7 @@ void callAPIFunction(const char* name)
     }
     else
     {
-        printErrorMessage("invalid statement \"%s\". Ignoring.", name);
+        printErrorMessage("invalid statement \"%s\". Ignoring.", func_name);
         resetArguments();
         return;
     }

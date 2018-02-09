@@ -13,9 +13,25 @@
 #include "Sphere.hpp"
 #include "Cylinder.hpp"
 #include "Disk.hpp"
+#include "Light.hpp"
+#include "PointLight.hpp"
+#include "SpotLight.hpp"
+#include "DistantLight.hpp"
+#include "DiffuseAreaLight.hpp"
+#include "Texture.hpp"
+#include "ConstantTexture.hpp"
+#include "ScaledTexture.hpp"
+#include "MixedTexture.hpp"
+#include "BilinearInterpolationTexture.hpp"
+#include "Material.hpp"
+#include "MatteMaterial.hpp"
+#include "PlasticMaterial.hpp"
+#include "MixedMaterial.hpp"
 #include "Model.hpp"
+#include "BoundingVolumeHierarchy.hpp"
 #include "Scene.hpp"
 #include "Integrator.hpp"
+#include "WhittedIntegrator.hpp"
 #include "Filter.hpp"
 #include "BoxFilter.hpp"
 #include "TriangleFilter.hpp"
@@ -101,7 +117,7 @@ public:
     imp_float transformation_start_time = 0.0f; // Point in time when the initial transformation applies
     imp_float transformation_end_time = 1.0f; // Point in time when the final transformation applies
 
-    std::string accelerator_type = "default"; // Type of the acceleration structure to use
+    std::string accelerator_type = "bvh"; // Type of the acceleration structure to use
     ParameterSet accelerator_parameters; // Parameters for the acceleration structure
 
     std::string sampler_type = "stratified"; // Type of the sampler type to use
@@ -113,10 +129,10 @@ public:
     std::string camera_type = "perspective"; // Type of the camera type to use
     ParameterSet camera_parameters; // Parameters for the camera
 
-    std::string sensor_type = "default"; // Type of the sensor type to use
+    std::string sensor_type = "image"; // Type of the sensor type to use
     ParameterSet sensor_parameters; // Parameters for the sensor
 
-    std::string integrator_type = "default"; // Type of the integrator type to use
+    std::string integrator_type = "whitted"; // Type of the integrator type to use
     ParameterSet integrator_parameters; // Parameters for the integrator
 
     TransformationSet camera_to_world; // The transformation set for the camera-to-world transformation
@@ -148,9 +164,18 @@ public:
     std::string area_light_type = "";
     ParameterSet area_light_parameters;
 
+    std::map< std::string, std::shared_ptr< Texture<imp_float> > > float_textures;
+    std::map< std::string, std::shared_ptr< Texture<Spectrum> > > spectrum_textures;
+
+    std::string material_type = "matte";
+    ParameterSet material_parameters;
+
+    std::map< std::string, std::shared_ptr<Material> > defined_materials;
+    std::shared_ptr<Material> current_defined_material;
+
     bool use_reverse_orientation = false;
 
-    std::shared_ptr<Material> createMaterial(const ParameterSet& parameters);
+    std::shared_ptr<Material> createMaterial(const ParameterSet& geometry_parameters);
 
     MediumInterface createMediumInterface();
 };
@@ -375,13 +400,9 @@ std::shared_ptr<Model> CreateAccelerationStructure(const std::string& type,
 {
     std::shared_ptr<Model> accelerator;
 
-    if (false)//type == "bvh")
+    if (type == "bvh")
     {
-
-    }
-    else if (false)//type == "kdtree")
-    {
-
+        accelerator = createBoundingVolumeHierarchy(models, parameters);
     }
     else
     {
@@ -400,9 +421,17 @@ std::shared_ptr<Light> createLight(const std::string& type,
 {
     std::shared_ptr<Light> light;
 
-    if (false)//type == "point")
+    if (type == "point")
     {
-
+        light = createPointLight(light_to_world, medium_interface, parameters);
+    }
+    else if (type == "spot")
+    {
+        light = createSpotLight(light_to_world, medium_interface, parameters);
+    }
+    else if (type == "distant")
+    {
+        light = createDistantLight(light_to_world, medium_interface, parameters);
     }
     else
     {
@@ -422,9 +451,9 @@ std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
 {
     std::shared_ptr<AreaLight> area_light;
 
-    if (false)//type == "diffuse")
+    if (type == "diffuse")
     {
-
+        area_light = createDiffuseAreaLight(light_to_world, medium_interface, parameters, shape);
     }
     else
     {
@@ -436,9 +465,140 @@ std::shared_ptr<AreaLight> createAreaLight(const std::string& type,
     return area_light;
 }
 
-std::shared_ptr<Material> GraphicsState::createMaterial(const ParameterSet& parameters)
+std::shared_ptr<Material> createMaterial(const std::string& type, const TextureParameterSet& parameters)
 {
-    return nullptr;
+    Material* material;
+    
+    if (type == "matte")
+    {
+        material = createMatteMaterial(parameters);
+    }
+    else if (type == "plastic")
+    {
+        material = createPlasticMaterial(parameters);
+    }
+    else if (type == "mixed")
+    {
+        std::string material_name_1 = parameters.getSingleStringValue("mix_material_1", "");
+        std::string material_name_2 = parameters.getSingleStringValue("mix_material_2", "");
+
+        std::shared_ptr<Material> mix_material_1, mix_material_2;
+
+        auto defined_material_1 = current_graphics_state.defined_materials.find(material_name_1);
+        auto defined_material_2 = current_graphics_state.defined_materials.find(material_name_2);
+
+        if (defined_material_1 == current_graphics_state.defined_materials.end())
+        {
+            if (material_name_1 == "")
+                printErrorMessage("mix material 1 has not been specified. Using \"matte\" material.");
+            else
+                printErrorMessage("material name \"%s\" undefined. Using \"matte\" material.", material_name_1.c_str());
+
+            mix_material_1 = createMaterial("matte", parameters);
+        }
+        else
+            mix_material_1 = defined_material_1->second;
+
+        if (defined_material_2 == current_graphics_state.defined_materials.end())
+        {
+            if (material_name_2 == "")
+                printErrorMessage("mix material 2 has not been specified. Using \"matte\" material.");
+            else
+                printErrorMessage("material name \"%s\" undefined. Using \"matte\" material.", material_name_2.c_str());
+
+            mix_material_2 = createMaterial("matte", parameters);
+        }
+        else
+            mix_material_2 = defined_material_2->second;
+
+        material = createMixedMaterial(mix_material_1, mix_material_2, parameters);
+    }
+    else
+    {
+        printErrorMessage("material type \"%s\" is invalid. Using \"matte\" material.", type.c_str());
+        material = createMatteMaterial(parameters);
+    }
+
+    parameters.warnAboutUnusedParameters();
+
+    if (!material)
+        printErrorMessage("could not create material of type \"%s\"", type.c_str());
+
+    return std::shared_ptr<Material>(material);
+}
+
+std::shared_ptr< Texture<imp_float> > createFloatTexture(const std::string& type,
+                                                         const Transformation& texture_to_world,
+                                                         const TextureParameterSet& parameters)
+{
+    Texture<imp_float>* texture = nullptr;
+
+    if (type == "constant")
+    {
+        texture = createConstantFloatTexture(texture_to_world, parameters);
+    }
+    else if (type == "scaled")
+    {
+        texture = createScaledFloatTexture(texture_to_world, parameters);
+    }
+    else if (type == "mixed")
+    {
+        texture = createMixedFloatTexture(texture_to_world, parameters);
+    }
+    else if (type == "bilinear_interpolation")
+    {
+        texture = createBilinearInterpolationFloatTexture(texture_to_world, parameters);
+    }
+    else
+    {
+        printErrorMessage("texture type \"%s\" is invalid.", type.c_str());
+    }
+
+    parameters.warnAboutUnusedParameters();
+    
+    return std::shared_ptr< Texture<imp_float> >(texture);
+}
+
+std::shared_ptr< Texture<Spectrum> > createSpectrumTexture(const std::string& type,
+                                                           const Transformation& texture_to_world,
+                                                           const TextureParameterSet& parameters)
+{
+    Texture<Spectrum>* texture = nullptr;
+
+    if (type == "constant")
+    {
+        texture = createConstantSpectrumTexture(texture_to_world, parameters);
+    }
+    else if (type == "scaled")
+    {
+        texture = createScaledSpectrumTexture(texture_to_world, parameters);
+    }
+    else if (type == "mixed")
+    {
+        texture = createMixedSpectrumTexture(texture_to_world, parameters);
+    }
+    else if (type == "bilinear_interpolation")
+    {
+        texture = createBilinearInterpolationSpectrumTexture(texture_to_world, parameters);
+    }
+    else
+    {
+        printErrorMessage("texture type \"%s\" is invalid.", type.c_str());
+    }
+
+    parameters.warnAboutUnusedParameters();
+    
+    return std::shared_ptr< Texture<Spectrum> >(texture);
+}
+
+std::shared_ptr<Material> GraphicsState::createMaterial(const ParameterSet& geometry_parameters)
+{
+    if (current_defined_material)
+        return current_defined_material;
+
+    TextureParameterSet parameters(float_textures, spectrum_textures, geometry_parameters, material_parameters);
+
+    return ::Impact::RayImpact::createMaterial(material_type, parameters);
 }
 
 MediumInterface GraphicsState::createMediumInterface()
@@ -452,8 +612,8 @@ Scene* Configurations::createScene()
                                                                      models,
                                                                      accelerator_parameters);
 
-    //if (!accelerator)
-    //    accelerator = std::make_shared<BoundingVolumeHierarchy>(models);
+    if (!accelerator)
+        accelerator = std::make_shared<BoundingVolumeHierarchy>(models);
 
     Scene* scene = new Scene(accelerator, lights);
 
@@ -483,9 +643,9 @@ Integrator* Configurations::createIntegrator() const
 
     Integrator* integrator = nullptr;
 
-    if (false)//integrator_type == "whitted")
+    if (integrator_type == "whitted")
     {
-
+        integrator = createWhittedIntegrator(camera, sampler, integrator_parameters);
     }
     else
     {
@@ -724,9 +884,9 @@ void RIMP_DefineCoordinateSystem(const std::string& name)
     defined_coordinate_systems[name] = current_transformations;
 }
 
-void RIMP_UseCoordinateSystem(const std::string& name)
+void RIMP_UseDefinedCoordinateSystem(const std::string& name)
 {
-    verify_initialized("UseCoordinateSystem");
+    verify_initialized("UseDefinedCoordinateSystem");
 
     auto entry = defined_coordinate_systems.find(name);
 
@@ -885,6 +1045,113 @@ void RIMP_EndTransformation()
     active_transformation_bits_stack.pop_back();
 }
 
+void RIMP_DefineTexture(const std::string& name,
+                        const std::string& texture_data_type,
+                        const std::string& texture_type,
+                        const ParameterSet& parameters)
+{
+    verify_in_scene_descript_state("DefineTexture");
+
+    ParameterSet no_parameters;
+
+    TextureParameterSet texture_parameters(current_graphics_state.float_textures,
+                                           current_graphics_state.spectrum_textures,
+                                           parameters, no_parameters);
+
+    if (texture_data_type == "float")
+    {
+        if (current_graphics_state.float_textures.find(name) != current_graphics_state.float_textures.end())
+            printWarningMessage("texture \"%s\" is being redefined", name.c_str());
+
+        warn_if_transformation_is_animated("DefineTexture");
+
+        std::shared_ptr< Texture<imp_float> > texture = createFloatTexture(texture_type,
+                                                                           current_transformations[0],
+                                                                           texture_parameters);
+
+        if (texture)
+            current_graphics_state.float_textures[name] = texture;
+    }
+    else if (texture_data_type == "color" || texture_data_type == "spectrum")
+    {
+        if (current_graphics_state.spectrum_textures.find(name) != current_graphics_state.spectrum_textures.end())
+            printWarningMessage("texture \"%s\" is being redefined", name.c_str());
+
+        warn_if_transformation_is_animated("DefineTexture");
+
+        std::shared_ptr< Texture<Spectrum> > texture = createSpectrumTexture(texture_type,
+                                                                             current_transformations[0],
+                                                                             texture_parameters);
+
+        if (texture)
+            current_graphics_state.spectrum_textures[name] = texture;
+    }
+    else
+        printErrorMessage("texture data type \"%s\" is invalid", texture_data_type.c_str());
+}
+
+void RIMP_UseMaterial(const std::string& type, const ParameterSet& parameters)
+{
+    verify_in_scene_descript_state("UseMaterial");
+    
+    current_graphics_state.material_type = type;
+    current_graphics_state.material_parameters = parameters;
+
+    current_graphics_state.current_defined_material.reset();
+}
+
+void RIMP_DefineMaterial(const std::string& name, const std::string& type, const ParameterSet& parameters)
+{
+    verify_in_scene_descript_state("DefineMaterial");
+
+    ParameterSet no_parameters;
+
+    TextureParameterSet texture_parameters(current_graphics_state.float_textures,
+                                           current_graphics_state.spectrum_textures,
+                                           parameters,
+                                           no_parameters);
+    
+    current_graphics_state.current_defined_material = createMaterial(type, texture_parameters);
+
+    current_graphics_state.defined_materials[name] = current_graphics_state.current_defined_material;
+}
+
+void RIMP_UseDefinedMaterial(const std::string& name)
+{
+    verify_in_scene_descript_state("UseDefinedMaterial");
+
+    auto defined_material = current_graphics_state.defined_materials.find(name);
+
+    if (defined_material != current_graphics_state.defined_materials.end())
+        current_graphics_state.current_defined_material = defined_material->second;
+    else
+        printWarningMessage("material \"%s\" not found. Ignoring call to \"UseDefinedMaterial\".", name.c_str());
+}
+
+void RIMP_CreateLight(const std::string& type, const ParameterSet& parameters)
+{
+    verify_in_scene_descript_state("CreateLight");
+
+    warn_if_transformation_is_animated("CreateLight");
+
+    const MediumInterface& medium_interface = current_graphics_state.createMediumInterface();
+
+    std::shared_ptr<Light> light = createLight(type, current_transformations[0], medium_interface, parameters);
+
+    if (!light)
+        printErrorMessage("could not create light of type \"%s\"", type.c_str());
+    else
+        configurations->lights.push_back(light);
+}
+
+void RIMP_CreateAreaLight(const std::string& type, const ParameterSet& parameters)
+{
+    verify_in_scene_descript_state("CreateAreaLight");
+
+    current_graphics_state.area_light_type = type;
+    current_graphics_state.area_light_parameters = parameters;
+}
+
 void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 {
     verify_in_scene_descript_state("CreateModel");
@@ -916,7 +1183,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 
         parameters.warnAboutUnusedParameters();
 
-        MediumInterface medium_interface = current_graphics_state.createMediumInterface();
+        const MediumInterface& medium_interface = current_graphics_state.createMediumInterface();
 
         for (auto shape : shapes)
         {
@@ -962,7 +1229,7 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
 
         parameters.warnAboutUnusedParameters();
 
-        MediumInterface medium_interface = current_graphics_state.createMediumInterface();
+        const MediumInterface& medium_interface = current_graphics_state.createMediumInterface();
 
         for (auto shape : shapes)
             models.push_back(std::make_shared<GeometricModel>(shape, material, nullptr, medium_interface));
@@ -981,9 +1248,9 @@ void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters)
         // Create aggregate from the geometric models if there is more than one
         if (models.size() > 1)
         {
-            //std::shared_ptr<Model> BVH = std::make_shared<BoundingVolumeHierarchy>(models);
+            std::shared_ptr<Model> BVH = std::make_shared<BoundingVolumeHierarchy>(models);
             models.clear();
-            //models.push_back(BVH);
+            models.push_back(BVH);
         }
 
         models[0] = std::make_shared<TransformedModel>(models[0], animated_model_to_world);
@@ -1062,8 +1329,8 @@ void RIMP_CreateObjectInstance(const std::string& name)
         std::shared_ptr<Model> aggregate(CreateAccelerationStructure(configurations->accelerator_type,
                                                                      object_models,
                                                                      configurations->accelerator_parameters));
-        //if (!aggregate)
-        //    aggregate = std::make_shared<BoundingVolumeHierarchy>(object_models);
+        if (!aggregate)
+            aggregate = std::make_shared<BoundingVolumeHierarchy>(object_models);
 
         object_models.clear();
         object_models.push_back(aggregate);

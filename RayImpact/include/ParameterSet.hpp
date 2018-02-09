@@ -5,9 +5,14 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 
 namespace Impact {
 namespace RayImpact {
+
+// Forward declarations
+template <typename T>
+class Texture;
 
 // Parameter declarations
 
@@ -110,6 +115,44 @@ public:
     void warnAboutUnusedParameters() const;
 
     void clearParameters();
+};
+
+// TextureParameterSet declarations
+
+class TextureParameterSet {
+
+private:
+
+    std::map< std::string, std::shared_ptr< Texture<imp_float> > >& float_textures;
+    std::map< std::string, std::shared_ptr< Texture<Spectrum> > >& spectrum_textures;
+    const ParameterSet& geometry_parameters;
+    const ParameterSet& material_parameters;
+
+public:
+
+    TextureParameterSet(std::map< std::string, std::shared_ptr< Texture<imp_float> > >& float_textures,
+                        std::map< std::string, std::shared_ptr< Texture<Spectrum> > >& spectrum_textures,
+                        const ParameterSet& geometry_parameters,
+                        const ParameterSet& material_parameters);
+
+    std::shared_ptr< Texture<imp_float> > getFloatTexture(const std::string& name, imp_float default_value) const;
+    std::shared_ptr< Texture<imp_float> > getFloatTexture(const std::string& name) const;
+
+    std::shared_ptr< Texture<Spectrum> > getSpectrumTexture(const std::string& name, const Spectrum& default_value) const;
+    std::shared_ptr< Texture<Spectrum> > getSpectrumTexture(const std::string& name) const;
+
+    bool getSingleBoolValue(const std::string& name, bool default_value) const;
+    int getSingleIntValue(const std::string& name, int default_value) const;
+    imp_float getSingleFloatValue(const std::string& name, imp_float default_value) const;
+    const std::string& getSingleStringValue(const std::string& name, const std::string& default_value) const;
+    const Point2F& getSinglePoint2FValue(const std::string& name, const Point2F& default_value) const;
+    const Vector2F& getSingleVector2FValue(const std::string& name, const Vector2F& default_value) const;
+    const Point3F& getSinglePoint3FValue(const std::string& name, const Point3F& default_value) const;
+    const Vector3F& getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const;
+    const Normal3F& getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const;
+    const Spectrum& getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const;
+    
+    void warnAboutUnusedParameters() const;
 };
 
 // Parameter method implementations

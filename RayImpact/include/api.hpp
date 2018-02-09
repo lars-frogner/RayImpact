@@ -50,7 +50,7 @@ void RIMP_UseConcatenated(const imp_float matrix_elements[16]);
 
 void RIMP_DefineCoordinateSystem(const std::string& name);
 
-void RIMP_UseCoordinateSystem(const std::string& name);
+void RIMP_DefineCoordinateSystem(const std::string& name);
 
 void RIMP_DefineMedium(const std::string& name, const ParameterSet& parameters);
 
@@ -79,6 +79,21 @@ void RIMP_EndAttribute();
 void RIMP_BeginTransformation();
 
 void RIMP_EndTransformation();
+
+void RIMP_DefineTexture(const std::string& name,
+                        const std::string& texture_data_type,
+                        const std::string& texture_type,
+                        const ParameterSet& parameters);
+
+void RIMP_UseMaterial(const std::string& type, const ParameterSet& parameters);
+
+void RIMP_DefineMaterial(const std::string& name, const std::string& type, const ParameterSet& parameters);
+
+void RIMP_UseDefinedMaterial(const std::string& name);
+
+void RIMP_CreateLight(const std::string& type, const ParameterSet& parameters);
+
+void RIMP_CreateAreaLight(const std::string& type, const ParameterSet& parameters);
 
 void RIMP_CreateModel(const std::string& type, const ParameterSet& parameters);
 
