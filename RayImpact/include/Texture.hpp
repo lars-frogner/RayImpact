@@ -1,8 +1,10 @@
 #pragma once
 #include "precision.hpp"
+#include "error.hpp"
 #include "geometry.hpp"
 #include "Transformation.hpp"
 #include "ScatteringEvent.hpp"
+#include "ParameterSet.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -124,6 +126,45 @@ public:
     Point3F textureCoordinate(const SurfaceScatteringEvent& scattering_event,
                               Vector3F* dpdx, Vector3F* dpdy) const;
 };
+
+// Texture mapper creation macros
+
+#define create_2D_texture_mapper(parameters, mapper) \
+    do { \
+        const std::string mapping = parameters.getSingleStringValue("mapping", "parametric"); \
+        \
+        if (mapping == "parametric") \
+        { \
+            imp_float s_scale = parameters.getSingleFloatValue("s_scale", 1.0f); \
+            imp_float t_scale = parameters.getSingleFloatValue("t_scale", 1.0f); \
+            imp_float s_offset = parameters.getSingleFloatValue("s_offset", 0.0f); \
+            imp_float t_offset = parameters.getSingleFloatValue("t_offset", 0.0f); \
+        \
+            mapper.reset(new ParametricMapper(s_scale, t_scale, s_offset, t_offset)); \
+        } \
+        else if (mapping == "spherical") \
+        { \
+            mapper.reset(new SphericalMapper(texture_to_world.inverted())); \
+        } \
+        else if (mapping == "cylindrical") \
+        { \
+            mapper.reset(new CylindricalMapper(texture_to_world.inverted())); \
+        } \
+        else if (mapping == "planar") \
+        { \
+            const Vector3F& s_tangent = parameters.getSingleVector3FValue("s_tangent", Vector3F(1, 0, 0)); \
+            const Vector3F& t_tangent = parameters.getSingleVector3FValue("t_tangent", Vector3F(0, 1, 0)); \
+            imp_float s_offset = parameters.getSingleFloatValue("s_offset", 0.0f); \
+            imp_float t_offset = parameters.getSingleFloatValue("t_offset", 0.0f); \
+        \
+            mapper.reset(new PlanarMapper(s_tangent, t_tangent, s_offset, t_offset)); \
+        } \
+        else \
+        { \
+            printErrorMessage("2D texture mapping \"%s\" is invalid. Using default parametric mapper.", mapping.c_str()); \
+            mapper.reset(new ParametricMapper(1, 1, 0, 0)); \
+        } \
+    } while (false)
 
 } // RayImpact
 } // Impact

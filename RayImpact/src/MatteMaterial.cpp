@@ -41,5 +41,14 @@ void MatteMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
     }
 }
 
+// MatteMaterial creation
+
+Material* createMatteMaterial(const TextureParameterSet& parameters)
+{
+    return new MatteMaterial(parameters.getSpectrumTexture("reflectance", ReflectionSpectrum(0.0f)),
+                             parameters.getFloatTexture("roughness", 0.0f),
+                             parameters.getFloatTexture("bump_map"));
+}
+
 } // RayImpact
 } // Impact

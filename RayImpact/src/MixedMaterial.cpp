@@ -41,5 +41,15 @@ void MixedMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                                                                         material_2_weight));
 }
 
+// MixedMaterial creation
+
+Material* createMixedMaterial(const std::shared_ptr<Material>& material_1,
+                              const std::shared_ptr<Material>& material_2,
+                              const TextureParameterSet& parameters)
+{
+    return new MixedMaterial(material_1, material_2,
+                             parameters.getSpectrumTexture("mixing_ratio", Spectrum(0.0f)));
+}
+
 } // RayImpact
 } // Impact

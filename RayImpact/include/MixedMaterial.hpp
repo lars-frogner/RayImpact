@@ -2,6 +2,7 @@
 #include "Material.hpp"
 #include "Spectrum.hpp"
 #include "Texture.hpp"
+#include "ParameterSet.hpp"
 #include <memory>
 
 namespace Impact {
@@ -28,6 +29,12 @@ public:
                       TransportMode transport_mode,
                       bool allow_multiple_scattering_types) const;
 };
+
+// MixedMaterial creation
+
+Material* createMixedMaterial(const std::shared_ptr<Material>& material_1,
+                              const std::shared_ptr<Material>& material_2,
+                              const TextureParameterSet& parameters);
 
 } // RayImpact
 } // Impact

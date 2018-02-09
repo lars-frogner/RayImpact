@@ -2,6 +2,7 @@
 #include "Material.hpp"
 #include "Spectrum.hpp"
 #include "Texture.hpp"
+#include "ParameterSet.hpp"
 #include <memory>
 
 namespace Impact {
@@ -28,6 +29,10 @@ public:
                       TransportMode transport_mode,
                       bool allow_multiple_scattering_types) const;
 };
+
+// MatteMaterial creation
+
+Material* createMatteMaterial(const TextureParameterSet& parameters);
 
 } // RayImpact
 } // Impact

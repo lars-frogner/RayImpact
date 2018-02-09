@@ -56,5 +56,18 @@ void PlasticMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
     }
 }
 
+// PlasticMaterial creation
+
+Material* createPlasticMaterial(const TextureParameterSet& parameters)
+{
+    bool normalized_roughness = parameters.getSingleBoolValue("normalized_roughness", true);
+
+    return new PlasticMaterial(parameters.getSpectrumTexture("diffuse_reflectance", ReflectionSpectrum(0.0f)),
+                               parameters.getSpectrumTexture("glossy_reflectance", ReflectionSpectrum(0.0f)),
+                               parameters.getFloatTexture("roughness", 0.0f),
+                               parameters.getFloatTexture("bump_map"),
+                               normalized_roughness);
+}
+
 } // RayImpact
 } // Impact
