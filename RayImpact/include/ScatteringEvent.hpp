@@ -3,6 +3,7 @@
 #include "RegionAllocator.hpp"
 #include "geometry.hpp"
 #include "Ray.hpp"
+#include "Spectrum.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -24,7 +25,7 @@ public:
     Vector3F position_error; // Error in scattering position
     Vector3F outgoing_direction; // Direction of the photon after scattering
     Normal3F surface_normal; // Normal vector for the surface (if present) at the scattering position
-    const MediumInterface* medium_interface;
+    MediumInterface medium_interface;
     imp_float time; // Point in time when the scattering event happens
 
     ScatteringEvent();
@@ -33,7 +34,11 @@ public:
                     const Vector3F& position_error,
                     const Vector3F& outgoing_direction,
                     const Normal3F& surface_normal,
-                    const MediumInterface* medium_interface,
+                    const MediumInterface& medium_interface,
+                    imp_float time);
+
+    ScatteringEvent(const Point3F& position,
+                    const MediumInterface& medium_interface,
                     imp_float time);
 
     Ray spawnRay(const Vector3F& direction) const;
@@ -103,8 +108,10 @@ public:
 
     void generateBSDF(const RayWithOffsets& ray,
                       RegionAllocator& allocator,
-                      TransportMode transport_mode,
-                      bool allow_multiple_scattering_types);
+                      TransportMode transport_mode = TransportMode::Radiance,
+                      bool allow_multiple_scattering_types = false);
+
+    RadianceSpectrum emittedRadiance(const Vector3F& outgoing_direction) const;
 };
 
 // Utility functions

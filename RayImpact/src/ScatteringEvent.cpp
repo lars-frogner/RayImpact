@@ -2,6 +2,7 @@
 #include "Shape.hpp"
 #include "Model.hpp"
 #include "BSDF.hpp"
+#include "Light.hpp"
 #include "math.hpp"
 #include <cmath>
 
@@ -15,20 +16,31 @@ ScatteringEvent::ScatteringEvent()
       position_error(),
       outgoing_direction(),
       surface_normal(),
-      medium_interface(nullptr),
+      medium_interface(),
       time(0)
 {}
 
 ScatteringEvent::ScatteringEvent(const Point3F& position,
                                  const Vector3F& position_error,
-                                  const Vector3F& outgoing_direction,
+                                 const Vector3F& outgoing_direction,
                                  const Normal3F& surface_normal,
-                                 const MediumInterface* medium_interface,
+                                 const MediumInterface& medium_interface,
                                  imp_float time)
     : position(position),
       position_error(position_error),
       outgoing_direction(outgoing_direction),
       surface_normal(surface_normal),
+      medium_interface(medium_interface),
+      time(time)
+{}
+
+ScatteringEvent::ScatteringEvent(const Point3F& position,
+                                 const MediumInterface& medium_interface,
+                                 imp_float time)
+    : position(position),
+      position_error(),
+      outgoing_direction(),
+      surface_normal(),
       medium_interface(medium_interface),
       time(time)
 {}
@@ -51,7 +63,12 @@ Ray ScatteringEvent::spawnRayTo(const Point3F& end_point) const
 
 Ray ScatteringEvent::spawnRayTo(const ScatteringEvent& other) const
 {
-    return spawnRayTo(other.position);
+    const Point3F& origin = offsetRayOrigin(position, position_error, surface_normal, other.position - position);
+    const Point3F& target = offsetRayOrigin(other.position, other.position_error, other.surface_normal, origin - other.position);
+
+    const Vector3F& direction = target - origin;
+
+    return Ray(origin, direction, 1.0f - IMP_SHADOW_EPS, time, getMediumInDirection(direction));
 }
 
 bool ScatteringEvent::isOnSurface() const
@@ -89,7 +106,7 @@ SurfaceScatteringEvent::SurfaceScatteringEvent(const Point3F& position,
                                        position_error,
                                        outgoing_direction,
                                        Normal3F(dpdu.cross(dpdv).normalized()),
-                                       nullptr,
+                                       MediumInterface(),
                                        time),
       position_uv(position_uv),
       dpdu(dpdu), dpdv(dpdv),
@@ -234,12 +251,18 @@ void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets&
 
 void SurfaceScatteringEvent::generateBSDF(const RayWithOffsets& ray,
                                           RegionAllocator& allocator,
-                                          TransportMode transport_mode,
-                                          bool allow_multiple_scattering_types)
+                                          TransportMode transport_mode /* = TransportMode::Radiance */,
+                                          bool allow_multiple_scattering_types /* = false */)
 {
     computeScreenSpaceDerivatives(ray);
 
     model->generateBSDF(this, allocator, transport_mode, allow_multiple_scattering_types);
+}
+
+RadianceSpectrum SurfaceScatteringEvent::emittedRadiance(const Vector3F& outgoing_direction) const
+{
+    const AreaLight* area_light = model->getAreaLight();
+    return (area_light)? area_light->emittedRadiance(*this, outgoing_direction) : RadianceSpectrum(0.0f);
 }
 
 // Utility functions
