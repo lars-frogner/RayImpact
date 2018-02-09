@@ -11,14 +11,10 @@ namespace RayImpact {
 
 // Forward declarations
 
-class Scene;
-
 class BSSRDF{};
 enum class TransportMode{ Radiance };
-class Light{ public: void preprocess(const Scene& scene) const {} };
-class AreaLight : public Light {};
 class Medium{};
-class MediumInterface{ public: const Medium* outside; };
+class MediumInterface{ public: const Medium* inside; const Medium* outside; };
 
 // Forward declarations
 
