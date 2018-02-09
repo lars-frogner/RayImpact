@@ -25,6 +25,21 @@
     <Filter Include="Materials">
       <UniqueIdentifier>{40cd985a-57c4-4208-9e01-2ced6e828960}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BXDFs">
+      <UniqueIdentifier>{dad1e993-e986-4d4e-a986-060a873766d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Textures">
+      <UniqueIdentifier>{83bb5053-11a9-4f86-b5fe-d991728b8752}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lights">
+      <UniqueIdentifier>{8abfed69-f173-4086-965d-21ab5cac9702}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Integrators">
+      <UniqueIdentifier>{c8cacd30-1531-48d3-bbd9-667dae55171c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Acceleration structures">
+      <UniqueIdentifier>{648eab9e-6a80-4509-aa7a-cb6b3c5a2875}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ray.cpp">
@@ -53,7 +68,6 @@
     <ClCompile Include="src\PerspectiveCamera.cpp">
       <Filter>Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sampler.cpp" />
     <ClCompile Include="src\StratifiedSampler.cpp">
       <Filter>Samplers</Filter>
     </ClCompile>
@@ -89,7 +103,6 @@
       <Filter>Parsing</Filter>
     </ClCompile>
     <ClCompile Include="src\BSDF.cpp" />
-    <ClCompile Include="src\sampling.cpp" />
     <ClCompile Include="src\MicrofacetDistribution.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MatteMaterial.cpp">
@@ -100,6 +113,53 @@
     </ClCompile>
     <ClCompile Include="src\MixedMaterial.cpp">
       <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\SpecularBRDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpecularBTDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpecularBSDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LambertianBRDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LambertianBTDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OrenNayarBRDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MicrofacetBRDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MicrofacetBTDF.cpp">
+      <Filter>BXDFs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FresnelReflector.cpp" />
+    <ClCompile Include="src\Sampler.cpp" />
+    <ClCompile Include="src\sampling.cpp" />
+    <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\PointLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpotLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DistantLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DiffuseAreaLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WhittedIntegrator.cpp">
+      <Filter>Integrators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoundingVolumeHierarchy.cpp">
+      <Filter>Acceleration structures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +198,6 @@
     <ClInclude Include="include\PerspectiveCamera.hpp">
       <Filter>Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="include\Sampler.hpp" />
     <ClInclude Include="include\StratifiedSampler.hpp">
       <Filter>Samplers</Filter>
     </ClInclude>
@@ -183,7 +242,6 @@
       <Filter>Parsing</Filter>
     </ClInclude>
     <ClInclude Include="include\BSDF.hpp" />
-    <ClInclude Include="include\sampling.hpp" />
     <ClInclude Include="include\MicrofacetDistribution.hpp" />
     <ClInclude Include="include\Material.hpp" />
     <ClInclude Include="include\MatteMaterial.hpp">
@@ -196,6 +254,64 @@
       <Filter>Materials</Filter>
     </ClInclude>
     <ClInclude Include="include\Texture.hpp" />
+    <ClInclude Include="include\SpecularBRDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SpecularBTDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SpecularBSDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LambertianBRDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LambertianBTDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OrenNayarBRDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MicrofacetBRDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MicrofacetBTDF.hpp">
+      <Filter>BXDFs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FresnelReflector.hpp" />
+    <ClInclude Include="include\Sampler.hpp" />
+    <ClInclude Include="include\sampling.hpp" />
+    <ClInclude Include="include\ConstantTexture.hpp">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScaledTexture.hpp">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MixedTexture.hpp">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BilinearInterpolationTexture.hpp">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Light.hpp" />
+    <ClInclude Include="include\PointLight.hpp">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SpotLight.hpp">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DistantLight.hpp">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DiffuseAreaLight.hpp">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WhittedIntegrator.hpp">
+      <Filter>Integrators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BoundingVolumeHierarchy.hpp">
+      <Filter>Acceleration structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Flex Include="src\parsing.l">
