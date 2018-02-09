@@ -260,8 +260,8 @@ inline Point3<T> BoundingBox<T>::getGlobalCoordinate(const Vector3<T>& local_coo
 template <typename T>
 inline void BoundingBox<T>::boundingSphere(Point3<T>* center, T* radius) const
 {
-    *center = (lower_corner + upper_corner)/2;
-    *radius = (contains(center))? distanceBetween(*center, upper_corner) : 0;
+    *center = 0.5f*(lower_corner + upper_corner);
+    *radius = (contains(*center))? distanceBetween(*center, upper_corner) : 0;
 }
 
 // Expands the bounding box to contain the given point
