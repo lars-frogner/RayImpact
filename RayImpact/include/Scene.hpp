@@ -3,6 +3,7 @@
 #include "Ray.hpp"
 #include "ScatteringEvent.hpp"
 #include "Model.hpp"
+#include "Light.hpp"
 #include <memory>
 #include <vector>
 
