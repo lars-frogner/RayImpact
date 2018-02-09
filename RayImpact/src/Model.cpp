@@ -34,7 +34,7 @@ bool GeometricModel::intersect(const Ray& ray,
 
     scattering_event->model = this;
 
-    // Initialize scattering_event->medium_interface here
+    // Initialize scattering_event.medium_interface here
 
     return true;
 }
@@ -130,6 +130,28 @@ void TransformedModel::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                     bool allow_multiple_scattering_types) const
 {
     printSevereMessage("\"generateBSDF()\" method of TransformedModel was called");
+}
+
+// AccelerationStructure method implementations
+
+const AreaLight* AccelerationStructure::getAreaLight() const
+{
+    printSevereMessage("\"getAreaLight()\" method of AccelerationStructure was called");
+    return nullptr;
+}
+
+const Material* AccelerationStructure::getMaterial() const
+{
+    printSevereMessage("\"getMaterial()\" method of AccelerationStructure was called");
+    return nullptr;
+}
+
+void AccelerationStructure::generateBSDF(SurfaceScatteringEvent* scattering_event,
+                                         RegionAllocator& allocator,
+                                         TransportMode transport_mode,
+                                         bool allow_multiple_scattering_types) const
+{
+    printSevereMessage("\"generateBSDF()\" method of AccelerationStructure was called");
 }
 
 } // RayImpact

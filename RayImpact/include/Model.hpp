@@ -8,6 +8,7 @@
 #include "ScatteringEvent.hpp"
 #include "Shape.hpp"
 #include "Material.hpp"
+#include "Light.hpp"
 #include <memory>
 
 namespace Impact {
@@ -91,6 +92,22 @@ public:
                    SurfaceScatteringEvent* scattering_event) const;
 
     bool hasIntersection(const Ray& ray) const;
+
+    const AreaLight* getAreaLight() const;
+
+    const Material* getMaterial() const;
+
+    void generateBSDF(SurfaceScatteringEvent* scattering_event,
+                      RegionAllocator& allocator,
+                      TransportMode transport_mode,
+                      bool allow_multiple_scattering_types) const;
+};
+
+// AccelerationStructure declarations
+
+class AccelerationStructure : public Model {
+
+public:
 
     const AreaLight* getAreaLight() const;
 
