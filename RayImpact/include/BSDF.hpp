@@ -43,7 +43,7 @@ public:
 
     virtual Spectrum sample(const Vector3F& outgoing_direction,
                             Vector3F* incident_direction,
-                            const Point2F& sample_values,
+                            const Point2F& uniform_sample,
                             imp_float* pdf_value,
                             BXDFType* sampled_type = nullptr) const;
 
@@ -77,7 +77,7 @@ public:
 
     Spectrum sample(const Vector3F& outgoing_direction,
                     Vector3F* incident_direction,
-                    const Point2F& sample_values,
+                    const Point2F& uniform_sample,
                     imp_float* pdf_value,
                     BXDFType* sampled_type = nullptr) const;
 
@@ -130,7 +130,7 @@ public:
 
     Spectrum evaluate(const Vector3F& world_outgoing_direction,
                       const Vector3F& world_incident_direction,
-                      BXDFType type) const;
+                      BXDFType type = BSDF_ALL) const;
 
     Spectrum reduced(const Vector3F& outgoing_direction,
                      unsigned int n_samples,
@@ -144,7 +144,7 @@ public:
 
     Spectrum sample(const Vector3F& outgoing_direction,
                     Vector3F* incident_direction,
-                    const Point2F& sample_values,
+                    const Point2F& uniform_sample,
                     imp_float* pdf_value,
                     BXDFType type = BSDF_ALL) const;
 };

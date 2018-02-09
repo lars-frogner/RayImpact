@@ -23,7 +23,7 @@ bool BXDF::contains(BXDFType t) const
 
 Spectrum BXDF::sample(const Vector3F& outgoing_direction,
                       Vector3F* incident_direction,
-                      const Point2F& sample_values,
+                      const Point2F& uniform_sample,
                       imp_float* pdf_value,
                       BXDFType* sampled_type /* = nullptr */) const
 {
@@ -70,13 +70,13 @@ Spectrum ScaledBXDF::evaluate(const Vector3F& outgoing_direction,
 
 Spectrum ScaledBXDF::sample(const Vector3F& outgoing_direction,
                             Vector3F* incident_direction,
-                            const Point2F& sample_values,
+                            const Point2F& uniform_sample,
                             imp_float* pdf_value,
                             BXDFType* sampled_type /* = nullptr */) const
 {
     return scale*bxdf->sample(outgoing_direction,
                               incident_direction,
-                              sample_values,
+                              uniform_sample,
                               pdf_value,
                               sampled_type);
 }
@@ -148,7 +148,7 @@ Vector3F BSDF::localToWorld(const Vector3F& vector) const
 
 Spectrum BSDF::evaluate(const Vector3F& world_outgoing_direction,
                         const Vector3F& world_incident_direction,
-                        BXDFType type) const
+                        BXDFType type /* = BSDF_ALL */) const
 {
     bool is_reflection = world_outgoing_direction.dot(geometric_normal)*world_incident_direction.dot(geometric_normal) > 0;
 
@@ -200,6 +200,16 @@ Spectrum BSDF::reduced(unsigned int n_samples,
     }
 
     return result;
+}
+
+Spectrum BSDF::sample(const Vector3F& outgoing_direction,
+                      Vector3F* incident_direction,
+                      const Point2F& uniform_sample,
+                      imp_float* pdf_value,
+                      BXDFType type /* = BSDF_ALL */) const
+{
+    printSevereMessage("BSDF::sample was called without being implemented");
+    return Spectrum(0.0f);
 }
 
 } // RayImpact

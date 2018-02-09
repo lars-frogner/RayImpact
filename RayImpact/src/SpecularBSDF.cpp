@@ -28,7 +28,7 @@ Spectrum SpecularBSDF::evaluate(const Vector3F& outgoing_direction,
 
 Spectrum SpecularBSDF::sample(const Vector3F& outgoing_direction,
                               Vector3F* incident_direction,
-                              const Point2F& sample_values,
+                              const Point2F& uniform_sample,
                               imp_float* pdf_value,
                               BXDFType* sampled_type /* = nullptr */) const
 {

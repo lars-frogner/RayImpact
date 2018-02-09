@@ -19,11 +19,11 @@ Spectrum LambertianBRDF::evaluate(const Vector3F& outgoing_direction,
 
 Spectrum LambertianBRDF::sample(const Vector3F& outgoing_direction,
                                 Vector3F* incident_direction,
-                                const Point2F& sample_values,
+                                const Point2F& uniform_sample,
                                 imp_float* pdf_value,
                                 BXDFType* sampled_type /* = nullptr */) const
 {
-    *incident_direction = cosineWeightedHemisphereSample(sample_values);
+    *incident_direction = cosineWeightedHemisphereSample(uniform_sample);
 
     if (outgoing_direction.z < 0)
         incident_direction->z = -incident_direction->z;
