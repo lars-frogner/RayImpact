@@ -8,7 +8,12 @@ using namespace RayImpact;
 int main(int argc, char *argv[])
 {
     std::vector<std::string> filenames;
-    filenames.push_back(std::string("scene.txt"));
+
+	if (argc < 2)
+		filenames.push_back("default.impScene");
+	else
+		for (int i = 1; i < argc; i++)
+		    filenames.push_back(std::string(argv[i]));
 
     parseSceneDescriptionFiles(filenames);
 }
