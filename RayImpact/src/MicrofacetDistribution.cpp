@@ -1,30 +1,38 @@
 #include "MicrofacetDistribution.hpp"
 #include "math.hpp"
 #include "BSDF.hpp"
+#include "spherical.hpp"
 #include <algorithm>
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// MicrofacetDistribution method implementations
+// MicrofacetDistribution method definitions
 
-imp_float MicrofacetDistribution::visibleFraction(const Vector3F& direction) const
+imp_float MicrofacetDistribution::pdf(const Vector3F& outgoing_direction,
+									  const Vector3F& micro_normal) const
 {
-    return 1.0f/(1 + maskedAreaFraction(direction));
+	if (sample_visible_area)
+	{
+		return areaWithMicroNormal(micro_normal)*
+			   maskedAreaFraction(outgoing_direction)*
+			   outgoing_direction.absDot(micro_normal)/
+			   absCosTheta(outgoing_direction);
+	}
+	else
+	{
+		return areaWithMicroNormal(micro_normal)*absCosTheta(micro_normal);
+	}
 }
 
-imp_float MicrofacetDistribution::visibleFraction(const Vector3F& direction_1,
-                                                  const Vector3F& direction_2) const
-{
-    return 1.0f/(1 + maskedAreaFraction(direction_1) + maskedAreaFraction(direction_2));
-}
-
-// BeckmannDistribution method implementations
+// BeckmannDistribution method definitions
 
 BeckmannDistribution::BeckmannDistribution(imp_float slope_deviation_x,
-                                           imp_float slope_deviation_y)
-    : slope_deviation_x(slope_deviation_x),
+                                           imp_float slope_deviation_y,
+										   bool sample_visible_area)
+    : MicrofacetDistribution::MicrofacetDistribution(sample_visible_area),
+	  slope_deviation_x(slope_deviation_x),
       slope_deviation_y(slope_deviation_y)
 {
     inv_slope_x_sq = 1.0f/(slope_deviation_x*slope_deviation_x);
@@ -70,11 +78,47 @@ imp_float BeckmannDistribution::maskedAreaFraction(const Vector3F& direction) co
     return (1 - 1.259f*a + 0.396f*a*a)/(3.535f*a + 2.181f*a*a);
 }
 
-// TrowbridgeReitzDistribution method implementations
+Vector3F BeckmannDistribution::sampleMicroNormal(const Vector3F& outgoing_direction,
+												 const Point2F& uniform_sample) const
+{
+	if (sample_visible_area)
+	{
+		printSevereMessage("Sampling only visible area of BeckmannDistribution has not been implemented.");
+		return Vector3F();
+	}
+	else
+	{
+		imp_float tan2_theta;
+		imp_float phi;
+
+		if (slope_deviation_x == slope_deviation_y)
+		{
+			imp_float log_sample = (uniform_sample.x > 0)? std::log(uniform_sample.x) : 0;
+			tan2_theta = -slope_deviation_x*slope_deviation_x*log_sample;
+			phi = IMP_TWO_PI*uniform_sample.y;
+		}
+		else
+		{
+			printSevereMessage("Sampling of anisotropic BeckmannDistribution has not been implemented.");
+		}
+
+		imp_float cos_theta = 1/std::sqrt(1 + tan2_theta);
+		imp_float sin_theta = std::sqrt(std::max<imp_float>(0, 1 - cos_theta*cos_theta));
+
+		Vector3F micro_normal = sphericalToDirection(cos_theta, sin_theta, phi);
+		if (!sameHemisphere(outgoing_direction, micro_normal)) micro_normal.reverse();
+
+		return micro_normal;
+	}
+}
+
+// TrowbridgeReitzDistribution method definitions
 
 TrowbridgeReitzDistribution::TrowbridgeReitzDistribution(imp_float slope_deviation_x,
-                                                         imp_float slope_deviation_y)
-    : slope_deviation_x(slope_deviation_x),
+                                                         imp_float slope_deviation_y,
+														 bool sample_visible_area)
+    : MicrofacetDistribution::MicrofacetDistribution(sample_visible_area),
+	  slope_deviation_x(slope_deviation_x),
       slope_deviation_y(slope_deviation_y)
 {
     inv_slope_x_sq = 1.0f/(slope_deviation_x*slope_deviation_x);
@@ -116,6 +160,13 @@ imp_float TrowbridgeReitzDistribution::maskedAreaFraction(const Vector3F& direct
     imp_float slope_deviation_tan_theta = slope_deviation*abs_tan_theta;
 
     return 0.5f*(std::sqrt(1 + slope_deviation_tan_theta*slope_deviation_tan_theta) - 1);
+}
+
+Vector3F TrowbridgeReitzDistribution::sampleMicroNormal(const Vector3F& outgoing_direction,
+														const Point2F& uniform_sample) const
+{
+	printSevereMessage("Sampling of TrowbridgeReitzDistribution has not been implemented.");
+	return Vector3F();
 }
 
 } // RayImpact

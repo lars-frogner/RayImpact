@@ -9,6 +9,12 @@ namespace RayImpact {
 
 class MicrofacetDistribution {
 
+protected:
+
+	const bool sample_visible_area;
+
+	MicrofacetDistribution(bool sample_visible_area);
+
 public:
 
     virtual imp_float areaWithMicroNormal(const Vector3F& micro_normal) const = 0;
@@ -19,6 +25,12 @@ public:
 
     imp_float visibleFraction(const Vector3F& direction_1,
                               const Vector3F& direction_2) const;
+
+	virtual Vector3F sampleMicroNormal(const Vector3F& outgoing_direction,
+									   const Point2F& uniform_sample) const = 0;
+
+	imp_float pdf(const Vector3F& outgoing_direction,
+				  const Vector3F& micro_normal) const;
 };
 
 // BeckmannDistribution declarations
@@ -33,13 +45,17 @@ private:
 public:
 
     BeckmannDistribution(imp_float slope_deviation_x,
-                         imp_float slope_deviation_y);
+                         imp_float slope_deviation_y,
+						 bool sample_visible_area);
 
     static imp_float roughnessToDeviation(imp_float roughness);
 
     imp_float areaWithMicroNormal(const Vector3F& micro_normal) const;
 
     imp_float maskedAreaFraction(const Vector3F& direction) const;
+
+	Vector3F sampleMicroNormal(const Vector3F& outgoing_direction,
+							   const Point2F& uniform_sample) const;
 };
 
 // TrowbridgeReitzDistribution declarations
@@ -54,14 +70,35 @@ private:
 public:
 
     TrowbridgeReitzDistribution(imp_float slope_deviation_x,
-                                imp_float slope_deviation_y);
+                                imp_float slope_deviation_y,
+								bool sample_visible_area);
 
     static imp_float roughnessToDeviation(imp_float roughness);
 
     imp_float areaWithMicroNormal(const Vector3F& micro_normal) const;
 
     imp_float maskedAreaFraction(const Vector3F& direction) const;
+
+	Vector3F sampleMicroNormal(const Vector3F& outgoing_direction,
+							   const Point2F& uniform_sample) const;
 };
+
+// MicrofacetDistribution inline method definitions
+
+inline MicrofacetDistribution::MicrofacetDistribution(bool sample_visible_area)
+	: sample_visible_area(sample_visible_area)
+{}
+
+inline imp_float MicrofacetDistribution::visibleFraction(const Vector3F& direction) const
+{
+    return 1.0f/(1 + maskedAreaFraction(direction));
+}
+
+inline imp_float MicrofacetDistribution::visibleFraction(const Vector3F& direction_1,
+														 const Vector3F& direction_2) const
+{
+    return 1.0f/(1 + maskedAreaFraction(direction_1) + maskedAreaFraction(direction_2));
+}
 
 } // RayImpact
 } // Impact
