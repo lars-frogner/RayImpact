@@ -3,7 +3,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// OrenNayarBRDF method implementations
+// OrenNayarBRDF method definitions
 
 OrenNayarBRDF::OrenNayarBRDF(const ReflectionSpectrum& reflectance,
                              imp_float slope_deviation)
