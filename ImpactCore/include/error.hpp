@@ -3,8 +3,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <stdexcept>
 
 namespace Impact {
+
+// Inline error function definitions
 
 // Prints a message to stdout
 inline void printInfoMessage(const char* format, ...)
@@ -81,8 +84,10 @@ inline void printSevereMessage(const char* format, ...)
 
     va_end(arguments);
 
-    exit(EXIT_FAILURE);
+    std::abort();
 }
+
+// Error macros
 
 // Define check statement (always active)
 #define imp_check(expression) \
