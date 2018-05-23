@@ -10,6 +10,8 @@ namespace Impact {
 #define IMP_L1_CACHE_LINE_SIZE 64
 #endif
 
+// Inline memory function definitions
+
 inline void* allocateAligned(size_t size)
 {
     #ifdef IMP_IS_WINDOWS
@@ -36,6 +38,8 @@ inline T* allocateAligned(size_t count)
 {
     return (T*)(allocateAligned(count*sizeof(T)));
 }
+
+// Memory macros
 
 #define allocated_on_stack(type, count) (type*)alloca((count)*sizeof(type))
 
