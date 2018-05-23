@@ -32,4 +32,40 @@ public:
     uint32_t uniformUInt32(uint32_t upper_limit);
 };
 
+// RandomNumberGenerator inline method definitions
+
+inline RandomNumberGenerator::RandomNumberGenerator()
+    : uniform_continuous_distribution(0.0f, 1.0f),
+      uniform_discrete_distribution()
+{
+    setRandomSeed();
+}
+
+inline RandomNumberGenerator::RandomNumberGenerator(unsigned int seed)
+    : generator(seed),
+      uniform_continuous_distribution(0.0f, 1.0f),
+      uniform_discrete_distribution()
+{}
+
+inline void RandomNumberGenerator::setSeed(unsigned int seed)
+{
+    generator.seed(seed);
+}
+
+inline void RandomNumberGenerator::setRandomSeed()
+{
+    std::random_device seed;
+    setSeed(seed());
+}
+
+inline imp_float RandomNumberGenerator::uniformFloat()
+{
+    return uniform_continuous_distribution(generator);
+}
+
+inline uint32_t RandomNumberGenerator::uniformUInt32()
+{
+    return uniform_discrete_distribution(generator);
+}
+
 } // Impact
