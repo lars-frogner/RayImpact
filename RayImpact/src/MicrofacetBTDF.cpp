@@ -3,22 +3,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// MicrofacetBTDF method implementations
-
-MicrofacetBTDF::MicrofacetBTDF(const TransmissionSpectrum& transmittance,
-                               imp_float refractive_index_outside,
-                               imp_float refractive_index_inside,
-                               MicrofacetDistribution* microfacet_distribution,
-                               TransportMode transport_mode)
-    : BXDF::BXDF(BXDFType(BSDF_TRANSMISSION | BSDF_GLOSSY)),
-      transmittance(transmittance),
-      refractive_index_outside(refractive_index_outside),
-      refractive_index_inside(refractive_index_inside),
-      microfacet_distribution(microfacet_distribution),
-      dielectric_reflector(refractive_index_outside,
-                           refractive_index_inside),
-      transport_mode(transport_mode)
-{}
+// MicrofacetBTDF method definitions
 
 Spectrum MicrofacetBTDF::evaluate(const Vector3F& outgoing_direction,
                                   const Vector3F& incident_direction) const
@@ -53,6 +38,47 @@ Spectrum MicrofacetBTDF::evaluate(const Vector3F& outgoing_direction,
             microfacet_distribution->visibleFraction(outgoing_direction, incident_direction)*
             num_factor*std::abs(outgoing_dot_half)*std::abs(incident_dot_half)/
             (denom_factor*denom_factor*cos_theta_incident*cos_theta_outgoing));
+}
+
+Spectrum MicrofacetBTDF::sample(const Vector3F& outgoing_direction,
+								Vector3F* incident_direction,
+								const Point2F& uniform_sample,
+								imp_float* pdf_value,
+								BXDFType* sampled_type /* = nullptr */) const
+{
+	const Vector3F& micro_normal = microfacet_distribution->sampleMicroNormal(outgoing_direction, uniform_sample);
+    imp_float refractive_index_ratio = (cosTheta(outgoing_direction) > 0)? refractive_index_inside/refractive_index_outside :
+                                                                           refractive_index_outside/refractive_index_inside;
+
+	if (!refract(outgoing_direction,
+				 static_cast<Normal3F>(micro_normal),
+				 refractive_index_ratio,
+				 incident_direction))
+		return Spectrum(0.0f);
+
+	*pdf_value = pdf(outgoing_direction, *incident_direction);
+
+	return evaluate(outgoing_direction, *incident_direction);
+}
+
+imp_float MicrofacetBTDF::pdf(const Vector3F& outgoing_direction,
+							  const Vector3F& incident_direction) const
+{
+	if (!sameHemisphere(outgoing_direction, incident_direction))
+		return 0;
+	
+    imp_float refractive_index_ratio = (cosTheta(outgoing_direction) > 0)? refractive_index_inside/refractive_index_outside :
+                                                                           refractive_index_outside/refractive_index_inside;
+
+	const Vector3F& micro_normal = (outgoing_direction + incident_direction*refractive_index_ratio).normalized();
+	
+	imp_float cos_theta_incident = incident_direction.dot(micro_normal);
+	imp_float sqrt_denom = outgoing_direction.dot(micro_normal) + refractive_index_ratio*cos_theta_incident;
+
+	// Apply change of variables from micro normal to incident direction for pdf
+	return microfacet_distribution->pdf(outgoing_direction, micro_normal)*
+		   std::abs((refractive_index_ratio*refractive_index_ratio*cos_theta_incident)/
+					(sqrt_denom*sqrt_denom));
 }
 
 } // RayImpact
