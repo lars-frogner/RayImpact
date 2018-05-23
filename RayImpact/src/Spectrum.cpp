@@ -53,32 +53,7 @@ static SampledSpectrum illumination_cyan_SPD; // Cyan illumination SPD
 static SampledSpectrum illumination_magenta_SPD; // Magenta illumination SPD
 static SampledSpectrum illumination_yellow_SPD; // Yellow illumination SPD
 
-// RGBSpectrum method implementations
-
-RGBSpectrum::RGBSpectrum()
-    : CoefficientSpectrum<3>::CoefficientSpectrum()
-{}
-
-RGBSpectrum::RGBSpectrum(imp_float initial_value)
-    : CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
-{}
-
-RGBSpectrum::RGBSpectrum(const imp_float* wavelengths,
-                         const imp_float* values,
-                         unsigned int n_samples)
-{
-    *this = RGBSpectrum::fromSamples(wavelengths, values, n_samples);
-}
-
-RGBSpectrum::RGBSpectrum(const imp_float rgb[3],
-                         SpectrumType type /* = SpectrumType::Reflectance */)
-{
-    *this = RGBSpectrum::fromRGBValues(rgb, type);
-}
-
-RGBSpectrum::RGBSpectrum(const CoefficientSpectrum& other)
-    : CoefficientSpectrum<3>::CoefficientSpectrum(other)
-{}
+// RGBSpectrum method definitions
 
 RGBSpectrum::RGBSpectrum(const SampledSpectrum& other,
                          SpectrumType type /* = SpectrumType::Reflectance */)
@@ -174,43 +149,7 @@ imp_float RGBSpectrum::tristimulusY() const
     return RGBToTristimulusY(coefficients);
 }
 
-const RGBSpectrum& RGBSpectrum::toRGBSpectrum() const
-{
-    return *this;
-}
-
-SampledSpectrum RGBSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
-{
-    return SampledSpectrum(*this, type);
-}
-
-// SampledSpectrum method implementations
-
-SampledSpectrum::SampledSpectrum()
-    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum()
-{}
-
-SampledSpectrum::SampledSpectrum(imp_float initial_value)
-    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(initial_value)
-{}
-
-SampledSpectrum::SampledSpectrum(const imp_float* wavelengths,
-                                 const imp_float* values,
-                                 unsigned int n_samples)
-{
-    *this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
-}
-
-
-SampledSpectrum::SampledSpectrum(const imp_float rgb[3],
-                                 SpectrumType type /* = SpectrumType::Reflectance */)
-{
-    *this = SampledSpectrum::fromRGBValues(rgb, type);
-}
-
-SampledSpectrum::SampledSpectrum(const CoefficientSpectrum& other)
-    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(other)
-{}
+// SampledSpectrum method definitions
 
 SampledSpectrum::SampledSpectrum(const RGBSpectrum& other,
                                  SpectrumType type /* = SpectrumType::Reflectance */)
@@ -427,16 +366,6 @@ imp_float SampledSpectrum::tristimulusY() const
     return Y*static_cast<imp_float>(wavelength_samples_end - wavelength_samples_start)/(CIE_Y_integral*n_spectral_samples);
 }
 
-RGBSpectrum SampledSpectrum::toRGBSpectrum() const
-{
-    return RGBSpectrum(*this);
-}
-
-const SampledSpectrum& SampledSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
-{
-    return *this;
-}
-
 // Initializes the SampledSpectrum objects representing the CIE X, Y and Z spectral matching curves
 void SampledSpectrum::initializeSpectralMatchingCurves()
 {
@@ -508,14 +437,7 @@ void SampledSpectrum::initializeBaseColorSPDs()
     }
 }
 
-// Initializes SampledSpectrum objects required for conversion between different color representations
-void SampledSpectrum::initialize()
-{
-    initializeSpectralMatchingCurves();
-    initializeBaseColorSPDs();
-}
-
-// Utility functions
+// Spectrum function definitions
 
 // Converts the given tristimulus X, Y and Z values to RGB values
 void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3])

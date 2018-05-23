@@ -5,6 +5,9 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <ostream>
+#include <sstream>
+#include <string>
 
 namespace Impact {
 namespace RayImpact {
@@ -33,43 +36,6 @@ static const unsigned int n_spectral_samples = 60; // Total number of samples he
 
 // Indicator for whether a spectrum is a reflectance or illumination spectrum
 enum class SpectrumType {Reflectance, Illumination};
-
-// Spectrum utility functions
-
-void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3]);
-
-void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3]);
-
-static imp_float RGBToTristimulusY(const imp_float rgb[3]);
-
-static bool samplesAreSorted(const imp_float* wavelengths,
-                             unsigned int n_samples);
-
-static void sortSamples(std::vector<imp_float>& wavelengths,
-                        std::vector<imp_float>& values);
-
-template <typename T>
-static imp_float averageSamples(const T* wavelengths,
-                                const T* values,
-                                unsigned int n_samples,
-                                T start_wavelength, T end_wavelength);
-
-static imp_float interpolateSamples(const imp_float* wavelengths,
-                                    const imp_float* values,
-                                    unsigned int n_samples,
-                                    imp_float wavelength);
-
-static imp_float sampleWavelength(unsigned int sample_idx);
-
-void computeBlackbodySpectrum(const imp_float* wavelengths,
-                              unsigned int n_values,
-                              imp_float temperature,
-                              imp_float* radiances);
-
-void computeNormalizedBlackbodySpectrum(const imp_float* wavelengths,
-                                        unsigned int n_values,
-                                        imp_float temperature,
-                                        imp_float* radiances);
 
 // CoefficientSpectrum declarations
 
@@ -172,6 +138,10 @@ public:
     const RGBSpectrum& toRGBSpectrum() const;
 
     SampledSpectrum toSampledSpectrum(SpectrumType type = SpectrumType::Reflectance) const;
+
+	std::string toRGBString() const;
+	
+	std::string toXYZString() const;
 };
 
 // SampledSpectrum declarations
@@ -223,71 +193,50 @@ public:
     const SampledSpectrum& toSampledSpectrum(SpectrumType type = SpectrumType::Reflectance) const;
 
     static void initialize();
+
+	std::string toRGBString() const;
+	
+	std::string toXYZString() const;
 };
 
-// Functions on CoefficientSpectrum objects
+// Spectrum function declarations
 
-template <unsigned int n>
-inline CoefficientSpectrum<n> sqrt(const CoefficientSpectrum<n>& spectrum)
-{
-    CoefficientSpectrum<n> result;
+void tristimulusToRGB(const imp_float xyz[3], imp_float rgb[3]);
 
-    for (unsigned int i = 0; i < n; i++)
-        result.coefficients[i] = std::sqrt(spectrum.coefficients[i]);
+void RGBToTristimulus(const imp_float rgb[3], imp_float xyz[3]);
 
-    imp_assert(!result.hasNaNs());
+static imp_float RGBToTristimulusY(const imp_float rgb[3]);
 
-    return result;
-}
+static bool samplesAreSorted(const imp_float* wavelengths,
+                             unsigned int n_samples);
 
-template <unsigned int n>
-inline CoefficientSpectrum<n> pow(const CoefficientSpectrum<n>& spectrum, imp_float exponent)
-{
-    CoefficientSpectrum<n> result;
+static void sortSamples(std::vector<imp_float>& wavelengths,
+                        std::vector<imp_float>& values);
 
-    for (unsigned int i = 0; i < n; i++)
-        result.coefficients[i] = std::pow(spectrum.coefficients[i], exponent);
+template <typename T>
+static imp_float averageSamples(const T* wavelengths,
+                                const T* values,
+                                unsigned int n_samples,
+                                T start_wavelength, T end_wavelength);
 
-    imp_assert(!result.hasNaNs());
+static imp_float interpolateSamples(const imp_float* wavelengths,
+                                    const imp_float* values,
+                                    unsigned int n_samples,
+                                    imp_float wavelength);
 
-    return result;
-}
+static imp_float sampleWavelength(unsigned int sample_idx);
 
-template <unsigned int n>
-inline CoefficientSpectrum<n> exp(const CoefficientSpectrum<n>& spectrum)
-{
-    CoefficientSpectrum<n> result;
+void computeBlackbodySpectrum(const imp_float* wavelengths,
+                              unsigned int n_values,
+                              imp_float temperature,
+                              imp_float* radiances);
 
-    for (unsigned int i = 0; i < n; i++)
-        result.coefficients[i] = std::exp(spectrum.coefficients[i]);
+void computeNormalizedBlackbodySpectrum(const imp_float* wavelengths,
+                                        unsigned int n_values,
+                                        imp_float temperature,
+                                        imp_float* radiances);
 
-    imp_assert(!result.hasNaNs());
-
-    return result;
-}
-
-template <unsigned int n>
-inline CoefficientSpectrum<n> lerp(const CoefficientSpectrum<n>& spectrum_1,
-                                   const CoefficientSpectrum<n>& spectrum_2,
-                                   imp_float weight)
-{
-    CoefficientSpectrum<n> result;
-
-    for (unsigned int i = 0; i < n; i++)
-        result.coefficients[i] = ::Impact::lerp(spectrum_1.coefficients[i], spectrum_2.coefficients[i], weight);
-
-    imp_assert(!result.hasNaNs());
-
-    return result;
-}
-
-template <unsigned int n>
-inline CoefficientSpectrum<n> operator*(imp_float constant, const CoefficientSpectrum<n>& spectrum)
-{
-    return spectrum*constant;
-}
-
-// CoefficientSpectrum method implementations
+// CoefficientSpectrum inline method definitions
 
 template <unsigned int n>
 inline CoefficientSpectrum<n>::CoefficientSpectrum()
@@ -296,6 +245,7 @@ inline CoefficientSpectrum<n>::CoefficientSpectrum()
 template <unsigned int n>
 inline CoefficientSpectrum<n>::CoefficientSpectrum(imp_float initial_value /* = 0 */)
 {
+    imp_assert(!isNaN(initial_value));
     for (unsigned int i = 0; i < n; i++)
         coefficients[i] = initial_value;
 }
@@ -503,6 +453,192 @@ inline CoefficientSpectrum<n> CoefficientSpectrum<n>::clamped(imp_float lower_li
         result.coefficients[i] = clamp(coefficients[i], lower_limit, upper_limit);
 
     return result;
+}
+
+// CoefficientSpectrum inline function definitions
+
+template <unsigned int n>
+inline CoefficientSpectrum<n> sqrt(const CoefficientSpectrum<n>& spectrum)
+{
+    CoefficientSpectrum<n> result;
+
+    for (unsigned int i = 0; i < n; i++)
+        result.coefficients[i] = std::sqrt(spectrum.coefficients[i]);
+
+    imp_assert(!result.hasNaNs());
+
+    return result;
+}
+
+template <unsigned int n>
+inline CoefficientSpectrum<n> pow(const CoefficientSpectrum<n>& spectrum, imp_float exponent)
+{
+    CoefficientSpectrum<n> result;
+
+    for (unsigned int i = 0; i < n; i++)
+        result.coefficients[i] = std::pow(spectrum.coefficients[i], exponent);
+
+    imp_assert(!result.hasNaNs());
+
+    return result;
+}
+
+template <unsigned int n>
+inline CoefficientSpectrum<n> exp(const CoefficientSpectrum<n>& spectrum)
+{
+    CoefficientSpectrum<n> result;
+
+    for (unsigned int i = 0; i < n; i++)
+        result.coefficients[i] = std::exp(spectrum.coefficients[i]);
+
+    imp_assert(!result.hasNaNs());
+
+    return result;
+}
+
+template <unsigned int n>
+inline CoefficientSpectrum<n> lerp(const CoefficientSpectrum<n>& spectrum_1,
+                                   const CoefficientSpectrum<n>& spectrum_2,
+                                   imp_float weight)
+{
+    CoefficientSpectrum<n> result;
+
+    for (unsigned int i = 0; i < n; i++)
+        result.coefficients[i] = ::Impact::lerp(spectrum_1.coefficients[i], spectrum_2.coefficients[i], weight);
+
+    imp_assert(!result.hasNaNs());
+
+    return result;
+}
+
+template <unsigned int n>
+inline CoefficientSpectrum<n> operator*(imp_float constant, const CoefficientSpectrum<n>& spectrum)
+{
+    return spectrum*constant;
+}
+
+// RGBSpectrum inline method definitions
+
+inline RGBSpectrum::RGBSpectrum()
+    : CoefficientSpectrum<3>::CoefficientSpectrum()
+{}
+
+inline RGBSpectrum::RGBSpectrum(imp_float initial_value)
+    : CoefficientSpectrum<3>::CoefficientSpectrum(initial_value)
+{}
+
+inline RGBSpectrum::RGBSpectrum(const imp_float* wavelengths,
+								const imp_float* values,
+								unsigned int n_samples)
+{
+    *this = RGBSpectrum::fromSamples(wavelengths, values, n_samples);
+}
+
+inline RGBSpectrum::RGBSpectrum(const imp_float rgb[3],
+								SpectrumType type /* = SpectrumType::Reflectance */)
+{
+    *this = RGBSpectrum::fromRGBValues(rgb, type);
+}
+
+inline RGBSpectrum::RGBSpectrum(const CoefficientSpectrum& other)
+    : CoefficientSpectrum<3>::CoefficientSpectrum(other)
+{}
+
+inline const RGBSpectrum& RGBSpectrum::toRGBSpectrum() const
+{
+    return *this;
+}
+
+inline SampledSpectrum RGBSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
+{
+    return SampledSpectrum(*this, type);
+}
+
+inline std::string RGBSpectrum::toRGBString() const
+{
+    std::ostringstream stream;
+	stream << "{R: " << coefficients[0] << ", G: " << coefficients[1] << ", B: " << coefficients[2] << "}";
+    return stream.str();
+}
+
+inline std::string RGBSpectrum::toXYZString() const
+{
+	imp_float xyz[3];
+    RGBToTristimulus(coefficients, xyz);
+    std::ostringstream stream;
+	stream << "{X: " << xyz[0] << ", Y: " << xyz[1] << ", Z: " << xyz[2] << "}";
+    return stream.str();
+}
+
+// SampledSpectrum inline method definitions
+
+inline SampledSpectrum::SampledSpectrum()
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum()
+{}
+
+inline SampledSpectrum::SampledSpectrum(imp_float initial_value)
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(initial_value)
+{}
+
+inline SampledSpectrum::SampledSpectrum(const imp_float* wavelengths,
+										const imp_float* values,
+										unsigned int n_samples)
+{
+    *this = SampledSpectrum::fromSamples(wavelengths, values, n_samples);
+}
+
+
+inline SampledSpectrum::SampledSpectrum(const imp_float rgb[3],
+										SpectrumType type /* = SpectrumType::Reflectance */)
+{
+    *this = SampledSpectrum::fromRGBValues(rgb, type);
+}
+
+inline SampledSpectrum::SampledSpectrum(const CoefficientSpectrum& other)
+    : CoefficientSpectrum<n_spectral_samples>::CoefficientSpectrum(other)
+{}
+
+inline RGBSpectrum SampledSpectrum::toRGBSpectrum() const
+{
+    return RGBSpectrum(*this);
+}
+
+inline const SampledSpectrum& SampledSpectrum::toSampledSpectrum(SpectrumType type /* = SpectrumType::Reflectance */) const
+{
+    return *this;
+}
+
+// Initializes SampledSpectrum objects required for conversion between different color representations
+inline void SampledSpectrum::initialize()
+{
+    initializeSpectralMatchingCurves();
+    initializeBaseColorSPDs();
+}
+
+inline std::string SampledSpectrum::toRGBString() const
+{
+    return toRGBSpectrum().toRGBString();
+}
+
+inline std::string SampledSpectrum::toXYZString() const
+{
+	return toRGBSpectrum().toXYZString();
+}
+
+// RGBSpectrum inline function definitions
+
+inline std::ostream& operator<<(std::ostream& stream, const RGBSpectrum& spectrum)
+{
+	stream << spectrum.toRGBString();
+    return stream;
+}
+
+// SampledSpectrum inline function definitions
+
+inline std::ostream& operator<<(std::ostream& stream, const SampledSpectrum& spectrum)
+{
+	stream << spectrum.toRGBString();
+    return stream;
 }
 
 } // RayImpact
