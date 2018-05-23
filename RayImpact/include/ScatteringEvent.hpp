@@ -114,12 +114,53 @@ public:
     RadianceSpectrum emittedRadiance(const Vector3F& outgoing_direction) const;
 };
 
-// Utility functions
+// ScatteringEvent function declarations
 
 Point3F offsetRayOrigin(const Point3F& ray_origin,
                         const Vector3F& ray_origin_error,
                         const Normal3F& surface_normal,
                         const Vector3F& ray_direction);
+
+// ScatteringEvent inline method definitions
+
+inline ScatteringEvent::ScatteringEvent()
+    : position(),
+      position_error(),
+      outgoing_direction(),
+      surface_normal(),
+      medium_interface(),
+      time(0)
+{}
+
+inline ScatteringEvent::ScatteringEvent(const Point3F& position,
+										const Vector3F& position_error,
+										const Vector3F& outgoing_direction,
+										const Normal3F& surface_normal,
+										const MediumInterface& medium_interface,
+										imp_float time)
+    : position(position),
+      position_error(position_error),
+      outgoing_direction(outgoing_direction),
+      surface_normal(surface_normal),
+      medium_interface(medium_interface),
+      time(time)
+{}
+
+inline ScatteringEvent::ScatteringEvent(const Point3F& position,
+										const MediumInterface& medium_interface,
+										imp_float time)
+    : position(position),
+      position_error(),
+      outgoing_direction(),
+      surface_normal(),
+      medium_interface(medium_interface),
+      time(time)
+{}
+
+inline bool ScatteringEvent::isOnSurface() const
+{
+    return surface_normal.nonZero();
+}
 
 } // RayImpact
 } // Impact

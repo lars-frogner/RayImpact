@@ -9,41 +9,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// ScatteringEvent method implementations
-
-ScatteringEvent::ScatteringEvent()
-    : position(),
-      position_error(),
-      outgoing_direction(),
-      surface_normal(),
-      medium_interface(),
-      time(0)
-{}
-
-ScatteringEvent::ScatteringEvent(const Point3F& position,
-                                 const Vector3F& position_error,
-                                 const Vector3F& outgoing_direction,
-                                 const Normal3F& surface_normal,
-                                 const MediumInterface& medium_interface,
-                                 imp_float time)
-    : position(position),
-      position_error(position_error),
-      outgoing_direction(outgoing_direction),
-      surface_normal(surface_normal),
-      medium_interface(medium_interface),
-      time(time)
-{}
-
-ScatteringEvent::ScatteringEvent(const Point3F& position,
-                                 const MediumInterface& medium_interface,
-                                 imp_float time)
-    : position(position),
-      position_error(),
-      outgoing_direction(),
-      surface_normal(),
-      medium_interface(medium_interface),
-      time(time)
-{}
+// ScatteringEvent method definitions
 
 Ray ScatteringEvent::spawnRay(const Vector3F& direction) const
 {
@@ -71,12 +37,7 @@ Ray ScatteringEvent::spawnRayTo(const ScatteringEvent& other) const
     return Ray(origin, direction, 1.0f - IMP_SHADOW_EPS, time, getMediumInDirection(direction));
 }
 
-bool ScatteringEvent::isOnSurface() const
-{
-    return surface_normal.nonZero();
-}
-
-// SurfaceScatteringEvent method implementations
+// SurfaceScatteringEvent method definitions
 
 SurfaceScatteringEvent::SurfaceScatteringEvent()
     : ScatteringEvent::ScatteringEvent(),
@@ -250,9 +211,9 @@ void SurfaceScatteringEvent::computeScreenSpaceDerivatives(const RayWithOffsets&
 }
 
 void SurfaceScatteringEvent::generateBSDF(const RayWithOffsets& ray,
-                                          RegionAllocator& allocator,
-                                          TransportMode transport_mode /* = TransportMode::Radiance */,
-                                          bool allow_multiple_scattering_types /* = false */)
+										  RegionAllocator& allocator,
+										  TransportMode transport_mode /* = TransportMode::Radiance */,
+										  bool allow_multiple_scattering_types /* = false */)
 {
     computeScreenSpaceDerivatives(ray);
 
@@ -265,7 +226,7 @@ RadianceSpectrum SurfaceScatteringEvent::emittedRadiance(const Vector3F& outgoin
     return (area_light)? area_light->emittedRadiance(*this, outgoing_direction) : RadianceSpectrum(0.0f);
 }
 
-// Utility functions
+// ScatteringEvent function definitions
 
 // Returns the position of a new ray origin that is guaranteed to not result in a false
 // re-intersection of the surface while still being as close to the original position as possible
