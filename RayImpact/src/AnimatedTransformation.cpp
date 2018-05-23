@@ -5,7 +5,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// AnimatedTransformation method implementations
+// AnimatedTransformation method definitions
 
 AnimatedTransformation::AnimatedTransformation(const Transformation* initial_transformation,
                                                const Transformation* final_transformation,
