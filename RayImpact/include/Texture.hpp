@@ -5,6 +5,9 @@
 #include "Transformation.hpp"
 #include "ScatteringEvent.hpp"
 #include "ParameterSet.hpp"
+#include <sstream>
+#include <string>
+#include <ostream>
 
 namespace Impact {
 namespace RayImpact {
@@ -16,6 +19,8 @@ class Texture {
 
 public:
     virtual T evaluate(const SurfaceScatteringEvent& scattering_event) const = 0;
+
+	virtual std::string toString() const = 0;
 };
 
 // TextureMapper2D declarations
@@ -127,7 +132,16 @@ public:
                               Vector3F* dpdx, Vector3F* dpdy) const;
 };
 
-// Texture mapper creation macros
+// Texture inline function definitions
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const Texture<T>& texture)
+{
+	stream << texture.toString();
+    return stream;
+}
+
+// Texture mapper function declarations macros
 
 #define create_2D_texture_mapper(parameters, mapper) \
     do { \
@@ -152,8 +166,8 @@ public:
         } \
         else if (mapping == "planar") \
         { \
-            const Vector3F& s_tangent = parameters.getSingleVector3FValue("s_tangent", Vector3F(1, 0, 0)); \
-            const Vector3F& t_tangent = parameters.getSingleVector3FValue("t_tangent", Vector3F(0, 1, 0)); \
+            const Vector3F& s_tangent = parameters.getSingleTripleValue("s_tangent", Vector3F(1, 0, 0)); \
+            const Vector3F& t_tangent = parameters.getSingleTripleValue("t_tangent", Vector3F(0, 1, 0)); \
             imp_float s_offset = parameters.getSingleFloatValue("s_offset", 0.0f); \
             imp_float t_offset = parameters.getSingleFloatValue("t_offset", 0.0f); \
         \

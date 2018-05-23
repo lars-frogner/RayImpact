@@ -1,32 +1,14 @@
 #include "Sphere.hpp"
-#include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
 #include "geometry.hpp"
+#include "api.hpp"
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// Sphere method implementations
-
-Sphere::Sphere(const Transformation* object_to_world,
-                const Transformation* world_to_object,
-               bool has_reverse_orientation,
-               imp_float radius,
-               imp_float y_min, imp_float y_max,
-               imp_float phi_max)
-    : Shape::Shape(object_to_world, world_to_object, has_reverse_orientation),
-      radius(radius),
-      y_min(clamp(y_min, -radius, radius)),
-      y_max(clamp(y_max, -radius, radius)),
-      theta_min(std::acos(clamp(y_max/radius, -1.0f, 1.0f))),
-      theta_max(std::acos(clamp(y_min/radius, -1.0f, 1.0f))),
-      phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
-{
-    imp_assert(radius >= 0);
-    imp_assert(y_max >= y_min);
-}
+// Sphere method definitions
 
 BoundingBoxF Sphere::objectSpaceBoundingBox() const
 {
@@ -179,14 +161,14 @@ bool Sphere::intersect(const Ray& ray,
     imp_float cos_phi = intersection_point.z*inverse_zx_radius;
     imp_float sin_phi = intersection_point.x*inverse_zx_radius;
 
-    const Vector3F& dpdu = Vector3F(-intersection_point.z*phi_max, 0, intersection_point.x*phi_max);
+    const Vector3F& dpdu = Vector3F(intersection_point.z*phi_max, 0, -intersection_point.x*phi_max);
 
-    const Vector3F& dpdv = Vector3F(intersection_point.y*cos_phi, -radius*std::sin(intersection_theta), intersection_point.y*sin_phi)*theta_range;
+    const Vector3F& dpdv = Vector3F(intersection_point.y*sin_phi, -radius*std::sin(intersection_theta), intersection_point.y*cos_phi)*theta_range;
 
     // Compute u and v derivatives of the surface normal
 
     const Vector3F& d2pdu2 = Vector3F(intersection_point.x, 0, intersection_point.z)*(-phi_max*phi_max);
-    const Vector3F& d2pdudv = Vector3F(-sin_phi, 0, cos_phi)*(theta_range*phi_max*intersection_point.y);
+    const Vector3F& d2pdudv = Vector3F(cos_phi, 0, -sin_phi)*(theta_range*phi_max*intersection_point.y);
     const Vector3F& d2pdv2 = Vector3F(intersection_point.x, intersection_point.y, intersection_point.z)*(-theta_range*theta_range);
 
     Normal3F dndu, dndv;
@@ -347,12 +329,7 @@ bool Sphere::hasIntersection(const Ray& ray,
     return true;
 }
 
-imp_float Sphere::surfaceArea() const
-{
-    return phi_max*radius*(y_max - y_min);
-}
-
-// Sphere creation
+// Sphere function definitions
 
 std::shared_ptr<Shape> createSphere(const Transformation* object_to_world,
                                     const Transformation* world_to_object,
@@ -360,16 +337,37 @@ std::shared_ptr<Shape> createSphere(const Transformation* object_to_world,
                                     const ParameterSet& parameters)
 {
     imp_float radius = parameters.getSingleFloatValue("radius", 1.0f);
-    imp_float y_min = parameters.getSingleFloatValue("y_min", -radius);
-    imp_float y_max = parameters.getSingleFloatValue("y_max", radius);
-    imp_float phi_max = parameters.getSingleFloatValue("phi_max", 360.0f);
+    imp_float bottom = parameters.getSingleFloatValue("bottom", -1.0f);
+    imp_float top = parameters.getSingleFloatValue("top", 1.0f);
+    imp_float sweep_angle = parameters.getSingleFloatValue("sweep_angle", 360.0f);
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_SHAPES_VERBOSITY)
+	{
+		printInfoMessage("Shape:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g degrees"
+						 "\n    %-20s%s m"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Type:", "Sphere",
+						 "Radius:", radius,
+						 "Bottom:", bottom,
+						 "Top:", top,
+						 "Sweep angle:", sweep_angle,
+						 "Center:", (*object_to_world)(Point3F(0, 0, 0)).toString().c_str(),
+						 "Up direction:", (*object_to_world)(Vector3F(0, 1, 0)).toString().c_str(),
+						 "Forward direction:", (*object_to_world)(Vector3F(0, 0, 1)).toString().c_str());
+	}
 
     return std::make_shared<Sphere>(object_to_world,
                                     world_to_object,
                                     has_reverse_orientation,
                                     radius,
-                                    y_min, y_max,
-                                    phi_max);
+                                    bottom*radius, top*radius,
+                                    sweep_angle);
 }
 
 } // RayImpact

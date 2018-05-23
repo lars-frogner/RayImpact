@@ -6,7 +6,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// ParametricMapper method implementations
+// ParametricMapper method definitions
 
 ParametricMapper::ParametricMapper(imp_float s_scale, imp_float t_scale,
                                    imp_float s_offset, imp_float t_offset)
@@ -24,7 +24,7 @@ Point2F ParametricMapper::textureCoordinate(const SurfaceScatteringEvent& scatte
                    t_scale*scattering_event.position_uv.y + t_offset);
 }
 
-// SphericalMapper method implementations
+// SphericalMapper method definitions
 
 SphericalMapper::SphericalMapper(const Transformation& world_to_sphere)
     : world_to_sphere(world_to_sphere)
@@ -64,7 +64,7 @@ Point2F SphericalMapper::textureCoordinate(const SurfaceScatteringEvent& scatter
     return texture_coordinate;
 }
 
-// CylindricalMapper method implementations
+// CylindricalMapper method definitions
 
 CylindricalMapper::CylindricalMapper(const Transformation& world_to_cylinder)
     : world_to_cylinder(world_to_cylinder)
@@ -104,7 +104,7 @@ Point2F CylindricalMapper::textureCoordinate(const SurfaceScatteringEvent& scatt
     return texture_coordinate;
 }
 
-// PlanarMapper method implementations
+// PlanarMapper method definitions
 
 PlanarMapper::PlanarMapper(const Vector3F& s_tangent, const Vector3F& t_tangent,
                            imp_float s_offset /* = 0 */, imp_float t_offset /* = 0 */)
@@ -124,7 +124,7 @@ Point2F PlanarMapper::textureCoordinate(const SurfaceScatteringEvent& scattering
                    position_vector.dot(t_tangent) + t_offset);
 }
 
-// TransformationMapper method implementations
+// TransformationMapper method definitions
 
 TransformationMapper::TransformationMapper(const Transformation& mapping_transformation)
     : mapping_transformation(mapping_transformation)

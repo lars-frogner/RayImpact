@@ -6,6 +6,7 @@
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
 #include "ParameterSet.hpp"
+#include "error.hpp"
 #include <memory>
 
 namespace Impact {
@@ -48,12 +49,37 @@ public:
     imp_float surfaceArea() const;
 };
 
-// Sphere creation
+// Sphere function declarations
 
 std::shared_ptr<Shape> createSphere(const Transformation* object_to_world,
                                     const Transformation* world_to_object,
                                     bool has_reverse_orientation,
                                     const ParameterSet& parameters);
+
+// Sphere inline method definitions
+
+inline Sphere::Sphere(const Transformation* object_to_world,
+					  const Transformation* world_to_object,
+					  bool has_reverse_orientation,
+					  imp_float radius,
+					  imp_float y_min, imp_float y_max,
+					  imp_float phi_max)
+    : Shape::Shape(object_to_world, world_to_object, has_reverse_orientation),
+      radius(radius),
+      y_min(clamp(y_min, -radius, radius)),
+      y_max(clamp(y_max, -radius, radius)),
+      theta_min(std::acos(clamp(y_max/radius, -1.0f, 1.0f))),
+      theta_max(std::acos(clamp(y_min/radius, -1.0f, 1.0f))),
+      phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
+{
+    imp_assert(radius >= 0);
+    imp_assert(y_max >= y_min);
+}
+
+inline imp_float Sphere::surfaceArea() const
+{
+    return phi_max*radius*(y_max - y_min);
+}
 
 } // RayImpact
 } // Impact
