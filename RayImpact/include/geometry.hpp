@@ -5,11 +5,13 @@
 #include <cmath>
 #include <algorithm>
 #include <ostream>
+#include <sstream>
+#include <string>
 
 namespace Impact {
 namespace RayImpact {
 
-// Forward declarations
+// Temporary forward declarations
 
 class BSSRDF{};
 enum class TransportMode{ Radiance };
@@ -65,6 +67,9 @@ public:
     Vector2();
     explicit Vector2(T x, T y);
 
+    template <typename U>
+    explicit operator Point2<U>() const;
+
     T operator[](unsigned int dimension) const;
     T& operator[](unsigned int dimension);
 
@@ -95,6 +100,8 @@ public:
     Vector2 normalized() const;
 
     void normalize();
+
+	std::string toString() const;
 };
 
 // Vector3 declarations
@@ -163,6 +170,8 @@ public:
     void flipToSameHemisphereAs(const Normal3<T>& normal);
 
     Vector3 reflectedAbout(const Vector3& direction) const;
+
+	std::string toString() const;
 };
 
 // Normal3 declarations
@@ -227,6 +236,8 @@ public:
 
     void flipToSameHemisphereAs(const Normal3& other);
     void flipToSameHemisphereAs(const Vector3<T>& vector);
+
+	std::string toString() const;
 };
 
 // Point2 declarations
@@ -279,6 +290,8 @@ public:
 
     unsigned int minDimension() const;
     unsigned int maxDimension() const;
+
+	std::string toString() const;
 };
 
 // Point3 declarations
@@ -330,9 +343,11 @@ public:
     Point3 permuted(unsigned int i,
                     unsigned int j,
                     unsigned int k) const;
+
+	std::string toString() const;
 };
 
-// Vector2 method implementations
+// Vector2 inline method definitions
 
 template <typename T>
 inline Vector2<T>::Vector2()
@@ -350,6 +365,13 @@ template <typename T>
 inline bool Vector2<T>::hasNaNs() const
 {
     return isNaN(x) || isNaN(y);
+}
+
+template<typename T>
+template<typename U>
+inline Vector2<T>::operator Point2<U>() const
+{
+    return Point2<U>(static_cast<U>(x), static_cast<U>(y));
 }
 
 template <typename T>
@@ -491,7 +513,15 @@ inline void Vector2<T>::normalize()
     *this /= length();
 }
 
-// Vector3 method implementations
+template <typename T>
+inline std::string Vector2<T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "[" << x << ", " << y << "]";
+	return stream.str();
+}
+
+// Vector3 inline method definitions
 
 template <typename T>
 inline Vector3<T>::Vector3()
@@ -727,7 +757,15 @@ inline Vector3<T> Vector3<T>::reflectedAbout(const Vector3& direction) const
     return (2.0f*dot(direction))*direction - *this;
 }
 
-// Normal3 method implementations
+template <typename T>
+inline std::string Vector3<T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "[" << x << ", " << y <<  ", " << z << "]";
+	return stream.str();
+}
+
+// Normal3 inline method definitions
 
 template <typename T>
 inline Normal3<T>::Normal3()
@@ -940,7 +978,15 @@ inline void Normal3<T>::flipToSameHemisphereAs(const Vector3<T>& vector)
         reverse();
 }
 
-// Point2 method implementations
+template <typename T>
+inline std::string Normal3<T>::toString() const
+{
+    std::ostringstream stream;
+    stream << "<" << x << ", " << y <<  ", " << z << ">";
+	return stream.str();
+}
+
+// Point2 inline method definitions
 
 template <typename T>
 inline Point2<T>::Point2()
@@ -1082,7 +1128,15 @@ inline unsigned int Point2<T>::maxDimension() const
     return (x >= y)? 0 : 1;
 }
 
-// Point3 method implementations
+template <typename T>
+inline std::string Point2<T>::toString() const
+{
+    std::ostringstream stream;
+    stream << "(" << x << ", " << y << ")";
+	return stream.str();
+}
+
+// Point3 inline method definitions
 
 template <typename T>
 inline Point3<T>::Point3()
@@ -1213,7 +1267,15 @@ inline Point3<T> Point3<T>::permuted(unsigned int i,
     return Point3(operator[](i), operator[](j), operator[](k));
 }
 
-// Functions on Vector2 objects
+template <typename T>
+inline std::string Point3<T>::toString() const
+{
+    std::ostringstream stream;
+    stream << "(" << x << ", " << y <<  ", " << z << ")";
+	return stream.str();
+}
+
+// Vector2 inline function definitions
 
 template <typename T>
 inline Vector2<T> operator*(T factor, const Vector2<T>& vector)
@@ -1246,7 +1308,7 @@ inline Vector2<T> max(const Vector2<T>& vector_1, const Vector2<T>& vector_2)
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Vector2<T>& vector)
 {
-    stream << "[" << vector.x << ", " << vector.y << "]";
+    stream << vector.toString();
     return stream;
 }
 
@@ -1320,14 +1382,36 @@ inline bool refract(const Vector3F& incident_direction,
     return true;
 }
 
+// Computes the direction of light after refraction at an optical interface (returns false for total internal reflection)
+inline bool refract(const Vector3F& incident_direction,
+                    const Normal3F& incident_surface_normal,
+                    imp_float refractive_index_ratio,
+                    Vector3F* transmitted_direction)
+{
+    imp_float cos_incident_angle = incident_direction.dot(incident_surface_normal);
+    imp_float sin_sq_incident_angle = std::max<imp_float>(0, 1 - cos_incident_angle*cos_incident_angle);
+    imp_float sin_sq_transmitted_angle = refractive_index_ratio*refractive_index_ratio*sin_sq_incident_angle;
+
+    // Total internal reflection
+    if (sin_sq_transmitted_angle >= 1)
+        return false;
+
+    imp_float cos_transmitted_angle = std::sqrt(1 - sin_sq_transmitted_angle);
+
+    *transmitted_direction = (refractive_index_ratio*cos_incident_angle - cos_transmitted_angle)*Vector3F(incident_surface_normal) -
+                             refractive_index_ratio*incident_direction;
+
+    return true;
+}
+
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Vector3<T>& vector)
 {
-    stream << "[" << vector.x << ", " << vector.y <<  ", " << vector.z << "]";
+    stream << vector.toString();
     return stream;
 }
 
-// Functions on Normal3 objects
+// Normal3 inline function definitions
 
 template <typename T>
 inline Normal3<T> operator*(T factor, const Normal3<T>& normal)
@@ -1362,11 +1446,11 @@ inline Normal3<T> max(const Normal3<T>& normal_1, const Normal3<T>& normal_2)
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Normal3<T>& normal)
 {
-    stream << "<" << normal.x << ", " << normal.y <<  ", " << normal.z << ">";
+	stream << normal.toString();
     return stream;
 }
 
-// Functions on Point2 objects
+// Point2 inline function definitions
 
 template <typename T>
 inline Point2<T> operator*(T weight, const Point2<T>& point)
@@ -1430,11 +1514,11 @@ inline Point2<T> lerp(const Point2<T>& point_1, const Point2<T>& point_2, T weig
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Point2<T>& point)
 {
-    stream << "(" << point.x << ", " << point.y << ")";
+	stream << point.toString();
     return stream;
 }
 
-// Functions on Point3 objects
+// Point3 inline function definitions
 
 template <typename T>
 inline Point3<T> operator*(T weight, const Point3<T>& point)
@@ -1500,7 +1584,7 @@ inline Point3<T> lerp(const Point3<T>& point_1, const Point3<T>& point_2, T weig
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const Point3<T>& point)
 {
-    stream << "(" << point.x << ", " << point.y <<  ", " << point.z << ")";
+	stream << point.toString();
     return stream;
 }
 
