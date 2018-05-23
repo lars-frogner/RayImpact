@@ -36,5 +36,39 @@ public:
                   const Vector3F& incident_direction) const;
 };
 
+// LambertianBRDF inline method definitions
+
+inline LambertianBRDF::LambertianBRDF(const ReflectionSpectrum& reflectance)
+    : BXDF::BXDF(BXDFType(BSDF_REFLECTION | BSDF_DIFFUSE)),
+      reflectance(reflectance)
+{}
+
+inline Spectrum LambertianBRDF::evaluate(const Vector3F& outgoing_direction,
+										 const Vector3F& incident_direction) const
+{
+    return reflectance*IMP_ONE_OVER_PI;
+}
+
+inline Spectrum LambertianBRDF::reduced(const Vector3F& outgoing_direction,
+										unsigned int n_samples,
+										const Point2F* samples) const
+{
+    return reflectance;
+}
+
+inline Spectrum LambertianBRDF::reduced(unsigned int n_samples,
+										const Point2F* samples_1,
+										const Point2F* samples_2) const
+{
+    return reflectance;
+}
+
+inline imp_float LambertianBRDF::pdf(const Vector3F& outgoing_direction,
+									 const Vector3F& incident_direction) const
+{
+    return sameHemisphere(outgoing_direction, incident_direction)?
+		absCosTheta(incident_direction)*IMP_ONE_OVER_PI : 0;
+}
+
 } // RayImpact
 } // Impact

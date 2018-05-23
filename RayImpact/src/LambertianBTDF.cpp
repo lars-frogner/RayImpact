@@ -4,18 +4,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// LambertianBTDF method implementations
-
-LambertianBTDF::LambertianBTDF(const TransmissionSpectrum& transmittance)
-    : BXDF::BXDF(BXDFType(BSDF_TRANSMISSION | BSDF_DIFFUSE)),
-      transmittance(transmittance)
-{}
-
-Spectrum LambertianBTDF::evaluate(const Vector3F& outgoing_direction,
-                                  const Vector3F& incident_direction) const
-{
-    return transmittance*IMP_ONE_OVER_PI;
-}
+// LambertianBTDF method definitions
 
 Spectrum LambertianBTDF::sample(const Vector3F& outgoing_direction,
                                 Vector3F* incident_direction,
@@ -31,12 +20,6 @@ Spectrum LambertianBTDF::sample(const Vector3F& outgoing_direction,
     *pdf_value = pdf(outgoing_direction, *incident_direction);
 
     return evaluate(outgoing_direction, *incident_direction);
-}
-
-imp_float LambertianBTDF::pdf(const Vector3F& outgoing_direction,
-                              const Vector3F& incident_direction) const
-{
-    return (!sameHemisphere(outgoing_direction, incident_direction))? absCosTheta(incident_direction)*IMP_ONE_OVER_PI : 0;
 }
 
 } // RayImpact

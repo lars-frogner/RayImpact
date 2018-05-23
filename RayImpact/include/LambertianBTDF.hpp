@@ -28,5 +28,25 @@ public:
                   const Vector3F& incident_direction) const;
 };
 
+// LambertianBTDF inline method definitions
+
+inline LambertianBTDF::LambertianBTDF(const TransmissionSpectrum& transmittance)
+    : BXDF::BXDF(BXDFType(BSDF_TRANSMISSION | BSDF_DIFFUSE)),
+      transmittance(transmittance)
+{}
+
+inline Spectrum LambertianBTDF::evaluate(const Vector3F& outgoing_direction,
+										 const Vector3F& incident_direction) const
+{
+    return transmittance*IMP_ONE_OVER_PI;
+}
+
+inline imp_float LambertianBTDF::pdf(const Vector3F& outgoing_direction,
+									 const Vector3F& incident_direction) const
+{
+    return (!sameHemisphere(outgoing_direction, incident_direction))?
+		absCosTheta(incident_direction)*IMP_ONE_OVER_PI : 0;
+}
+
 } // RayImpact
 } // Impact
