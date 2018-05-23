@@ -6,6 +6,8 @@
 #include "Ray.hpp"
 #include <algorithm>
 #include <ostream>
+#include <sstream>
+#include <string>
 #include <limits>
 
 namespace Impact {
@@ -66,6 +68,8 @@ public:
 
     bool hasIntersection(const Ray& ray,
                          const Vector3F& inverse_direction) const;
+
+	std::string toString() const;
 };
 
 // BoundingBox typedefs
@@ -73,7 +77,7 @@ public:
 typedef BoundingBox<imp_float> BoundingBoxF;
 typedef BoundingBox<int> BoundingBoxI;
 
-// Functions on BoundingBox objects
+// BoundingBox inline function definitions
 
 // Creates bounding box encompassing the given bounding box and point
 template <typename T>
@@ -105,11 +109,11 @@ inline BoundingBox<T> intersectionOf(const BoundingBox<T>& bounding_box_1,
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const BoundingBox<T>& box)
 {
-    stream << "{lower corner = " << box.lower_corner << ", upper corner = " << box.upper_corner << "}";
+    stream << box.toString();
     return stream;
 }
 
-// BoundingBox method implementations
+// BoundingBox inline method definitions
 
 template <typename T>
 inline BoundingBox<T>::BoundingBox()
@@ -428,6 +432,14 @@ inline bool BoundingBox<T>::hasIntersection(const Ray& ray,
         max_dist = max_dist_temp;
 
     return (min_dist < ray.max_distance && max_dist > 0);
+}
+
+template <typename T>
+inline std::string BoundingBox<T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "{lower: " << lower_corner << ", upper: " << upper_corner << "}";
+	return stream.str();
 }
 
 } // RayImpact

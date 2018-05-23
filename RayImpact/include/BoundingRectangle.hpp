@@ -5,6 +5,8 @@
 #include "geometry.hpp"
 #include <algorithm>
 #include <ostream>
+#include <sstream>
+#include <string>
 #include <iterator>
 #include <limits>
 
@@ -55,6 +57,8 @@ public:
     Point2<T> getGlobalCoordinate(const Vector2<T>& local_coord) const;
 
     void enclose(const Point2<T>& point);
+
+	std::string toString() const;
 };
 
 // BoundingRectangle typedefs
@@ -86,7 +90,7 @@ public:
     const Point2I& operator*() const;
 };
 
-// Functions on BoundingRectangle objects
+// BoundingRectangle inline function definitions
 
 // Creates bounding rectangle encompassing the given bounding rectangle and point
 template <typename T>
@@ -118,11 +122,11 @@ inline BoundingRectangle<T> intersectionOf(const BoundingRectangle<T>& bounding_
 template <typename T>
 inline std::ostream& operator<<(std::ostream& stream, const BoundingRectangle<T>& rectangle)
 {
-    stream << "{lower corner = " << rectangle.lower_corner << ", upper corner = " << rectangle.upper_corner << "}";
-    return stream;
+    stream << rectangle.toString();
+	return stream;
 }
 
-// BoundingRectangle method implementations
+// BoundingRectangle inline method definitions
 
 template <typename T>
 inline BoundingRectangle<T>::BoundingRectangle()
@@ -271,7 +275,15 @@ void BoundingRectangle<T>::enclose(const Point2<T>& point)
     upper_corner.y = std::max(upper_corner.y, point.y);
 }
 
-// Funcions on BoundingRectangleIteratorI objects
+template <typename T>
+inline std::string BoundingRectangle<T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "{lower: " << lower_corner << ", upper: " << upper_corner << "}";
+	return stream.str();
+}
+
+// BoundingRectangleIteratorI inline function definitions
 
 inline BoundingRectangleIteratorI begin(const BoundingRectangleI& bounding_rectangle)
 {
@@ -292,7 +304,7 @@ inline BoundingRectangleIteratorI end(const BoundingRectangleI& bounding_rectang
     return BoundingRectangleIteratorI(bounding_rectangle, end_point);
 }
 
-// BoundingRectangleIteratorI method implementations
+// BoundingRectangleIteratorI inline method definitions
 
 inline BoundingRectangleIteratorI::BoundingRectangleIteratorI(const BoundingRectangleI& bounding_rectangle,
                                                        const Point2I& point)
