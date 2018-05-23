@@ -1,25 +1,10 @@
 #include "BSDF.hpp"
-#include "error.hpp"
 #include "sampling.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// BXDF method implementations
-
-BXDF::BXDF(BXDFType type)
-    : type(type)
-{}
-
-bool BXDF::containedIn(BXDFType t) const
-{
-    return (type & t) == type;
-}
-
-bool BXDF::contains(BXDFType t) const
-{
-    return type & t;
-}
+// BXDF method definitions
 
 Spectrum BXDF::sample(const Vector3F& outgoing_direction,
                       Vector3F* incident_direction,
@@ -27,96 +12,63 @@ Spectrum BXDF::sample(const Vector3F& outgoing_direction,
                       imp_float* pdf_value,
                       BXDFType* sampled_type /* = nullptr */) const
 {
-    printSevereMessage("BXDF::sample was called without being implemented");
-    return Spectrum(0.0f);
+	*incident_direction = cosineWeightedHemisphereSample(uniform_sample);
+	if (outgoing_direction.z < 0) incident_direction->z *= -1;
+
+	*pdf_value = pdf(outgoing_direction, *incident_direction);
+
+    return evaluate(outgoing_direction, *incident_direction);
 }
 
 Spectrum BXDF::reduced(const Vector3F& outgoing_direction,
                        unsigned int n_samples,
                        const Point2F* samples) const
 {
-    printSevereMessage("BXDF::reduced (1) was called without being implemented");
-    return Spectrum(0.0f);
+	Spectrum result(0.0f);
+
+	Vector3F incident_direction;
+	imp_float pdf_value;
+	Spectrum bsdf_value;
+
+	for (unsigned int i = 0; i < n_samples; i++)
+	{
+		pdf_value = 0;
+		bsdf_value = sample(outgoing_direction, &incident_direction, samples[i], &pdf_value);
+		if (pdf_value > 0)
+			result += bsdf_value*absCosTheta(incident_direction)/pdf_value;
+	}
+
+    return result/static_cast<imp_float>(n_samples);
 }
 
 Spectrum BXDF::reduced(unsigned int n_samples,
                        const Point2F* samples_1,
                        const Point2F* samples_2) const
 {
-    printSevereMessage("BXDF::reduced (2) was called without being implemented");
-    return Spectrum(0.0f);
+    ReflectionSpectrum result(0.0f);
+
+	Vector3F outgoing_direction;
+	Vector3F incident_direction;
+	imp_float outgoing_pdf_value;
+	imp_float incident_pdf_value;
+	Spectrum bsdf_value;
+
+	for (unsigned int i = 0; i < n_samples; i++)
+	{
+		outgoing_direction = uniformHemisphereSample(samples_1[i]);
+		outgoing_pdf_value = IMP_ONE_OVER_TWO_PI;
+		incident_pdf_value = 0;
+
+		bsdf_value = sample(outgoing_direction, &incident_direction, samples_2[i], &incident_pdf_value);
+
+		if (incident_pdf_value > 0)
+			result += bsdf_value*absCosTheta(incident_direction)*absCosTheta(outgoing_direction)/(outgoing_pdf_value*incident_pdf_value);
+	}
+
+    return result/(IMP_PI*n_samples);
 }
 
-imp_float BXDF::pdf(const Vector3F& outgoing_direction,
-                    const Vector3F& incident_direction) const
-{
-    printSevereMessage("BXDF::pdf was called without being implemented");
-    return 0.0f;
-}
-
-// ScaledBXDF method implementations
-
-ScaledBXDF::ScaledBXDF(BXDF* bxdf, const Spectrum& scale)
-    : BXDF::BXDF(BXDFType(bxdf->type)),
-      bxdf(bxdf),
-      scale(scale)
-{}
-
-Spectrum ScaledBXDF::evaluate(const Vector3F& outgoing_direction,
-                              const Vector3F& incident_direction) const
-{
-    return scale*bxdf->evaluate(outgoing_direction, incident_direction);
-}
-
-Spectrum ScaledBXDF::sample(const Vector3F& outgoing_direction,
-                            Vector3F* incident_direction,
-                            const Point2F& uniform_sample,
-                            imp_float* pdf_value,
-                            BXDFType* sampled_type /* = nullptr */) const
-{
-    return scale*bxdf->sample(outgoing_direction,
-                              incident_direction,
-                              uniform_sample,
-                              pdf_value,
-                              sampled_type);
-}
-
-Spectrum ScaledBXDF::reduced(const Vector3F& outgoing_direction,
-                             unsigned int n_samples,
-                             const Point2F* samples) const
-{
-    return scale*bxdf->reduced(outgoing_direction, n_samples, samples);
-}
-
-Spectrum ScaledBXDF::reduced(unsigned int n_samples,
-                             const Point2F* samples_1,
-                             const Point2F* samples_2) const
-{
-    return scale*bxdf->reduced(n_samples, samples_1, samples_2);
-}
-
-imp_float ScaledBXDF::pdf(const Vector3F& outgoing_direction,
-                          const Vector3F& incident_direction) const
-{
-    return bxdf->pdf(outgoing_direction, incident_direction);
-}
-
-// BSDF method implementations
-
-BSDF::BSDF(const SurfaceScatteringEvent& scattering_event,
-           imp_float refractive_index_outside /* = 1.0f */)
-    : refractive_index_outside(refractive_index_outside),
-      geometric_normal(scattering_event.surface_normal),
-      shading_normal(scattering_event.shading.surface_normal),
-      shading_tangent(scattering_event.shading.dpdu.normalized()),
-      shading_bitangent(Vector3F(shading_normal).cross(shading_tangent))
-{}
-
-void BSDF::addComponent(BXDF* bxdf)
-{
-    imp_assert(n_bxdfs < max_bxdfs);
-    bxdfs[n_bxdfs++] = bxdf;
-}
+// BSDF method definitions
 
 unsigned int BSDF::numberOfComponents(BXDFType type /* = BSDF_ALL */) const
 {
@@ -132,18 +84,6 @@ unsigned int BSDF::numberOfComponents(BXDFType type /* = BSDF_ALL */) const
     }
 
     return n;
-}
-
-Vector3F BSDF::worldToLocal(const Vector3F& vector) const
-{
-    return Vector3F(shading_tangent.dot(vector), shading_bitangent.dot(vector), shading_normal.dot(vector));
-}
-
-Vector3F BSDF::localToWorld(const Vector3F& vector) const
-{
-    return Vector3F(shading_tangent.x*vector.x + shading_bitangent.x*vector.y + shading_normal.x*vector.z,
-                    shading_tangent.y*vector.x + shading_bitangent.y*vector.y + shading_normal.y*vector.z,
-                    shading_tangent.z*vector.x + shading_bitangent.z*vector.y + shading_normal.z*vector.z);
 }
 
 Spectrum BSDF::evaluate(const Vector3F& world_outgoing_direction,
@@ -202,14 +142,103 @@ Spectrum BSDF::reduced(unsigned int n_samples,
     return result;
 }
 
-Spectrum BSDF::sample(const Vector3F& outgoing_direction,
-                      Vector3F* incident_direction,
+Spectrum BSDF::sample(const Vector3F& world_outgoing_direction,
+                      Vector3F* world_incident_direction,
                       const Point2F& uniform_sample,
                       imp_float* pdf_value,
-                      BXDFType type /* = BSDF_ALL */) const
+                      BXDFType type /* = BSDF_ALL */,
+					  BXDFType* sampled_type /* = nullptr */) const
 {
-    printSevereMessage("BSDF::sample was called without being implemented");
-    return Spectrum(0.0f);
+	*pdf_value = 0;
+
+    unsigned int n_matching_components = numberOfComponents(type);
+
+	if (n_matching_components == 0)
+		return Spectrum(0.0f);
+
+	// Use first sample value to choose one of the matching BxDF components
+	int component = std::min<int>(static_cast<int>(std::floor(uniform_sample.x*n_matching_components)),
+								  n_matching_components - 1);
+
+	BXDF* bxdf = nullptr;
+	int count = component;
+
+	// Find the pointer to the matching component
+	for (unsigned int i = 0; i < n_bxdfs; i++)
+	{
+		if (bxdfs[i]->containedIn(type) && count-- == 0)
+		{
+			bxdf = bxdfs[i];
+			break;
+		}
+	}
+
+	imp_assert(bxdf);
+
+	// Remap the first sample value to ensure that it is uniformly distributed
+	Point2F remapped_uniform_sample(n_matching_components*uniform_sample.x - count, uniform_sample.y);
+
+	Vector3F incident_direction;
+	const Vector3F& outgoing_direction = worldToLocal(world_outgoing_direction);
+
+	if (sampled_type)
+		*sampled_type = bxdf->type;
+
+	Spectrum bsdf_value = bxdf->sample(outgoing_direction,
+									   &incident_direction,
+									   remapped_uniform_sample,
+									   pdf_value,
+									   sampled_type);
+
+	if (*pdf_value == 0)
+		return Spectrum(0.0f);
+
+	*world_incident_direction = localToWorld(incident_direction);
+
+	if (!(bxdf->contains(BSDF_SPECULAR)) && n_matching_components > 1)
+	{
+		for (unsigned int i = 0; i < n_bxdfs; i++)
+		{
+			if (bxdfs[i] != bxdf && bxdfs[i]->containedIn(type))
+				*pdf_value += bxdfs[i]->pdf(outgoing_direction, incident_direction);
+		}
+	}
+
+	if (n_matching_components > 1)
+		*pdf_value /= n_matching_components;
+
+	if (!(bxdf->contains(BSDF_SPECULAR)) && n_matching_components > 1)
+	{
+		bool was_reflected = world_incident_direction->dot(geometric_normal)*world_outgoing_direction.dot(geometric_normal) > 0;
+		bsdf_value = 0.0f;
+
+		for (unsigned int i = 0; i < n_bxdfs; i++)
+		{
+			if (bxdfs[i]->containedIn(type) &&
+				(( was_reflected && bxdfs[i]->contains(BSDF_REFLECTION)) ||
+				 (!was_reflected && bxdfs[i]->contains(BSDF_TRANSMISSION))))
+				bsdf_value += bxdfs[i]->evaluate(outgoing_direction, incident_direction);
+		}
+	}
+
+	return bsdf_value;
+}
+
+imp_float BSDF::pdf(const Vector3F& outgoing_direction,
+                    const Vector3F& incident_direction,
+                    BXDFType type /* = BSDF_ALL */) const
+{
+	imp_float pdf_value = 0;
+
+	for (unsigned int i = 0; i < n_bxdfs; i++)
+	{
+		if (bxdfs[i]->containedIn(type))
+			pdf_value += bxdfs[i]->pdf(outgoing_direction, incident_direction);
+	}
+
+	pdf_value /= n_bxdfs;
+
+	return pdf_value;
 }
 
 } // RayImpact

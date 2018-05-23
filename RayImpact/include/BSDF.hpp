@@ -2,6 +2,7 @@
 #include "precision.hpp"
 #include "geometry.hpp"
 #include "math.hpp"
+#include "error.hpp"
 #include "Spectrum.hpp"
 #include "ScatteringEvent.hpp"
 #include <cmath>
@@ -142,14 +143,19 @@ public:
                      const Point2F* samples_2,
                      BXDFType type = BSDF_ALL) const;
 
-    Spectrum sample(const Vector3F& outgoing_direction,
-                    Vector3F* incident_direction,
+    Spectrum sample(const Vector3F& world_outgoing_direction,
+                    Vector3F* world_incident_direction,
                     const Point2F& uniform_sample,
                     imp_float* pdf_value,
-                    BXDFType type = BSDF_ALL) const;
+                    BXDFType type = BSDF_ALL,
+					BXDFType* sampled_type = nullptr) const;
+
+    imp_float pdf(const Vector3F& outgoing_direction,
+                  const Vector3F& incident_direction,
+                  BXDFType type = BSDF_ALL) const;
 };
 
-// BSDF coordinate system utility functions
+// BSDF inline function definitions
 
 /*
 Theta is the angle between the surface normal (z-axis) and the direction vector.
@@ -232,6 +238,104 @@ inline bool sameHemisphere(const Vector3F& direction_1, const Vector3F& directio
 inline bool sameHemisphere(const Vector3F& direction, const Normal3F& normal)
 {
     return direction.z*normal.z > 0;
+}
+
+// BXDF inline method definitions
+
+inline BXDF::BXDF(BXDFType type)
+    : type(type)
+{}
+
+inline bool BXDF::containedIn(BXDFType t) const
+{
+    return (type & t) == type;
+}
+
+inline bool BXDF::contains(BXDFType t) const
+{
+    return type & t;
+}
+
+inline imp_float BXDF::pdf(const Vector3F& outgoing_direction,
+						   const Vector3F& incident_direction) const
+{
+    return sameHemisphere(outgoing_direction, incident_direction)? absCosTheta(incident_direction)*IMP_ONE_OVER_PI : 0;
+}
+
+// ScaledBXDF inline method definitions
+
+inline ScaledBXDF::ScaledBXDF(BXDF* bxdf, const Spectrum& scale)
+    : BXDF::BXDF(BXDFType(bxdf->type)),
+      bxdf(bxdf),
+      scale(scale)
+{}
+
+inline Spectrum ScaledBXDF::evaluate(const Vector3F& outgoing_direction,
+									 const Vector3F& incident_direction) const
+{
+    return scale*bxdf->evaluate(outgoing_direction, incident_direction);
+}
+
+inline Spectrum ScaledBXDF::sample(const Vector3F& outgoing_direction,
+								   Vector3F* incident_direction,
+								   const Point2F& uniform_sample,
+								   imp_float* pdf_value,
+								   BXDFType* sampled_type /* = nullptr */) const
+{
+    return scale*bxdf->sample(outgoing_direction,
+                              incident_direction,
+                              uniform_sample,
+                              pdf_value,
+                              sampled_type);
+}
+
+inline Spectrum ScaledBXDF::reduced(const Vector3F& outgoing_direction,
+								    unsigned int n_samples,
+									const Point2F* samples) const
+{
+    return scale*bxdf->reduced(outgoing_direction, n_samples, samples);
+}
+
+inline Spectrum ScaledBXDF::reduced(unsigned int n_samples,
+									const Point2F* samples_1,
+									const Point2F* samples_2) const
+{
+    return scale*bxdf->reduced(n_samples, samples_1, samples_2);
+}
+
+inline imp_float ScaledBXDF::pdf(const Vector3F& outgoing_direction,
+								 const Vector3F& incident_direction) const
+{
+    return bxdf->pdf(outgoing_direction, incident_direction);
+}
+
+// BSDF inline method definitions
+
+inline BSDF::BSDF(const SurfaceScatteringEvent& scattering_event,
+				  imp_float refractive_index_outside /* = 1.0f */)
+    : refractive_index_outside(refractive_index_outside),
+      geometric_normal(scattering_event.surface_normal),
+      shading_normal(scattering_event.shading.surface_normal),
+      shading_tangent(scattering_event.shading.dpdu.normalized()),
+      shading_bitangent(Vector3F(shading_normal).cross(shading_tangent))
+{}
+
+inline void BSDF::addComponent(BXDF* bxdf)
+{
+    imp_assert(n_bxdfs < max_bxdfs);
+    bxdfs[n_bxdfs++] = bxdf;
+}
+
+inline Vector3F BSDF::worldToLocal(const Vector3F& vector) const
+{
+    return Vector3F(shading_tangent.dot(vector), shading_bitangent.dot(vector), shading_normal.dot(vector));
+}
+
+inline Vector3F BSDF::localToWorld(const Vector3F& vector) const
+{
+    return Vector3F(shading_tangent.x*vector.x + shading_bitangent.x*vector.y + shading_normal.x*vector.z,
+                    shading_tangent.y*vector.x + shading_bitangent.y*vector.y + shading_normal.y*vector.z,
+                    shading_tangent.z*vector.x + shading_bitangent.z*vector.y + shading_normal.z*vector.z);
 }
 
 } // RayImpact
