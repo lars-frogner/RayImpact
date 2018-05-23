@@ -7,6 +7,8 @@
 
 namespace Impact {
 
+// String utility function declarations
+
 void trim(std::string& s);
 void trimLeft(std::string& s);
 void trimRight(std::string& s);

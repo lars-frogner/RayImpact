@@ -10,6 +10,8 @@
 
 namespace Impact {
 
+// String utility function definitions
+
 void trim(std::string& s)
 {
     trimLeft(s);
