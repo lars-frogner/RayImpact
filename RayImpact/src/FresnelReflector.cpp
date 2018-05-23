@@ -3,6 +3,8 @@
 namespace Impact {
 namespace RayImpact {
 
+// FresnelReflector function definitions
+
 // Computes Fresnel reflectance for dielectric materials
 imp_float fresnelReflectance(imp_float cos_incident_angle,
                              imp_float refractive_index_outside,
