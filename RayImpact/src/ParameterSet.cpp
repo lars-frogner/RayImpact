@@ -23,6 +23,7 @@ namespace RayImpact {
     return false
 
 #define get_single_parameter_value(param_vector) \
+	do { \
     for (const auto& param : param_vector) \
     { \
         if (param->name == name && param->n_values == 1) \
@@ -31,9 +32,10 @@ namespace RayImpact {
             return param->values[0]; \
         } \
     } \
-    return default_value
+	} while (false)
 
 #define get_parameter_values(param_vector) \
+	do { \
     for (const auto& param : param_vector) \
     { \
         if (param->name == name) \
@@ -43,9 +45,9 @@ namespace RayImpact {
             return param->values.get(); \
         } \
     } \
-    return nullptr
+	} while (false)
 
-// ParameterSet method implmentations
+// ParameterSet method definitions
 
 void ParameterSet::addBoolParameter(const std::string& name, std::unique_ptr<bool[]> values, unsigned int n_values)
 {
@@ -65,6 +67,29 @@ void ParameterSet::addFloatParameter(const std::string& name, std::unique_ptr<im
     add_parameter(imp_float, float_params);
 }
 
+void ParameterSet::addNumParameter(const std::string& name, std::unique_ptr<imp_float[]> values, unsigned int n_values)
+{
+    removeNumParameter(name);
+	
+	bool might_be_int = true;
+	std::unique_ptr<int[]> int_values(new int[n_values]);
+
+	for (unsigned int i = 0; i < n_values; i++)
+	{
+		int_values[i] = (int)(values[i]);
+		if (values[i] != (imp_float)(int_values[i]))
+		{
+			might_be_int = false;
+			break;
+		}
+	}
+
+    add_parameter(imp_float, float_num_params);
+
+	if (might_be_int)
+	    int_num_params.emplace_back(new Parameter<int>(name, std::move(int_values), n_values));
+}
+
 void ParameterSet::addStringParameter(const std::string& name, std::unique_ptr<std::string[]> values, unsigned int n_values)
 {
     removeStringParameter(name);
@@ -77,34 +102,16 @@ void ParameterSet::addTextureNameParameter(const std::string& name, std::unique_
     add_parameter(std::string, texture_name_params);
 }
 
-void ParameterSet::addPoint2FParameter(const std::string& name, std::unique_ptr<Point2F[]> values, unsigned int n_values)
+void ParameterSet::addPairParameter(const std::string& name, std::unique_ptr<Vector2F[]> values, unsigned int n_values)
 {
-    removePoint2FParameter(name);
-    add_parameter(Point2F, point2f_params);
+    removePairParameter(name);
+    add_parameter(Vector2F, pair_params);
 }
 
-void ParameterSet::addVector2FParameter(const std::string& name, std::unique_ptr<Vector2F[]> values, unsigned int n_values)
+void ParameterSet::addTripleParameter(const std::string& name, std::unique_ptr<Vector3F[]> values, unsigned int n_values)
 {
-    removeVector2FParameter(name);
-    add_parameter(Vector2F, vector2f_params);
-}
-
-void ParameterSet::addPoint3FParameter(const std::string& name, std::unique_ptr<Point3F[]> values, unsigned int n_values)
-{
-    removePoint3FParameter(name);
-    add_parameter(Point3F, point3f_params);
-}
-
-void ParameterSet::addVector3FParameter(const std::string& name, std::unique_ptr<Vector3F[]> values, unsigned int n_values)
-{
-    removeVector3FParameter(name);
-    add_parameter(Vector3F, vector3f_params);
-}
-
-void ParameterSet::addNormal3FParameter(const std::string& name, std::unique_ptr<Normal3F[]> values, unsigned int n_values)
-{
-    removeNormal3FParameter(name);
-    add_parameter(Normal3F, normal3f_params);
+    removeTripleParameter(name);
+    add_parameter(Vector3F, triple_params);
 }
 
 void ParameterSet::addSpectrumParameter(const std::string& name, std::unique_ptr<Spectrum[]> values, unsigned int n_values)
@@ -128,6 +135,12 @@ bool ParameterSet::removeFloatParameter(const std::string& name)
     remove_parameter(float_params);
 }
 
+bool ParameterSet::removeNumParameter(const std::string& name)
+{
+    remove_parameter(float_num_params);
+    remove_parameter(int_num_params);
+}
+
 bool ParameterSet::removeStringParameter(const std::string& name)
 {
     remove_parameter(string_params);
@@ -138,29 +151,14 @@ bool ParameterSet::removeTextureNameParameter(const std::string& name)
     remove_parameter(texture_name_params);
 }
 
-bool ParameterSet::removePoint2FParameter(const std::string& name)
+bool ParameterSet::removePairParameter(const std::string& name)
 {
-    remove_parameter(point2f_params);
+    remove_parameter(pair_params);
 }
 
-bool ParameterSet::removeVector2FParameter(const std::string& name)
+bool ParameterSet::removeTripleParameter(const std::string& name)
 {
-    remove_parameter(vector2f_params);
-}
-
-bool ParameterSet::removePoint3FParameter(const std::string& name)
-{
-    remove_parameter(point3f_params);
-}
-
-bool ParameterSet::removeVector3FParameter(const std::string& name)
-{
-    remove_parameter(vector3f_params);
-}
-
-bool ParameterSet::removeNormal3FParameter(const std::string& name)
-{
-    remove_parameter(normal3f_params);
+    remove_parameter(triple_params);
 }
 
 bool ParameterSet::removeSpectrumParameter(const std::string& name)
@@ -171,102 +169,148 @@ bool ParameterSet::removeSpectrumParameter(const std::string& name)
 bool ParameterSet::getSingleBoolValue(const std::string& name, bool default_value) const
 {
     get_single_parameter_value(bool_params);
+	return default_value;
 }
 
 int ParameterSet::getSingleIntValue(const std::string& name, int default_value) const
 {
     get_single_parameter_value(int_params);
+
+	for (const auto& param : int_num_params)
+    {
+        if (param->name == name && param->n_values == 1)
+        {
+            param->was_looked_up = true;
+
+			for (const auto& flt_param : float_num_params)
+				if (flt_param->name == name && flt_param->n_values == 1)
+				{
+					flt_param->was_looked_up = true;
+					break;
+				}
+
+            return param->values[0];
+        }
+    }
+
+    return default_value;
 }
 
 imp_float ParameterSet::getSingleFloatValue(const std::string& name, imp_float default_value) const
 {
     get_single_parameter_value(float_params);
+    get_single_parameter_value(float_num_params);
+    return default_value;
 }
 
 const std::string& ParameterSet::getSingleStringValue(const std::string& name, const std::string& default_value) const
 {
     get_single_parameter_value(string_params);
+	return default_value;
 }
 
 const std::string& ParameterSet::getSingleTextureNameValue(const std::string& name, const std::string& default_value) const
 {
     get_single_parameter_value(texture_name_params);
+	return default_value;
 }
 
-const Point2F& ParameterSet::getSinglePoint2FValue(const std::string& name, const Point2F& default_value) const
+const Vector2F& ParameterSet::getSinglePairValue(const std::string& name, const Vector2F& default_value) const
 {
-    get_single_parameter_value(point2f_params);
+    get_single_parameter_value(pair_params);
+	return default_value;
 }
 
-const Vector2F& ParameterSet::getSingleVector2FValue(const std::string& name, const Vector2F& default_value) const
+const Vector3F& ParameterSet::getSingleTripleValue(const std::string& name, const Vector3F& default_value) const
 {
-    get_single_parameter_value(vector2f_params);
+    get_single_parameter_value(triple_params);
+	return default_value;
 }
 
-const Point3F& ParameterSet::getSinglePoint3FValue(const std::string& name, const Point3F& default_value) const
-{
-    get_single_parameter_value(point3f_params);
-}
-
-const Vector3F& ParameterSet::getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const
-{
-    get_single_parameter_value(vector3f_params);
-}
-
-const Normal3F& ParameterSet::getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const
-{
-    get_single_parameter_value(normal3f_params);
-}
-
-const Spectrum& ParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
+Spectrum ParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
 {
     get_single_parameter_value(spectrum_params);
+
+	for (const auto& param : triple_params)
+    {
+        if (param->name == name && param->n_values == 1)
+        {
+            param->was_looked_up = true;
+            const Vector3F& val = param->values[0];
+			imp_float rgb[3] = {val.x, val.y, val.z};
+			return Spectrum(rgb);
+        }
+    }
+
+	return default_value;
 }
 
 const bool* ParameterSet::getBoolValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(bool_params);
+	return nullptr;
 }
 
 const int* ParameterSet::getIntValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(int_params);
+
+	for (const auto& param : int_num_params)
+    {
+        if (param->name == name)
+        {
+            param->was_looked_up = true;
+            *n_values = param->n_values;
+
+			for (const auto& flt_param : float_num_params)
+				if (flt_param->name == name)
+				{
+					flt_param->was_looked_up = true;
+					break;
+				}
+
+            return param->values.get();
+        }
+    }
+
+    return nullptr;
 }
+
 const imp_float* ParameterSet::getFloatValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(float_params);
+    get_parameter_values(float_num_params);
+    return nullptr;
 }
+
 const std::string* ParameterSet::getStringValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(string_params);
+	return nullptr;
 }
+
 const std::string* ParameterSet::getTextureNameValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(texture_name_params);
+	return nullptr;
 }
-const Point2F* ParameterSet::getPoint2FValues(const std::string& name, unsigned int* n_values) const
+
+const Vector2F* ParameterSet::getPairValues(const std::string& name, unsigned int* n_values) const
 {
-    get_parameter_values(point2f_params);
+    get_parameter_values(pair_params);
+	return nullptr;
 }
-const Vector2F* ParameterSet::getVector2FValues(const std::string& name, unsigned int* n_values) const
+
+const Vector3F* ParameterSet::getTripleValues(const std::string& name, unsigned int* n_values) const
 {
-    get_parameter_values(vector2f_params);
+    get_parameter_values(triple_params);
+	return nullptr;
 }
-const Point3F* ParameterSet::getPoint3FValues(const std::string& name, unsigned int* n_values) const
-{
-    get_parameter_values(point3f_params);
-}
-const Vector3F* ParameterSet::getVector3FValues(const std::string& name, unsigned int* n_values) const
-{
-    get_parameter_values(vector3f_params);
-}
-const Normal3F* ParameterSet::getNormal3FValues(const std::string& name, unsigned int* n_values) const
-{
-    get_parameter_values(normal3f_params);
-}
+
 const Spectrum* ParameterSet::getSpectrumValues(const std::string& name, unsigned int* n_values) const
 {
     get_parameter_values(spectrum_params);
+	return nullptr;
 }
 
 void ParameterSet::constructSpectrumParameterFromRGB(const std::string& name, const imp_float* rgb_values,
@@ -343,6 +387,12 @@ void ParameterSet::warnAboutUnusedParameters() const
             printWarningMessage("float parameter \"%s\" is unused", param->name.c_str());
     }
 
+    for (const auto& param : float_num_params)
+    {
+        if (!param->was_looked_up)
+            printWarningMessage("parameter \"%s\" is unused", param->name.c_str());
+    }
+
     for (const auto& param : string_params)
     {
         if (!param->was_looked_up)
@@ -355,34 +405,16 @@ void ParameterSet::warnAboutUnusedParameters() const
             printWarningMessage("texture name parameter \"%s\" is unused", param->name.c_str());
     }
 
-    for (const auto& param : point2f_params)
+    for (const auto& param : pair_params)
     {
         if (!param->was_looked_up)
-            printWarningMessage("Point2F parameter \"%s\" is unused", param->name.c_str());
+            printWarningMessage("Pair parameter \"%s\" is unused", param->name.c_str());
     }
 
-    for (const auto& param : vector2f_params)
+    for (const auto& param : triple_params)
     {
         if (!param->was_looked_up)
-            printWarningMessage("Vector2F parameter \"%s\" is unused", param->name.c_str());
-    }
-
-    for (const auto& param : point3f_params)
-    {
-        if (!param->was_looked_up)
-            printWarningMessage("Point3F parameter \"%s\" is unused", param->name.c_str());
-    }
-
-    for (const auto& param : vector3f_params)
-    {
-        if (!param->was_looked_up)
-            printWarningMessage("Vector3F parameter \"%s\" is unused", param->name.c_str());
-    }
-
-    for (const auto& param : normal3f_params)
-    {
-        if (!param->was_looked_up)
-            printWarningMessage("Normal3F parameter \"%s\" is unused", param->name.c_str());
+            printWarningMessage("Triple parameter \"%s\" is unused", param->name.c_str());
     }
 
     for (const auto& param : spectrum_params)
@@ -397,17 +429,16 @@ void ParameterSet::clearParameters()
     bool_params.clear();
     int_params.clear();
     float_params.clear();
+    int_num_params.clear();
+    float_num_params.clear();
     string_params.clear();
     texture_name_params.clear();
-    point2f_params.clear();
-    vector2f_params.clear();
-    point3f_params.clear();
-    vector3f_params.clear();
-    normal3f_params.clear();
+	pair_params.clear();
+	triple_params.clear();
     spectrum_params.clear();
 }
 
-// TextureParameterSet method implementations
+// TextureParameterSet method definitions
 
 TextureParameterSet::TextureParameterSet(std::map< std::string, std::shared_ptr< Texture<imp_float> > >& float_textures,
                                          std::map< std::string, std::shared_ptr< Texture<Spectrum> > >& spectrum_textures,
@@ -527,32 +558,17 @@ const std::string& TextureParameterSet::getSingleStringValue(const std::string& 
     return geometry_parameters.getSingleStringValue(name, material_parameters.getSingleStringValue(name, default_value));
 }
 
-const Point2F& TextureParameterSet::getSinglePoint2FValue(const std::string& name, const Point2F& default_value) const
+const Vector2F& TextureParameterSet::getSinglePairValue(const std::string& name, const Vector2F& default_value) const
 {
-    return geometry_parameters.getSinglePoint2FValue(name, material_parameters.getSinglePoint2FValue(name, default_value));
+    return geometry_parameters.getSinglePairValue(name, material_parameters.getSinglePairValue(name, default_value));
 }
 
-const Vector2F& TextureParameterSet::getSingleVector2FValue(const std::string& name, const Vector2F& default_value) const
+const Vector3F& TextureParameterSet::getSingleTripleValue(const std::string& name, const Vector3F& default_value) const
 {
-    return geometry_parameters.getSingleVector2FValue(name, material_parameters.getSingleVector2FValue(name, default_value));
+    return geometry_parameters.getSingleTripleValue(name, material_parameters.getSingleTripleValue(name, default_value));
 }
 
-const Point3F& TextureParameterSet::getSinglePoint3FValue(const std::string& name, const Point3F& default_value) const
-{
-    return geometry_parameters.getSinglePoint3FValue(name, material_parameters.getSinglePoint3FValue(name, default_value));
-}
-
-const Vector3F& TextureParameterSet::getSingleVector3FValue(const std::string& name, const Vector3F& default_value) const
-{
-    return geometry_parameters.getSingleVector3FValue(name, material_parameters.getSingleVector3FValue(name, default_value));
-}
-
-const Normal3F& TextureParameterSet::getSingleNormal3FValue(const std::string& name, const Normal3F& default_value) const
-{
-    return geometry_parameters.getSingleNormal3FValue(name, material_parameters.getSingleNormal3FValue(name, default_value));
-}
-
-const Spectrum& TextureParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
+Spectrum TextureParameterSet::getSingleSpectrumValue(const std::string& name, const Spectrum& default_value) const
 {
     return geometry_parameters.getSingleSpectrumValue(name, material_parameters.getSingleSpectrumValue(name, default_value));
 }

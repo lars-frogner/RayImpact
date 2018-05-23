@@ -13,13 +13,15 @@
 using namespace Impact;
 using namespace RayImpact;
 
+// Parsing macros
+
 #define create_single_value_array_ptr(type, arr) \
     imp_assert(!arr.empty()); \
     unsigned int n_values = (unsigned int)arr.size(); \
     std::unique_ptr<type[]> value_ptr(new type[n_values]); \
     do { \
         for (unsigned int i = 0; i < n_values; i++) \
-            value_ptr[i] = arr[i]; \
+            value_ptr[i] = static_cast<type>(arr[i]); \
     } while (false)
 
 #define create_double_value_array_ptr(type, arr) \
@@ -63,10 +65,10 @@ using namespace RayImpact;
 #define find_next_float_arg(value, is_single) \
     value = parameter_set.getFloatValues(nextPositionalArgumentID(), &n_values); \
     if (!value || (is_single && n_values != 1)) \
-    { \
-        printErrorMessage("argument number %d (float%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
-        resetArguments(); \
-        return; \
+	{ \
+		printErrorMessage("argument number %d (float%s) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, (is_single)? "" : " array", func_name); \
+		resetArguments(); \
+		return; \
     } \
     else
 
@@ -80,8 +82,8 @@ using namespace RayImpact;
     } \
     else
 
-#define find_next_vector2_arg(value) \
-    value = parameter_set.getVector2FValues(nextPositionalArgumentID(), &n_values); \
+#define find_next_pair_arg(value) \
+    value = parameter_set.getPairValues(nextPositionalArgumentID(), &n_values); \
     if (!value || n_values != 1) \
     { \
         printErrorMessage("argument number %d (float pair) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, func_name); \
@@ -90,15 +92,17 @@ using namespace RayImpact;
     } \
     else
 
-#define find_next_vector3_arg(value) \
-    value = parameter_set.getVector3FValues(nextPositionalArgumentID(), &n_values); \
+#define find_next_triple_arg(value) \
+    value = parameter_set.getTripleValues(nextPositionalArgumentID(), &n_values); \
     if (!value || n_values != 1) \
     { \
-        printErrorMessage("argument number %d (float triplet) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, func_name); \
+        printErrorMessage("argument number %d (float triple) to \"%s\" is missing or has invalid type. Ignoring call.", positional_arg, func_name); \
         resetArguments(); \
         return; \
     } \
     else
+
+// Parsing static variables
 
 static std::string parsing_output_filename("stdout");
 
@@ -107,10 +111,13 @@ static unsigned int positional_arg = 0;
 static std::vector<bool> bool_array;
 static std::vector<int> int_array;
 static std::vector<imp_float> float_array;
+static std::vector<imp_float> num_array;
 static std::vector<std::string> string_array;
 static std::string next_positional_argument_id;
 
 static ParameterSet parameter_set;
+
+// Parsing function definitions
 
 const char* nextPositionalArgumentID()
 {
@@ -133,6 +140,11 @@ void addFloatElement(double value)
     float_array.push_back((imp_float)value);
 }
 
+void addNumElement(double value)
+{
+    num_array.push_back((imp_float)value);
+}
+
 void addStringElement(const char* value)
 {
     string_array.push_back(std::string(value));
@@ -153,6 +165,11 @@ void clearFloatElements()
     float_array.clear();
 }
 
+void clearNumElements()
+{
+    num_array.clear();
+}
+
 void clearStringElements()
 {
     string_array.clear();
@@ -161,8 +178,9 @@ void clearStringElements()
 void clearAllElements()
 {
     clearBoolElements();
-    clearIntElements();
-    clearFloatElements();
+	clearIntElements();
+	clearFloatElements();
+    clearNumElements();
     clearStringElements();
 }
 
@@ -177,7 +195,7 @@ void addIntParameter(const char* name)
 {
     create_single_value_array_ptr(int, int_array);
     parameter_set.addIntParameter(std::string(name), std::move(value_ptr), n_values);
-    clearIntElements();
+    clearNumElements();
 }
 
 void addFloatParameter(const char* name)
@@ -187,6 +205,20 @@ void addFloatParameter(const char* name)
     clearFloatElements();
 }
 
+void addNumParameter(const char* name)
+{
+    create_single_value_array_ptr(imp_float, num_array);
+    parameter_set.addNumParameter(std::string(name), std::move(value_ptr), n_values);
+    clearNumElements();
+}
+
+void addIntNumParameter(const char* name)
+{
+    create_single_value_array_ptr(int, num_array);
+    parameter_set.addIntParameter(std::string(name), std::move(value_ptr), n_values);
+    clearNumElements();
+}
+
 void addStringParameter(const char* name)
 {
     create_single_value_array_ptr(std::string, string_array);
@@ -194,64 +226,43 @@ void addStringParameter(const char* name)
     clearStringElements();
 }
 
-void addPoint2FParameter(const char* name)
+void addPairParameter(const char* name)
 {
-    create_double_value_array_ptr(Point2F, float_array);
-    parameter_set.addPoint2FParameter(std::string(name), std::move(value_ptr), n_values);
-    clearFloatElements();
+    create_double_value_array_ptr(Vector2F, num_array);
+    parameter_set.addPairParameter(std::string(name), std::move(value_ptr), n_values);
+    clearNumElements();
 }
 
-void addVector2FParameter(const char* name)
+void addTripleParameter(const char* name)
 {
-    create_double_value_array_ptr(Vector2F, float_array);
-    parameter_set.addVector2FParameter(std::string(name), std::move(value_ptr), n_values);
-    clearFloatElements();
-}
-
-void addPoint3FParameter(const char* name)
-{
-    create_triple_value_array_ptr(Point3F, float_array);
-    parameter_set.addPoint3FParameter(std::string(name), std::move(value_ptr), n_values);
-    clearFloatElements();
-}
-
-void addVector3FParameter(const char* name)
-{
-    create_triple_value_array_ptr(Vector3F, float_array);
-    parameter_set.addVector3FParameter(std::string(name), std::move(value_ptr), n_values);
-    clearFloatElements();
-}
-
-void addNormal3FParameter(const char* name)
-{
-    create_triple_value_array_ptr(Normal3F, float_array);
-    parameter_set.addNormal3FParameter(std::string(name), std::move(value_ptr), n_values);
-    clearFloatElements();
+    create_triple_value_array_ptr(Vector3F, num_array);
+    parameter_set.addTripleParameter(std::string(name), std::move(value_ptr), n_values);
+    clearNumElements();
 }
 
 void addRGBSpectrumParameter(const char* name)
 {
-    imp_assert(float_array.size() % 3 == 0 && !float_array.empty());
-    parameter_set.constructSpectrumParameterFromRGB(std::string(name), float_array.data(), (unsigned int)(float_array.size()/3));
-    clearFloatElements();
+    imp_assert(num_array.size() % 3 == 0 && !num_array.empty());
+    parameter_set.constructSpectrumParameterFromRGB(std::string(name), num_array.data(), (unsigned int)(num_array.size()/3));
+    clearNumElements();
 }
 
 void addTristimulusSpectrumParameter(const char* name)
 {
-    imp_assert(float_array.size() % 3 == 0 && !float_array.empty());
-    parameter_set.constructSpectrumParameterFromTristimulus(std::string(name), float_array.data(), (unsigned int)(float_array.size()/3));
-    clearFloatElements();
+    imp_assert(num_array.size() % 3 == 0 && !num_array.empty());
+    parameter_set.constructSpectrumParameterFromTristimulus(std::string(name), num_array.data(), (unsigned int)(num_array.size()/3));
+    clearNumElements();
 }
 
 void addSampledSpectrumParameter(const char* name)
 {
-    imp_assert(float_array.size() % 2 == 0 && !float_array.empty());
+    imp_assert(num_array.size() % 2 == 0 && !num_array.empty());
 
     unsigned int n_samples_total;
 
     if (int_array.empty())
     {
-        n_samples_total = (unsigned int)(float_array.size()/2);
+        n_samples_total = (unsigned int)(num_array.size()/2);
         addIntElement((int)n_samples_total);
     }
     else
@@ -261,10 +272,10 @@ void addSampledSpectrumParameter(const char* name)
         for (size_t i = 0; i < int_array.size(); i++)
             n_samples_total += (unsigned int)(int_array[i]);
 
-        if (n_samples_total != (unsigned int)(float_array.size()/2))
+        if (n_samples_total != (unsigned int)(num_array.size()/2))
         {
             printErrorMessage("the sum of the SPD sample numbers is not consistent with the number of given samples. Ignoring parameter.");
-            clearFloatElements();
+            clearNumElements();
             clearIntElements();
             return;
         }
@@ -278,8 +289,8 @@ void addSampledSpectrumParameter(const char* name)
 
     for (size_t i = 0; i < n_samples_total; i++)
     {
-        wavelengths.push_back(float_array[2*i]);
-        values.push_back(float_array[2*i + 1]);
+        wavelengths.push_back(num_array[2*i]);
+        values.push_back(num_array[2*i + 1]);
     }
 
     parameter_set.constructSpectrumParameterFromSamples(std::string(name),
@@ -287,7 +298,7 @@ void addSampledSpectrumParameter(const char* name)
                                                         values.data(),
                                                         int_array.data(),
                                                         (unsigned int)int_array.size());
-    clearFloatElements();
+    clearNumElements();
     clearIntElements();
 }
 
@@ -303,7 +314,8 @@ void callAPIFunction(const char* func_name)
     positional_arg = 0;
     unsigned int n_values;
 
-    printInfoMessage("Calling \"%s\"", func_name);
+	if (RIMP_OPTIONS.verbosity >= IMP_CALLS_VERBOSITY)
+	    printInfoMessage("Calling \"%s\"", func_name);
 
     if (function_name == "SetOption")
     {
@@ -340,34 +352,66 @@ void callAPIFunction(const char* func_name)
     else if (function_name == "UseTranslation")
     {
         const Vector3F* displacement;
-        find_next_vector3_arg(displacement);
+        find_next_triple_arg(displacement);
         RIMP_UseTranslation(*displacement);
+    }
+    else if (function_name == "ApplyTranslation")
+    {
+        const Vector3F* displacement;
+        find_next_triple_arg(displacement);
+        RIMP_ApplyTranslation(*displacement);
     }
     else if (function_name == "UseRotation")
     {
         const Vector3F* axis;
         const imp_float* angle;
-        find_next_vector3_arg(axis);
+        find_next_triple_arg(axis);
         find_next_float_arg(angle, true);
         RIMP_UseRotation(*axis, *angle);
+    }
+    else if (function_name == "ApplyRotation")
+    {
+        const Vector3F* axis;
+        const imp_float* angle;
+        find_next_triple_arg(axis);
+        find_next_float_arg(angle, true);
+        RIMP_ApplyRotation(*axis, *angle);
     }
     else if (function_name == "UseScaling")
     {
         const Vector3F* scaling;
-        find_next_vector3_arg(scaling);
+        find_next_triple_arg(scaling);
         RIMP_UseScaling(*scaling);
+    }
+    else if (function_name == "ApplyScaling")
+    {
+        const Vector3F* scaling;
+        find_next_triple_arg(scaling);
+        RIMP_ApplyScaling(*scaling);
     }
     else if (function_name == "UseWorldToCamera")
     {
         const Vector3F* camera_position;
         const Vector3F* up_vector;
         const Vector3F* look_point;
-        find_next_vector3_arg(camera_position);
-        find_next_vector3_arg(up_vector);
-        find_next_vector3_arg(look_point);
+        find_next_triple_arg(camera_position);
+        find_next_triple_arg(up_vector);
+        find_next_triple_arg(look_point);
         RIMP_UseWorldToCamera(Point3F(camera_position->x, camera_position->y, camera_position->z),
                               *up_vector,
                               Point3F(look_point->x, look_point->y, look_point->z));
+    }
+    else if (function_name == "ApplyWorldToCamera")
+    {
+        const Vector3F* camera_position;
+        const Vector3F* up_vector;
+        const Vector3F* look_point;
+        find_next_triple_arg(camera_position);
+        find_next_triple_arg(up_vector);
+        find_next_triple_arg(look_point);
+        RIMP_ApplyWorldToCamera(Point3F(camera_position->x, camera_position->y, camera_position->z),
+                                *up_vector,
+                                Point3F(look_point->x, look_point->y, look_point->z));
     }
     else if (function_name == "UseTransformation")
     {
@@ -381,7 +425,7 @@ void callAPIFunction(const char* func_name)
         }
         RIMP_UseTransformation(matrix_elements);
     }
-    else if (function_name == "UseConcatenated")
+    else if (function_name == "ApplyTransformation")
     {
         const imp_float* matrix_elements;
         find_next_float_arg(matrix_elements, false);
@@ -391,7 +435,7 @@ void callAPIFunction(const char* func_name)
             resetArguments();
             return;
         }
-        RIMP_UseConcatenated(matrix_elements);
+        RIMP_ApplyTransformation(matrix_elements);
     }
     else if (function_name == "DefineCoordinateSystem")
     {
@@ -453,9 +497,7 @@ void callAPIFunction(const char* func_name)
     }
     else if (function_name == "SetCameraSensor")
     {
-        const std::string* type;
-        find_next_string_arg(type, true);
-        RIMP_SetCameraSensor(*type, parameter_set);
+        RIMP_SetCameraSensor(parameter_set);
     }
     else if (function_name == "SetIntegrator")
     {
@@ -547,6 +589,18 @@ void callAPIFunction(const char* func_name)
         find_next_string_arg(name, true);
         RIMP_CreateObjectInstance(*name);
     }
+    else if (function_name == "UseSinglePixel")
+    {
+        const int* pixel;
+        find_next_int_arg(pixel, false);
+        if (n_values != 2)
+        {
+            printErrorMessage("argument number %d (int array) to \"%s\" must have size 2. Ignoring call.", positional_arg, func_name);
+            resetArguments();
+            return;
+        }
+        RIMP_UseSinglePixel(pixel);
+    }
     else if (function_name == "EndSceneDescription")
     {
         RIMP_EndSceneDescription();
@@ -558,7 +612,6 @@ void callAPIFunction(const char* func_name)
         return;
     }
 
-    parameter_set.warnAboutUnusedParameters();
     resetArguments();
 }
 
@@ -598,6 +651,9 @@ namespace RayImpact {
 
 void parseSceneDescriptionFiles(const std::vector<std::string>& filenames)
 {
+	if (filenames.empty())
+		printInfoMessage("Warning: no scene description file given");
+
     for (const std::string& filename : filenames)
     {
         parseFile(filename.c_str());
