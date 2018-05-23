@@ -10,7 +10,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RayImpact", "RayImpact\RayI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImpactCore", "ImpactCore\ImpactCore.vcxproj", "{427C847C-48D0-44A3-B175-D2987EAE4B81}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FluidImpact", "FluidImpact\FluidImpact.vcxproj", "{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{427C847C-48D0-44A3-B175-D2987EAE4B81} = {427C847C-48D0-44A3-B175-D2987EAE4B81}
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -34,11 +42,22 @@ Global
 		{427C847C-48D0-44A3-B175-D2987EAE4B81}.Release|x64.Build.0 = Release|x64
 		{427C847C-48D0-44A3-B175-D2987EAE4B81}.Release|x86.ActiveCfg = Release|Win32
 		{427C847C-48D0-44A3-B175-D2987EAE4B81}.Release|x86.Build.0 = Release|Win32
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Debug|x64.ActiveCfg = Debug|x64
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Debug|x64.Build.0 = Debug|x64
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Debug|x86.ActiveCfg = Debug|Win32
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Debug|x86.Build.0 = Debug|Win32
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Release|x64.ActiveCfg = Release|x64
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Release|x64.Build.0 = Release|x64
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Release|x86.ActiveCfg = Release|Win32
+		{89325C3F-F3E0-4927-8FE2-0FCF2A4C42DF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EA0A48F2-C697-4E54-999B-3DB2BECB2020}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AtomicFloat.hpp" />
+    <ClInclude Include="include\Barrier.hpp" />
     <ClInclude Include="include\BlockedArray.hpp" />
     <ClInclude Include="include\error.hpp" />
     <ClInclude Include="include\ErrorFloat.hpp" />
@@ -35,9 +36,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AtomicFloat.cpp" />
+    <ClCompile Include="src\Barrier.cpp" />
     <ClCompile Include="src\image_util.cpp" />
+    <ClCompile Include="src\math.cpp" />
     <ClCompile Include="src\Matrix4x4.cpp" />
     <ClCompile Include="src\parallel.cpp" />
+    <ClCompile Include="src\precision.cpp" />
     <ClCompile Include="src\RandomNumberGenerator.cpp" />
     <ClCompile Include="src\RegionAllocator.cpp" />
     <ClCompile Include="src\string_util.cpp" />
@@ -138,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ImpactCore\include\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDBUG;IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -154,7 +158,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ImpactCore\include\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDBUG;IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

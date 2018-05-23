@@ -21,14 +21,17 @@
   <ItemGroup>
     <ClCompile Include="src\AnimatedTransformation.cpp" />
     <ClCompile Include="src\api.cpp" />
+    <ClCompile Include="src\BilinearInterpolationTexture.cpp" />
     <ClCompile Include="src\BoundingVolumeHierarchy.cpp" />
     <ClCompile Include="src\BSDF.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\ConstantTexture.cpp" />
     <ClCompile Include="src\Cylinder.cpp" />
     <ClCompile Include="src\DiffuseAreaLight.cpp" />
     <ClCompile Include="src\Disk.cpp" />
     <ClCompile Include="src\DistantLight.cpp" />
     <ClCompile Include="src\FresnelReflector.cpp" />
+    <ClCompile Include="src\GlassMaterial.cpp" />
     <ClCompile Include="src\Integrator.cpp" />
     <ClCompile Include="src\LambertianBRDF.cpp" />
     <ClCompile Include="src\LambertianBTDF.cpp" />
@@ -39,6 +42,7 @@
     <ClCompile Include="src\MicrofacetBTDF.cpp" />
     <ClCompile Include="src\MicrofacetDistribution.cpp" />
     <ClCompile Include="src\MixedMaterial.cpp" />
+    <ClCompile Include="src\MixedTexture.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OrenNayarBRDF.cpp" />
     <ClCompile Include="src\OrthographicCamera.cpp" />
@@ -55,6 +59,7 @@
     <ClCompile Include="src\ray_impact.cpp" />
     <ClCompile Include="src\Sampler.cpp" />
     <ClCompile Include="src\sampling.cpp" />
+    <ClCompile Include="src\ScaledTexture.cpp" />
     <ClCompile Include="src\ScatteringEvent.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Sensor.cpp" />
@@ -89,6 +94,7 @@
     <ClInclude Include="include\FresnelReflector.hpp" />
     <ClInclude Include="include\GaussianFilter.hpp" />
     <ClInclude Include="include\geometry.hpp" />
+    <ClInclude Include="include\GlassMaterial.hpp" />
     <ClInclude Include="include\Integrator.hpp" />
     <ClInclude Include="include\LambertianBRDF.hpp" />
     <ClInclude Include="include\LambertianBTDF.hpp" />
@@ -217,7 +223,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)RayImpact\include\;$(SolutionDir)ImpactCore\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessorDefinitions>IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMP_IS_WINDOWS;IMP_VERBOSE_PARSING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -243,7 +249,7 @@
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)RayImpact\include\;$(SolutionDir)ImpactCore\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
-      <PreprocessorDefinitions>IMP_IS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMP_IS_WINDOWS;IMP_VERBOSE_PARSING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

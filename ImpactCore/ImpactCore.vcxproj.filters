@@ -63,6 +63,9 @@
     <ClInclude Include="include\parallel.hpp">
       <Filter>Parallel</Filter>
     </ClInclude>
+    <ClInclude Include="include\Barrier.hpp">
+      <Filter>Parallel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Matrix4x4.cpp">
@@ -85,6 +88,15 @@
     </ClCompile>
     <ClCompile Include="src\parallel.cpp">
       <Filter>Parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Barrier.cpp">
+      <Filter>Parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\precision.cpp">
+      <Filter>Precision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

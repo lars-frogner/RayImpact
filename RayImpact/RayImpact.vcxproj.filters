@@ -161,6 +161,21 @@
     <ClCompile Include="src\BoundingVolumeHierarchy.cpp">
       <Filter>Acceleration structures</Filter>
     </ClCompile>
+    <ClCompile Include="src\ConstantTexture.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BilinearInterpolationTexture.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MixedTexture.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScaledTexture.cpp">
+      <Filter>Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlassMaterial.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BoundingBox.hpp">
@@ -311,6 +326,9 @@
     </ClInclude>
     <ClInclude Include="include\BoundingVolumeHierarchy.hpp">
       <Filter>Acceleration structures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlassMaterial.hpp">
+      <Filter>Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
