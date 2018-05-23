@@ -1,6 +1,7 @@
 #pragma once
 #include "Light.hpp"
 #include "ParameterSet.hpp"
+#include "math.hpp"
 #include <memory>
 
 namespace Impact {
@@ -34,11 +35,28 @@ public:
     PowerSpectrum emittedPower() const;
 };
 
-// DistantLight creation
+// DistantLight function declarations
 
 std::shared_ptr<Light> createDistantLight(const Transformation& light_to_world,
                                           const MediumInterface& medium_interface,
                                           const ParameterSet& parameters);
+
+// DistantLight inline method definitions
+
+inline DistantLight::DistantLight(const Transformation& light_to_world,
+								  const Vector3F& direction,
+								  const RadianceSpectrum& incident_radiance)
+    : Light::Light(LightFlags(LIGHT_DIRECTION_IS_DELTA),
+                   light_to_world,
+                   MediumInterface()),
+    direction(light_to_world(direction)),
+    incident_radiance(incident_radiance)
+{}
+
+inline PowerSpectrum DistantLight::emittedPower() const
+{
+    return (IMP_PI*scene_radius*scene_radius)*incident_radiance;
+}
 
 } // RayImpact
 } // Impact

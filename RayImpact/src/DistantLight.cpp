@@ -1,21 +1,11 @@
 #include "DistantLight.hpp"
-#include "math.hpp"
 #include "Scene.hpp"
+#include "api.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// DistantLight method implementations
-
-DistantLight::DistantLight(const Transformation& light_to_world,
-                           const Vector3F& direction,
-                           const RadianceSpectrum& incident_radiance)
-    : Light::Light(LightFlags(LIGHT_DIRECTION_IS_DELTA),
-                   light_to_world,
-                   MediumInterface()),
-    direction(light_to_world(direction)),
-    incident_radiance(incident_radiance)
-{}
+// DistantLight method definitions
 
 void DistantLight::preprocess(const Scene& scene)
 {
@@ -28,34 +18,40 @@ RadianceSpectrum DistantLight::sampleIncidentRadiance(const ScatteringEvent& sca
                                                       imp_float* pdf_value,
                                                       VisibilityTester* visibility_tester) const
 {
-    *incident_direction = direction;
+    *incident_direction = -direction;
 
     *pdf_value = 1.0f;
 
-    const Point3F& outside_point = scattering_event.position + direction*(2*scene_radius);
+    const Point3F& outside_point = scattering_event.position - direction*(2*scene_radius);
 
     *visibility_tester = VisibilityTester(ScatteringEvent(outside_point, medium_interface, scattering_event.time), scattering_event);
 
     return incident_radiance;
 }
 
-PowerSpectrum DistantLight::emittedPower() const
-{
-    return (IMP_PI*scene_radius*scene_radius)*incident_radiance;
-}
-
-// DistantLight creation
+// DistantLight function definitions
 
 std::shared_ptr<Light> createDistantLight(const Transformation& light_to_world,
                                           const MediumInterface& medium_interface,
                                           const ParameterSet& parameters)
 {
-    const Vector3F& direction = parameters.getSingleVector3FValue("direction", Vector3F(0, 0, -1));
-    const RadianceSpectrum& incident_radiance = parameters.getSingleSpectrumValue("incident_radiance", RadianceSpectrum(0.0f));
+    const Vector3F& direction = parameters.getSingleTripleValue("direction", Vector3F(0, 0, -1)).normalized();
+    const RadianceSpectrum& radiance = parameters.getSingleSpectrumValue("radiance", RadianceSpectrum(1.0f));
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_LIGHTS_VERBOSITY)
+	{
+		printInfoMessage("Light:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s W/sr/m^2"
+						 "\n    %-20s%s",
+						 "Type:", "Distant",
+						 "Radiance:", radiance.toRGBString().c_str(),
+						 "Direction:", light_to_world(direction).toString().c_str());
+	}
 
     return std::make_shared<DistantLight>(light_to_world,
                                           direction,
-                                          incident_radiance);
+                                          radiance);
 }
 
 } // RayImpact
