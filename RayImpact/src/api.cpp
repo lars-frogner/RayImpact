@@ -26,6 +26,7 @@
 #include "Material.hpp"
 #include "MatteMaterial.hpp"
 #include "PlasticMaterial.hpp"
+#include "GlassMaterial.hpp"
 #include "MixedMaterial.hpp"
 #include "Model.hpp"
 #include "BoundingVolumeHierarchy.hpp"
@@ -175,6 +176,9 @@ public:
 
     bool use_reverse_orientation = false;
 
+	bool render_single_pixel = false;
+	Point2I single_pixel;
+
     std::shared_ptr<Material> createMaterial(const ParameterSet& geometry_parameters);
 
     MediumInterface createMediumInterface();
@@ -208,7 +212,8 @@ public:
         else
         {
             // Allocate memory for the transformation and its inverse
-            transformation_ptr = nullptr;//allocator.allocate<Transformation>(2, false);
+            //transformation_ptr = allocator.allocate<Transformation>(2, false); !!TEMP!!
+			transformation_ptr = (Transformation*)(allocator.allocate(2*sizeof(Transformation)));
             inverse_transformation_ptr = transformation_ptr + 1;
 
             // Store the transformation and its inverse
@@ -477,6 +482,10 @@ std::shared_ptr<Material> createMaterial(const std::string& type, const TextureP
     {
         material = createPlasticMaterial(parameters);
     }
+    else if (type == "glass")
+    {
+        material = createGlassMaterial(parameters);
+    }
     else if (type == "mixed")
     {
         std::string material_name_1 = parameters.getSingleStringValue("mix_material_1", "");
@@ -608,7 +617,7 @@ MediumInterface GraphicsState::createMediumInterface()
 
 Scene* Configurations::createScene()
 {
-    std::shared_ptr<Model> accelerator = CreateAccelerationStructure(accelerator_type,
+	std::shared_ptr<Model> accelerator = CreateAccelerationStructure(accelerator_type,
                                                                      models,
                                                                      accelerator_parameters);
 
@@ -723,7 +732,7 @@ Camera* Configurations::createCamera() const
     return camera;
 }
 
-// API function implementations
+// API function definitions
 
 void RIMP_SetOption(const std::string& option, const std::string& value)
 {
@@ -744,6 +753,18 @@ void RIMP_SetOption(const std::string& option, const std::string& value)
     else if (option == "image_filename")
     {
         RIMP_OPTIONS.image_filename = value;
+    }
+    else if (option == "verbosity")
+    {
+        int verbosity = std::stoi(value);
+
+        if (verbosity < IMP_MIN_VERBOSITY || verbosity > IMP_MAX_VERBOSITY)
+        {
+            printWarningMessage("invalid verbosity: %d. Using default.", verbosity);
+            return;
+        }
+
+        RIMP_OPTIONS.verbosity = verbosity;
     }
     else
     {
@@ -826,6 +847,15 @@ void RIMP_UseTranslation(const Vector3F& displacement)
     )
 }
 
+void RIMP_ApplyTranslation(const Vector3F& displacement)
+{
+    verify_initialized("ApplyTranslation");
+
+    for_active_transformations(
+        current_transformations[idx] = Transformation::translation(displacement)*current_transformations[idx];
+    )
+}
+
 void RIMP_UseRotation(const Vector3F& axis, imp_float angle)
 {
     verify_initialized("UseRotation");
@@ -835,12 +865,30 @@ void RIMP_UseRotation(const Vector3F& axis, imp_float angle)
     )
 }
 
+void RIMP_ApplyRotation(const Vector3F& axis, imp_float angle)
+{
+    verify_initialized("ApplyRotation");
+
+    for_active_transformations(
+        current_transformations[idx] = Transformation::rotation(axis, angle)*current_transformations[idx];
+    )
+}
+
 void RIMP_UseScaling(const Vector3F& scaling)
 {
     verify_initialized("UseScaling");
 
     for_active_transformations(
         current_transformations[idx] = Transformation::scaling(scaling.x, scaling.y, scaling.z);
+    )
+}
+
+void RIMP_ApplyScaling(const Vector3F& scaling)
+{
+    verify_initialized("ApplyScaling");
+
+    for_active_transformations(
+        current_transformations[idx] = Transformation::scaling(scaling.x, scaling.y, scaling.z)*current_transformations[idx];
     )
 }
 
@@ -855,6 +903,17 @@ void RIMP_UseWorldToCamera(const Point3F& camera_position,
     )
 }
 
+void RIMP_ApplyWorldToCamera(const Point3F& camera_position,
+                             const Vector3F& up_vector,
+                             const Point3F& look_point)
+{
+    verify_initialized("ApplyWorldToCamera");
+
+    for_active_transformations(
+        current_transformations[idx] = Transformation::worldToCamera(camera_position, up_vector, look_point)*current_transformations[idx];
+    )
+}
+
 void RIMP_UseTransformation(const imp_float matrix_elements[16])
 {
     verify_initialized("UseTransformation");
@@ -866,14 +925,14 @@ void RIMP_UseTransformation(const imp_float matrix_elements[16])
     )
 }
 
-void RIMP_UseConcatenated(const imp_float matrix_elements[16])
+void RIMP_ApplyTransformation(const imp_float matrix_elements[16])
 {
-    verify_initialized("UseConcatenated");
+    verify_initialized("ApplyTransformation");
 
     const Transformation& transformation = Transformation(Matrix4x4(matrix_elements));
 
     for_active_transformations(
-        current_transformations[idx] = current_transformations[idx]*transformation;
+        current_transformations[idx] = transformation*current_transformations[idx];
     )
 }
 
@@ -960,11 +1019,10 @@ void RIMP_SetCamera(const std::string& type, const ParameterSet& parameters)
     defined_coordinate_systems["camera"] = configurations->camera_to_world;
 }
 
-void RIMP_SetCameraSensor(const std::string& type, const ParameterSet& parameters)
+void RIMP_SetCameraSensor(const ParameterSet& parameters)
 {
     verify_in_config_state("SetCameraSensor");
 
-    configurations->sensor_type = type;
     configurations->sensor_parameters = parameters;
 }
 
@@ -1350,6 +1408,15 @@ void RIMP_CreateObjectInstance(const std::string& name)
     configurations->models.push_back(model);
 }
 
+void RIMP_UseSinglePixel(const int pixel[2])
+{
+    verify_in_scene_descript_state("UseSinglePixel");
+
+	current_graphics_state.render_single_pixel = true;
+	current_graphics_state.single_pixel.x = pixel[0];
+	current_graphics_state.single_pixel.y = pixel[1];
+}
+
 void RIMP_EndSceneDescription()
 {
     verify_in_scene_descript_state("EndSceneDescription");
@@ -1373,7 +1440,10 @@ void RIMP_EndSceneDescription()
     std::unique_ptr<Scene> scene(configurations->createScene());
 
     if (integrator && scene)
-        integrator->render(*scene);
+		if (current_graphics_state.render_single_pixel)
+			integrator->renderSinglePixel(*scene, current_graphics_state.single_pixel);
+		else
+	        integrator->render(*scene);
 
     current_API_state = APIState::Configuration;
 

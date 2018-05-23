@@ -10,9 +10,21 @@ struct Options
 {
     unsigned int n_threads = 0; // The number of threads to use for parallelization (determined automatically if set to 0)
     std::string image_filename = "out.pfm"; // The filename to use for the rendered image
+	int verbosity = 0;
 };
 
 extern Options RIMP_OPTIONS; // Global rendering options
+
+// API macros
+
+#define IMP_MIN_VERBOSITY 0
+#define IMP_MAX_VERBOSITY 3
+
+#define IMP_CORE_VERBOSITY 1
+#define IMP_SHAPES_VERBOSITY 2
+#define IMP_LIGHTS_VERBOSITY 2
+#define IMP_MATERIALS_VERBOSITY 2
+#define IMP_CALLS_VERBOSITY 3
 
 // API function declarations
 
@@ -36,19 +48,27 @@ void RIMP_UseIdentity();
 
 void RIMP_UseTranslation(const Vector3F& displacement);
 
+void RIMP_ApplyTranslation(const Vector3F& displacement);
+
 void RIMP_UseRotation(const Vector3F& axis, imp_float angle);
 
+void RIMP_ApplyRotation(const Vector3F& axis, imp_float angle);
+
 void RIMP_UseScaling(const Vector3F& scaling);
+
+void RIMP_ApplyScaling(const Vector3F& scaling);
 
 void RIMP_UseWorldToCamera(const Point3F& camera_position,
                            const Vector3F& up_vector,
                            const Point3F& look_point);
 
+void RIMP_ApplyWorldToCamera(const Point3F& camera_position,
+                             const Vector3F& up_vector,
+                             const Point3F& look_point);
+
 void RIMP_UseTransformation(const imp_float matrix_elements[16]);
 
-void RIMP_UseConcatenated(const imp_float matrix_elements[16]);
-
-void RIMP_DefineCoordinateSystem(const std::string& name);
+void RIMP_ApplyTransformation(const imp_float matrix_elements[16]);
 
 void RIMP_DefineCoordinateSystem(const std::string& name);
 
@@ -66,7 +86,7 @@ void RIMP_SetFilter(const std::string& type, const ParameterSet& parameters);
 
 void RIMP_SetCamera(const std::string& type, const ParameterSet& parameters);
 
-void RIMP_SetCameraSensor(const std::string& type, const ParameterSet& parameters);
+void RIMP_SetCameraSensor(const ParameterSet& parameters);
 
 void RIMP_SetIntegrator(const std::string& type, const ParameterSet& parameters);
 
@@ -102,6 +122,8 @@ void RIMP_BeginObject(const std::string& name);
 void RIMP_EndObject();
 
 void RIMP_CreateObjectInstance(const std::string& name);
+
+void RIMP_UseSinglePixel(const int pixel[2]);
 
 void RIMP_EndSceneDescription();
 
