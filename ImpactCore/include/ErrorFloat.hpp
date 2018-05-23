@@ -171,7 +171,7 @@ inline bool solveQuadraticEquation(const ErrorFloat& a,
 
     const ErrorFloat& discriminant = b*b - ErrorFloat(4.0)*a*c;
 
-    if (discriminant < 0.0)
+    if (discriminant.lowerBound() < 0.0)
         return false;
 
     const ErrorFloat& sqrt_discriminant = sqrt(discriminant);
