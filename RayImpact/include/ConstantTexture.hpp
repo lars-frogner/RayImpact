@@ -1,6 +1,5 @@
 #pragma once
 #include "Texture.hpp"
-#include "ParameterSet.hpp"
 
 namespace Impact {
 namespace RayImpact {
@@ -15,32 +14,40 @@ private:
 
 public:
 
-    ConstantTexture(const T& value)
-        : value(value)
-    {}
+    ConstantTexture(const T& value);
 
-    T evaluate(const SurfaceScatteringEvent& scattering_event) const
-    {
-        return value;
-    }
+    T evaluate(const SurfaceScatteringEvent& scattering_event) const;
+
+	std::string toString() const;
 };
 
-// ConstantTexture creation
+// ConstantTexture function declarations
 
 Texture<imp_float>* createConstantFloatTexture(const Transformation& texture_to_world,
-                                               const TextureParameterSet& parameters)
-{
-    imp_float value = parameters.getSingleFloatValue("value", 0.0f);
-
-    return new ConstantTexture<imp_float>(value);
-}
+                                               const TextureParameterSet& parameters);
 
 Texture<Spectrum>* createConstantSpectrumTexture(const Transformation& texture_to_world,
-                                                 const TextureParameterSet& parameters)
-{
-    const Spectrum& value = parameters.getSingleSpectrumValue("value", Spectrum(0.0f));
+                                                 const TextureParameterSet& parameters);
 
-    return new ConstantTexture<Spectrum>(value);
+// ConstantTexture inline method definitions
+
+template <typename T>
+inline ConstantTexture<T>::ConstantTexture(const T& value)
+    : value(value)
+{}
+
+template <typename T>
+inline T ConstantTexture<T>::evaluate(const SurfaceScatteringEvent& scattering_event) const
+{
+    return value;
+}
+
+template <typename T>
+inline std::string ConstantTexture<T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "{value: " << value << "}";
+    return stream.str();
 }
 
 } // RayImpact

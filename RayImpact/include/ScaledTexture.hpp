@@ -19,30 +19,41 @@ private:
 public:
 
     ScaledTexture(const std::shared_ptr< Texture<T_scale> >& scale,
-                  const std::shared_ptr< Texture<T> >& texture)
-        : scale(scale), texture(texture)
-    {}
+                  const std::shared_ptr< Texture<T> >& texture);
 
-    T evaluate(const SurfaceScatteringEvent& scattering_event) const
-    {
-        return scale->evaluate(scattering_event)*texture->evaluate(scattering_event);
-    }
+    T evaluate(const SurfaceScatteringEvent& scattering_event) const;
+
+	std::string toString() const;
 };
 
-// ScaledTexture creation
+// ScaledTexture function declarations
 
 ScaledTexture<imp_float, imp_float>* createScaledFloatTexture(const Transformation& texture_to_world,
-                                                              const TextureParameterSet& parameters)
-{
-    return new ScaledTexture<imp_float, imp_float>(parameters.getFloatTexture("scale", 0.0f),
-                                                   parameters.getFloatTexture("texture", 0.0f));
-}
+                                                              const TextureParameterSet& parameters);
 
 ScaledTexture<Spectrum, Spectrum>* createScaledSpectrumTexture(const Transformation& texture_to_world,
-                                                               const TextureParameterSet& parameters)
+                                                               const TextureParameterSet& parameters);
+
+// MixedTexture inline method definitions
+
+template <typename T_scale, typename T>
+inline ScaledTexture<T_scale, T>::ScaledTexture(const std::shared_ptr< Texture<T_scale> >& scale,
+												const std::shared_ptr< Texture<T> >& texture)
+    : scale(scale), texture(texture)
+{}
+
+template <typename T_scale, typename T>
+inline T ScaledTexture<T_scale, T>::evaluate(const SurfaceScatteringEvent& scattering_event) const
 {
-    return new ScaledTexture<Spectrum, Spectrum>(parameters.getSpectrumTexture("scale", Spectrum(0.0f)),
-                                                 parameters.getSpectrumTexture("texture", Spectrum(0.0f)));
+    return scale->evaluate(scattering_event)*texture->evaluate(scattering_event);
+}
+
+template <typename T_scale, typename T>
+inline std::string ScaledTexture<T_scale, T>::toString() const
+{
+    std::ostringstream stream;
+	stream << "{scale: " << *scale << ", texture: " << *texture << "}";
+    return stream.str();
 }
 
 } // RayImpact
