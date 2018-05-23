@@ -2,22 +2,7 @@
 
 namespace Impact {
 
-// AtomicFloat method implementations
-
-AtomicFloat::AtomicFloat(imp_float value /* = 0 */)
-    : bits(floatToBits(value))
-{}
-
-AtomicFloat::operator imp_float() const
-{
-    return bitsToFloat(bits);
-}
-
-imp_float AtomicFloat::operator=(imp_float value)
-{
-    bits = floatToBits(value);
-    return value;
-}
+// AtomicFloat method definitions
 
 void AtomicFloat::add(imp_float value)
 {
