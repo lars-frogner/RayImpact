@@ -4,19 +4,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// Camera method implementations
-
-Camera::Camera(const AnimatedTransformation& camera_to_world,
-               imp_float shutter_opening_time,
-               imp_float shutter_closing_time,
-               Sensor* sensor,
-               const Medium* medium)
-    : camera_to_world(camera_to_world),
-      shutter_opening_time(shutter_opening_time),
-      shutter_closing_time(shutter_closing_time),
-      sensor(sensor),
-      medium(medium)
-{}
+// Camera method definitions
 
 imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
                                          RayWithOffsets* ray) const
@@ -56,7 +44,7 @@ imp_float Camera::generateRayWithOffsets(const CameraSample& sample,
     return ray_weight;
 }
 
-// ProjectiveCamera method implementations
+// ProjectiveCamera method definitions
 
 ProjectiveCamera::ProjectiveCamera(const AnimatedTransformation& camera_to_world,
                                    const Transformation& camera_to_screen,

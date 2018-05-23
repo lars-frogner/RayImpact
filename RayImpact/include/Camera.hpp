@@ -73,5 +73,19 @@ public:
                      const Medium* medium);
 };
 
+// Camera inline method definitions
+
+inline Camera::Camera(const AnimatedTransformation& camera_to_world,
+					  imp_float shutter_opening_time,
+					  imp_float shutter_closing_time,
+					  Sensor* sensor,
+					  const Medium* medium)
+    : camera_to_world(camera_to_world),
+      shutter_opening_time(shutter_opening_time),
+      shutter_closing_time(shutter_closing_time),
+      sensor(sensor),
+      medium(medium)
+{}
+
 } // RayImpact
 } // Impact
