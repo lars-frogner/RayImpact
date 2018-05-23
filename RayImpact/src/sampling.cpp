@@ -3,7 +3,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// DistributionFunction1D method implementations
+// DistributionFunction1D method definitions
 
 DistributionFunction1D::DistributionFunction1D(const imp_float* values, unsigned int n_values)
     : values(values, values + n_values),
@@ -30,11 +30,6 @@ DistributionFunction1D::DistributionFunction1D(const imp_float* values, unsigned
         for (unsigned int i = 1; i <= n_values; i++)
             cdf_values[i] *= inv_integral;
     }
-}
-
-unsigned int DistributionFunction1D::size() const
-{
-    return (unsigned int)(values.size());
 }
 
 imp_float DistributionFunction1D::continuousSample(imp_float uniform_sample,
@@ -75,12 +70,7 @@ unsigned int DistributionFunction1D::discreteSample(imp_float uniform_sample,
     return idx;
 }
 
-imp_float DistributionFunction1D::discretePDF(unsigned int idx) const
-{
-    return values[idx]/(integral*size());
-}
-
-// Sampling utility function implementations
+// Sampling function definitions
 
 // Fills the given array with stratified sample values covering the unit interval
 void generateStratifiedSamples(imp_float* samples,

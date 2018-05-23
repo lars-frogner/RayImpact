@@ -35,17 +35,20 @@ public:
     imp_float discretePDF(unsigned int idx) const;
 };
 
-// Sampling utility function declarations
+// Sampling function declarations
 
+// Fills the given array with stratified sample values covering the unit interval
 void generateStratifiedSamples(imp_float* samples,
                                size_t n_samples,
                                RandomNumberGenerator& rng);
 
+// Fills the given array with stratified sample points covering the unit square
 void generateStratifiedSamples(Point2F* samples,
                                size_t n_horizontal_samples,
                                size_t n_vertical_samples,
                                RandomNumberGenerator& rng);
 
+// Fills the given array with Latin hypercube sample points inside the n-dimensional unit cube
 void generateLatinHypercubeSamples(imp_float* samples,
                                    size_t n_samples,
                                    unsigned int n_sample_dimensions,
@@ -53,15 +56,31 @@ void generateLatinHypercubeSamples(imp_float* samples,
 
 Point2F rejectionDiskSample(RandomNumberGenerator& rng);
 
+// Given a sample point inside the unit square, returns a uniformly sampled point inside the unit disk
 Point2F uniformDiskSample(const Point2F& uniform_sample);
 
+// Given a sample point inside the unit square, returns a concentric sampled point inside the unit disk
 Point2F concentricDiskSample(const Point2F& uniform_sample);
 
+// Given a sample point inside the unit square, returns a uniformly sampled direction vector in the unit hemisphere around the z-axis
 Vector3F uniformHemisphereSample(const Point2F& uniform_sample);
 
+// Given a sample point inside the unit square, returns a cosine-weighted sampled direction vector in the unit hemisphere around the z-axis
 Vector3F cosineWeightedHemisphereSample(const Point2F& uniform_sample);
 
-// Sampling utility function implementations
+// DistributionFunction1D inline method definitions
+
+inline unsigned int DistributionFunction1D::size() const
+{
+    return (unsigned int)(values.size());
+}
+
+inline imp_float DistributionFunction1D::discretePDF(unsigned int idx) const
+{
+    return values[idx]/(integral*size());
+}
+
+// Sampling inline function definitions
 
 // Shuffles the elements in the given array into a random order
 template <typename T>
