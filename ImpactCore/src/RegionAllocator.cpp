@@ -5,18 +5,7 @@
 
 namespace Impact {
 
-// RegionAllocator method implementations
-
-RegionAllocator::RegionAllocator(size_t block_size /* = 262144 */)
-    : block_size(block_size),
-      current_block(nullptr),
-      current_position(0),
-      current_block_size(0),
-      used_blocks(),
-      available_blocks()
-{
-    imp_assert(block_size % 16 == 0);
-}
+// RegionAllocator method definitions
 
 RegionAllocator::~RegionAllocator()
 {
@@ -96,7 +85,7 @@ void* RegionAllocator::allocate(size_t n_bytes)
 
 // Returns a pointer to a region of memory with room for the given number of objects
 template <typename T>
-inline T* RegionAllocator::allocate(size_t n_elements /* = 1 */, bool call_constructor /* = true */)
+T* RegionAllocator::allocate(size_t n_elements /* = 1 */, bool call_constructor /* = true */)
 {
     T* pointer_to_allocated = (T*)(allocate(n_elements*sizeof(T)));
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "error.hpp"
 #include <cstdint>
 #include <list>
 #include <utility>
@@ -31,5 +32,18 @@ public:
 
     void release();
 };
+
+// RegionAllocator inline method definitions
+
+inline RegionAllocator::RegionAllocator(size_t block_size /* = 262144 */)
+    : block_size(block_size),
+      current_block(nullptr),
+      current_position(0),
+      current_block_size(0),
+      used_blocks(),
+      available_blocks()
+{
+    imp_assert(block_size % 16 == 0);
+}
 
 } // Impact
