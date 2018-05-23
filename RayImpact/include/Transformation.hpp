@@ -7,6 +7,8 @@
 #include "BoundingBox.hpp"
 #include "ScatteringEvent.hpp"
 #include <ostream>
+#include <sstream>
+#include <string>
 
 namespace Impact {
 namespace RayImpact {
@@ -17,8 +19,6 @@ class AnimatedTransformation;
 // Transformation declarations
 
 class Transformation {
-
-friend std::ostream& operator<<(std::ostream& stream, const Transformation& transformation);
 
 friend AnimatedTransformation;
 
@@ -99,7 +99,101 @@ public:
     Transformation inverted() const;
 
     Quaternion quaternion() const;
+
+	std::string toString() const;
 };
+
+// Transformation inline method definitions
+
+// Identity transformation
+inline Transformation::Transformation()
+    : matrix(),
+      matrix_inverse()
+{}
+
+inline Transformation::Transformation(const Matrix4x4& matrix)
+    : matrix(matrix),
+      matrix_inverse(matrix.inverted())
+{}
+
+inline Transformation::Transformation(const Matrix4x4& matrix,
+									  const Matrix4x4& matrix_inverse)
+    : matrix(matrix),
+      matrix_inverse(matrix_inverse)
+{}
+
+inline bool Transformation::operator==(const Transformation& other) const
+{
+    return matrix == other.matrix;
+}
+
+inline bool Transformation::operator!=(const Transformation& other) const
+{
+    return !(*this == other);
+}
+
+inline Transformation Transformation::operator*(const Transformation& other) const
+{
+    return Transformation(matrix*other.matrix, other.matrix_inverse*matrix_inverse);
+}
+
+inline Transformation& Transformation::operator*=(const Transformation& other)
+{
+    (*this) = (*this)*other;
+    return *this;
+}
+
+inline bool Transformation::isIdentity() const
+{
+    return matrix.isIdentity();
+}
+
+inline Transformation Transformation::transposed() const
+{
+    return Transformation(matrix.transposed(), matrix_inverse.transposed());
+}
+
+inline Transformation Transformation::inverted() const
+{
+    return Transformation(matrix_inverse, matrix);
+}
+
+inline Quaternion Transformation::quaternion() const
+{
+    return quaternionFromMatrix(matrix);
+}
+
+inline std::string Transformation::toString() const
+{
+    std::ostringstream stream;
+	stream << "["
+           << matrix.a11 << ", "
+           << matrix.a12 << ", "
+           << matrix.a13 << ", "
+           << matrix.a14 << "; "
+           << matrix.a21 << ", "
+           << matrix.a22 << ", "
+           << matrix.a23 << ", "
+           << matrix.a24 << "; "
+           << matrix.a31 << ", "
+           << matrix.a32 << ", "
+           << matrix.a33 << ", "
+           << matrix.a34 << "; "
+           << matrix.a41 << ", "
+           << matrix.a42 << ", "
+           << matrix.a43 << ", "
+           << matrix.a44 << "]";
+    return stream.str();
+}
+
+// Transformation inline function definitions
+
+inline std::ostream& operator<<(std::ostream& stream, const Transformation& transformation)
+{
+	stream << transformation.toString();
+    return stream;
+}
+
 
 } // RayImpact
 } // Impact

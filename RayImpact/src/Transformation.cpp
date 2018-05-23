@@ -6,24 +6,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// Transformation method implementations
-
-// Identity transformation
-Transformation::Transformation()
-    : matrix(),
-      matrix_inverse()
-{}
-
-Transformation::Transformation(const Matrix4x4& matrix)
-    : matrix(matrix),
-      matrix_inverse(matrix.inverted())
-{}
-
-Transformation::Transformation(const Matrix4x4& matrix,
-                               const Matrix4x4& matrix_inverse)
-    : matrix(matrix),
-      matrix_inverse(matrix_inverse)
-{}
+// Transformation method definitions
 
 Transformation Transformation::translation(const Vector3F& displacement)
 {
@@ -46,10 +29,10 @@ Transformation Transformation::scaling(imp_float scale_x,
 {
     imp_assert(scale_x != 0 && scale_y != 0 && scale_z != 0);
 
-    Matrix4x4 matrix(scale_x,        0,         0, 0,
+    Matrix4x4 matrix(scale_x,        0,        0, 0,
                            0, scale_y,         0, 0,
-                           0,        0, scale_z, 0,
-                           0,        0,         0, 1);
+                           0,        0, scale_z,  0,
+                           0,        0,        0, 1);
 
     Matrix4x4 matrix_inverse(1.0f/scale_x,              0,            0, 0,
                                         0, 1.0f/scale_y,            0, 0,
@@ -206,16 +189,6 @@ Transformation Transformation::perspective(imp_float field_of_view,
     return scaling(xy_scale, xy_scale, 1)*Transformation(projection);
 }
 
-bool Transformation::operator==(const Transformation& other) const
-{
-    return matrix == other.matrix;
-}
-
-bool Transformation::operator!=(const Transformation& other) const
-{
-    return !(*this == other);
-}
-
 bool Transformation::operator<(const Transformation& other) const
 {
     if (matrix.a11 < other.matrix.a11) return true;
@@ -257,17 +230,6 @@ bool Transformation::operator<(const Transformation& other) const
     return false;
 }
 
-Transformation Transformation::operator*(const Transformation& other) const
-{
-    return Transformation(matrix*other.matrix, other.matrix_inverse*matrix_inverse);
-}
-
-Transformation& Transformation::operator*=(const Transformation& other)
-{
-    (*this) = (*this)*other;
-    return *this;
-}
-
 Point3F Transformation::operator()(const Point3F& point) const
 {
     imp_float x = matrix.a11*point.x + matrix.a12*point.y + matrix.a13*point.z + matrix.a14;
@@ -302,9 +264,9 @@ Point3F Transformation::operator()(const Point3F& point, const Vector3F& point_e
                                         std::abs(matrix.a21*point.x) + std::abs(matrix.a22*point.y) + std::abs(matrix.a23*point.z) + std::abs(matrix.a24),
                                         std::abs(matrix.a31*point.x) + std::abs(matrix.a32*point.y) + std::abs(matrix.a33*point.z) + std::abs(matrix.a34))
                                *errorPowerBound(3) +
-                               Vector3F(std::abs(matrix.a11)*point_error.x + std::abs(matrix.a12)*point_error.y + std::abs(matrix.a13)*point_error.z + std::abs(matrix.a14),
-                                        std::abs(matrix.a21)*point_error.x + std::abs(matrix.a22)*point_error.y + std::abs(matrix.a23)*point_error.z + std::abs(matrix.a24),
-                                        std::abs(matrix.a31)*point_error.x + std::abs(matrix.a32)*point_error.y + std::abs(matrix.a33)*point_error.z + std::abs(matrix.a34))
+                               Vector3F(std::abs(matrix.a11)*point_error.x + std::abs(matrix.a12)*point_error.y + std::abs(matrix.a13)*point_error.z,
+                                        std::abs(matrix.a21)*point_error.x + std::abs(matrix.a22)*point_error.y + std::abs(matrix.a23)*point_error.z,
+                                        std::abs(matrix.a31)*point_error.x + std::abs(matrix.a32)*point_error.y + std::abs(matrix.a33)*point_error.z)
                                *(errorPowerBound(3) + 1);
 
     return Point3F(matrix.a11*point.x + matrix.a12*point.y + matrix.a13*point.z + matrix.a14,
@@ -480,14 +442,12 @@ SurfaceScatteringEvent Transformation::operator()(const SurfaceScatteringEvent& 
     transformed_event.shading.dndu = transformation(scattering_event.shading.dndu);
     transformed_event.shading.dndv = transformation(scattering_event.shading.dndv);
 
+	transformed_event.dpdx = transformation(scattering_event.dpdx);
+	transformed_event.dpdy = transformation(scattering_event.dpdy);
+
     transformed_event.shading.surface_normal.flipToSameHemisphereAs(transformed_event.surface_normal);
 
     return transformed_event;
-}
-
-bool Transformation::isIdentity() const
-{
-    return matrix.isIdentity();
 }
 
 bool Transformation::hasScaling() const
@@ -509,16 +469,6 @@ bool Transformation::swapsHandedness() const
                             matrix.a13*(matrix.a21*matrix.a32 - matrix.a22*matrix.a31);
 
     return determinant < 0;
-}
-
-Transformation Transformation::transposed() const
-{
-    return Transformation(matrix.transposed(), matrix_inverse.transposed());
-}
-
-Transformation Transformation::inverted() const
-{
-    return Transformation(matrix_inverse, matrix);
 }
 
 Quaternion Transformation::quaternionFromMatrix(const Matrix4x4& matrix)
@@ -651,35 +601,6 @@ Quaternion Transformation::quaternionFromMatrix(const Matrix4x4& matrix)
     }
 
     return result;
-}
-
-Quaternion Transformation::quaternion() const
-{
-    return quaternionFromMatrix(matrix);
-}
-
-// Printing functions
-
-std::ostream& operator<<(std::ostream& stream, const Transformation& transformation)
-{
-    stream << "["
-           << transformation.matrix.a11 << ", "
-           << transformation.matrix.a12 << ", "
-           << transformation.matrix.a13 << ", "
-           << transformation.matrix.a14 << "; "
-           << transformation.matrix.a21 << ", "
-           << transformation.matrix.a22 << ", "
-           << transformation.matrix.a23 << ", "
-           << transformation.matrix.a24 << "; "
-           << transformation.matrix.a31 << ", "
-           << transformation.matrix.a32 << ", "
-           << transformation.matrix.a33 << ", "
-           << transformation.matrix.a34 << "; "
-           << transformation.matrix.a41 << ", "
-           << transformation.matrix.a42 << ", "
-           << transformation.matrix.a43 << ", "
-           << transformation.matrix.a44 << "]";
-    return stream;
 }
 
 } // RayImpact
