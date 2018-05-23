@@ -1,25 +1,9 @@
 #include "Model.hpp"
-#include "error.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// GeometricModel method implementations
-
-GeometricModel::GeometricModel(const std::shared_ptr<Shape>& shape,
-                               const std::shared_ptr<Material>& material,
-                               const std::shared_ptr<AreaLight>& area_light,
-                               const MediumInterface& medium_interface)
-    : shape(shape),
-      material(material),
-      area_light(area_light),
-      medium_interface(medium_interface)
-{}
-
-BoundingBoxF GeometricModel::worldSpaceBoundingBox() const
-{
-    return shape->worldSpaceBoundingBox();
-}
+// GeometricModel method definitions
 
 bool GeometricModel::intersect(const Ray& ray,
                                SurfaceScatteringEvent* scattering_event) const
@@ -39,47 +23,7 @@ bool GeometricModel::intersect(const Ray& ray,
     return true;
 }
 
-bool GeometricModel::hasIntersection(const Ray& ray) const
-{
-    return shape->hasIntersection(ray);
-}
-
-const AreaLight* GeometricModel::getAreaLight() const
-{
-    return area_light.get();
-}
-
-const Material* GeometricModel::getMaterial() const
-{
-    return material.get();
-}
-
-void GeometricModel::generateBSDF(SurfaceScatteringEvent* scattering_event,
-                                  RegionAllocator& allocator,
-                                  TransportMode transport_mode,
-                                  bool allow_multiple_scattering_types) const
-{
-    if (material)
-    {
-        material->generateBSDF(scattering_event,
-                               allocator,
-                               transport_mode,
-                               allow_multiple_scattering_types);
-    }
-}
-
-// TransformedModel method implementations
-
-TransformedModel::TransformedModel(const std::shared_ptr<Model>& model,
-                                   const AnimatedTransformation& model_to_world)
-    : model(model),
-      model_to_world(model_to_world)
-{}
-
-BoundingBoxF TransformedModel::worldSpaceBoundingBox() const
-{
-    return model_to_world.encompassMotionInBoundingBox(model->worldSpaceBoundingBox());
-}
+// TransformedModel method definitions
 
 bool TransformedModel::intersect(const Ray& ray,
                                  SurfaceScatteringEvent* scattering_event) const
@@ -110,48 +54,6 @@ bool TransformedModel::hasIntersection(const Ray& ray) const
     model_to_world.computeInterpolatedTransformation(&interpolated_model_to_world, ray.time);
 
     return model->hasIntersection(interpolated_model_to_world.inverted()(ray));
-}
-
-const AreaLight* TransformedModel::getAreaLight() const
-{
-    printSevereMessage("\"getAreaLight()\" method of TransformedModel was called");
-    return nullptr;
-}
-
-const Material* TransformedModel::getMaterial() const
-{
-    printSevereMessage("\"getMaterial()\" method of TransformedModel was called");
-    return nullptr;
-}
-
-void TransformedModel::generateBSDF(SurfaceScatteringEvent* scattering_event,
-                                    RegionAllocator& allocator,
-                                    TransportMode transport_mode,
-                                    bool allow_multiple_scattering_types) const
-{
-    printSevereMessage("\"generateBSDF()\" method of TransformedModel was called");
-}
-
-// AccelerationStructure method implementations
-
-const AreaLight* AccelerationStructure::getAreaLight() const
-{
-    printSevereMessage("\"getAreaLight()\" method of AccelerationStructure was called");
-    return nullptr;
-}
-
-const Material* AccelerationStructure::getMaterial() const
-{
-    printSevereMessage("\"getMaterial()\" method of AccelerationStructure was called");
-    return nullptr;
-}
-
-void AccelerationStructure::generateBSDF(SurfaceScatteringEvent* scattering_event,
-                                         RegionAllocator& allocator,
-                                         TransportMode transport_mode,
-                                         bool allow_multiple_scattering_types) const
-{
-    printSevereMessage("\"generateBSDF()\" method of AccelerationStructure was called");
 }
 
 } // RayImpact
