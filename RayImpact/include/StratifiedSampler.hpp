@@ -26,9 +26,19 @@ public:
     std::unique_ptr<Sampler> cloned(unsigned int seed);
 };
 
-// StratifiedSampler creation
+// StratifiedSampler function declarations
 
 Sampler* createStratifiedSampler(const ParameterSet& parameters);
+
+// StratifiedSampler inline method definitions
+
+inline StratifiedSampler::StratifiedSampler(unsigned int n_horizontal_samples_per_pixel,
+											unsigned int n_vertical_samples_per_pixel,
+											unsigned int n_sampled_dimensions)
+    : PixelSampler::PixelSampler(n_horizontal_samples_per_pixel*n_vertical_samples_per_pixel, n_sampled_dimensions),
+      n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
+      n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
+{}
 
 } // RayImpact
 } // Impact

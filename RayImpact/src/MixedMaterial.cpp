@@ -2,19 +2,12 @@
 #include "memory.hpp"
 #include "math.hpp"
 #include "BSDF.hpp"
+#include "api.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// MixedMaterial method implementations
-
-MixedMaterial::MixedMaterial(const std::shared_ptr<Material>& material_1,
-                             const std::shared_ptr<Material>& material_2,
-                             const std::shared_ptr< Texture<Spectrum> >& mixing_ratio_texture)
-    : material_1(material_1),
-      material_2(material_2),
-      mixing_ratio_texture(mixing_ratio_texture)
-{}
+// MixedMaterial method definitions
 
 void MixedMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                  RegionAllocator& allocator,
@@ -41,14 +34,25 @@ void MixedMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                                                                         material_2_weight));
 }
 
-// MixedMaterial creation
+// MixedMaterial function definitions
 
 Material* createMixedMaterial(const std::shared_ptr<Material>& material_1,
                               const std::shared_ptr<Material>& material_2,
                               const TextureParameterSet& parameters)
 {
-    return new MixedMaterial(material_1, material_2,
-                             parameters.getSpectrumTexture("mixing_ratio", Spectrum(0.0f)));
+	const std::shared_ptr< Texture<Spectrum> >& mixing_ratio_texture = parameters.getSpectrumTexture("mixing_ratio", Spectrum(0.0f));
+    
+	if (RIMP_OPTIONS.verbosity >= IMP_MATERIALS_VERBOSITY)
+	{
+		printInfoMessage("Material:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Type:", "Mixed",
+						 "Mixing ratio:", mixing_ratio_texture->toString().c_str());
+	}
+
+	return new MixedMaterial(material_1, material_2,
+                             mixing_ratio_texture);
 }
 
 } // RayImpact

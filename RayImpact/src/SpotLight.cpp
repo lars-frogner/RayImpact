@@ -1,25 +1,11 @@
 #include "SpotLight.hpp"
-#include "math.hpp"
+#include "api.hpp"
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// PointLight method implementations
-
-SpotLight::SpotLight(const Transformation& light_to_world,
-                     const MediumInterface& medium_interface,
-                     const IntensitySpectrum& emitted_intensity,
-                     imp_float max_angle,
-                     imp_float falloff_start_angle)
-    : Light::Light(LightFlags(LIGHT_POSITION_IS_DELTA),
-                   light_to_world,
-                   medium_interface),
-    position(light_to_world(Point3F(0, 0, 0))),
-    emitted_intensity(emitted_intensity),
-    cos_max_angle(std::cos(degreesToRadians(clamp(max_angle, 0.0f, 180.0f)))),
-    cos_falloff_start_angle(std::cos(degreesToRadians(clamp(falloff_start_angle, 0.0f, max_angle))))
-{}
+// PointLight method definitions
 
 imp_float SpotLight::falloffInDirection(const Vector3F& direction) const
 {
@@ -30,7 +16,7 @@ imp_float SpotLight::falloffInDirection(const Vector3F& direction) const
     if (cos_direction_angle < cos_max_angle)
         return 0;
 
-    if (cos_direction_angle > cos_falloff_start_angle)
+    if (cos_direction_angle >= cos_falloff_start_angle)
         return 1;
 
     imp_float delta = (cos_direction_angle - cos_max_angle)/(cos_falloff_start_angle - cos_max_angle);
@@ -53,26 +39,38 @@ RadianceSpectrum SpotLight::sampleIncidentRadiance(const ScatteringEvent& scatte
     return emitted_intensity*(falloffInDirection(-(*incident_direction))/squaredDistanceBetween(position, scattering_event.position));
 }
 
-PowerSpectrum SpotLight::emittedPower() const
-{
-    return (IMP_TWO_PI*(1 - 0.5f*(cos_max_angle + cos_falloff_start_angle)))*emitted_intensity;
-}
-
-// SpotLight creation
+// SpotLight function definitions
 
 std::shared_ptr<Light> createSpotLight(const Transformation& light_to_world,
                                        const MediumInterface& medium_interface,
                                        const ParameterSet& parameters)
 {
-    const IntensitySpectrum& emitted_intensity = parameters.getSingleSpectrumValue("emitted_intensity", RadianceSpectrum(0.0f));
-    imp_float max_angle = parameters.getSingleFloatValue("max_angle", 180.0f);
-    imp_float falloff_start_angle = parameters.getSingleFloatValue("falloff_start_angle", max_angle);
+    const IntensitySpectrum& intensity = parameters.getSingleSpectrumValue("intensity", RadianceSpectrum(1.0f));
+    imp_float cone_width = parameters.getSingleFloatValue("cone_width", 180.0f);
+    imp_float falloff_start = parameters.getSingleFloatValue("falloff_start", cone_width);
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_LIGHTS_VERBOSITY)
+	{
+		printInfoMessage("Light:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s W/sr"
+						 "\n    %-20s%g degrees"
+						 "\n    %-20s%g degrees"
+						 "\n    %-20s%s m"
+						 "\n    %-20s%s",
+						 "Type:", "Spot",
+						 "Intensity:", intensity.toRGBString().c_str(),
+						 "Cone width:", cone_width,
+						 "Falloff start", falloff_start,
+						 "Position:", light_to_world(Point3F(0, 0, 0)).toString().c_str(),
+						 "Direction:", light_to_world(Vector3F(0, 0, 1)).toString().c_str());
+	}
 
     return std::make_shared<SpotLight>(light_to_world,
                                        medium_interface,
-                                       emitted_intensity,
-                                       max_angle,
-                                       falloff_start_angle);
+                                       intensity,
+                                       cone_width,
+                                       falloff_start);
 }
 
 } // RayImpact

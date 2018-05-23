@@ -1,15 +1,11 @@
 #include "RandomSampler.hpp"
+#include "api.hpp"
 #include <algorithm>
 
 namespace Impact {
 namespace RayImpact {
 
-// RandomSampler method implementations
-
-RandomSampler::RandomSampler(unsigned int n_samples_per_pixel,
-                             unsigned int n_sampled_dimensions)
-    : PixelSampler::PixelSampler(n_samples_per_pixel, n_sampled_dimensions)
-{}
+// RandomSampler method definitions
 
 void RandomSampler::setPixel(const Point2I& pixel)
 {
@@ -74,14 +70,25 @@ std::unique_ptr<Sampler> RandomSampler::cloned(unsigned int seed)
     return std::unique_ptr<Sampler>(sampler);
 }
 
-// RandomSampler creation
+// RandomSampler function definitions
 
 Sampler* createRandomSampler(const ParameterSet& parameters)
 {
-    unsigned int n_pix_samples = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples", 1));
-    unsigned int n_sample_dims = (unsigned int)std::abs(parameters.getSingleIntValue("n_sample_dims", 5));
+    unsigned int samples = (unsigned int)std::abs(parameters.getSingleIntValue("samples", 1));
+    unsigned int sample_dimensions = (unsigned int)std::abs(parameters.getSingleIntValue("sample_dimensions", 5));
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_CORE_VERBOSITY)
+	{
+		printInfoMessage("Sampler:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%u"
+						 "\n    %-20s%u",
+						 "Type:", "Random",
+						 "Samples per pixel:", samples,
+						 "Sample dimensions:", sample_dimensions);
+	}
 
-    return new RandomSampler(n_pix_samples, n_sample_dims);
+    return new RandomSampler(samples, sample_dimensions);
 }
 
 } // RayImpact

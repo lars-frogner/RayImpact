@@ -1,6 +1,7 @@
 #pragma once
 #include "Light.hpp"
 #include "ParameterSet.hpp"
+#include "math.hpp"
 #include <memory>
 
 namespace Impact {
@@ -30,11 +31,28 @@ public:
     PowerSpectrum emittedPower() const;
 };
 
-// PointLight creation
+// PointLight function declarations
 
 std::shared_ptr<Light> createPointLight(const Transformation& light_to_world,
                                         const MediumInterface& medium_interface,
                                         const ParameterSet& parameters);
+
+// PointLight inline method definitions
+
+inline PointLight::PointLight(const Transformation& light_to_world,
+							  const MediumInterface& medium_interface,
+							  const IntensitySpectrum& emitted_intensity)
+    : Light::Light(LightFlags(LIGHT_POSITION_IS_DELTA),
+                   light_to_world,
+                   medium_interface),
+    position(light_to_world(Point3F(0, 0, 0))),
+    emitted_intensity(emitted_intensity)
+{}
+
+inline PowerSpectrum PointLight::emittedPower() const
+{
+    return IMP_FOUR_PI*emitted_intensity;
+}
 
 } // RayImpact
 } // Impact

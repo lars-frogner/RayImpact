@@ -22,9 +22,16 @@ public:
     std::unique_ptr<Sampler> cloned(unsigned int seed);
 };
 
-// RandomSampler creation
+// RandomSampler function declarations
 
 Sampler* createRandomSampler(const ParameterSet& parameters);
+
+// RandomSampler inline method definitions
+
+inline RandomSampler::RandomSampler(unsigned int n_samples_per_pixel,
+									unsigned int n_sampled_dimensions)
+    : PixelSampler::PixelSampler(n_samples_per_pixel, n_sampled_dimensions)
+{}
 
 } // RayImpact
 } // Impact

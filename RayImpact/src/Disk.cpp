@@ -1,29 +1,13 @@
 #include "Disk.hpp"
-#include "error.hpp"
 #include "math.hpp"
 #include "geometry.hpp"
+#include "api.hpp"
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// Disk method implementations
-
-Disk::Disk(const Transformation* object_to_world,
-           const Transformation* world_to_object,
-           bool has_reverse_orientation,
-           imp_float radius, imp_float inner_radius,
-           imp_float y,
-           imp_float phi_max)
-    : Shape::Shape(object_to_world, world_to_object, has_reverse_orientation),
-      radius(radius),
-      inner_radius(inner_radius),
-      y(y),
-      phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
-{
-    imp_assert(inner_radius >= 0);
-    imp_assert(radius >= inner_radius);
-}
+// Disk method definitions
 
 BoundingBoxF Disk::objectSpaceBoundingBox() const
 {
@@ -187,12 +171,7 @@ bool Disk::hasIntersection(const Ray& ray,
     return true;
 }
 
-imp_float Disk::surfaceArea() const
-{
-    return 0.5f*phi_max*(radius*radius - inner_radius*inner_radius);
-}
-
-// Disk creation
+// Disk function definitions
 
 std::shared_ptr<Shape> createDisk(const Transformation* object_to_world,
                                   const Transformation* world_to_object,
@@ -201,15 +180,34 @@ std::shared_ptr<Shape> createDisk(const Transformation* object_to_world,
 {
     imp_float radius = parameters.getSingleFloatValue("radius", 1.0f);
     imp_float inner_radius = parameters.getSingleFloatValue("inner_radius", 0.0f);
-    imp_float y = parameters.getSingleFloatValue("y", 0.0f);
-    imp_float phi_max = parameters.getSingleFloatValue("phi_max", 360.0f);
+    imp_float height = parameters.getSingleFloatValue("height", 0.0f);
+    imp_float sweep_angle = parameters.getSingleFloatValue("sweep_angle", 360.0f);
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_SHAPES_VERBOSITY)
+	{
+		printInfoMessage("Shape:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g degrees"
+						 "\n    %-20s%s m"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Type:", "Disk",
+						 "Radius:", radius,
+						 "Inner radius:", inner_radius,
+						 "Sweep angle:", sweep_angle,
+						 "Center:", (*object_to_world)(Point3F(0, 0, 0)).toString().c_str(),
+						 "Up direction:", (*object_to_world)(Vector3F(0, 1, 0)).toString().c_str(),
+						 "Forward direction:", (*object_to_world)(Vector3F(0, 0, 1)).toString().c_str());
+	}
 
     return std::make_shared<Disk>(object_to_world,
                                   world_to_object,
                                   has_reverse_orientation,
                                   radius, inner_radius,
-                                  y,
-                                  phi_max);
+                                  height,
+                                  sweep_angle);
 }
 
 } // RayImpact

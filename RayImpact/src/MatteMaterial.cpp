@@ -4,19 +4,12 @@
 #include "BSDF.hpp"
 #include "LambertianBRDF.hpp"
 #include "OrenNayarBRDF.hpp"
+#include "api.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// MatteMaterial method implementations
-
-MatteMaterial::MatteMaterial(const std::shared_ptr< Texture<ReflectionSpectrum> >& reflectance_texture,
-                             const std::shared_ptr< Texture<imp_float> >& slope_deviation_texture,
-                             const std::shared_ptr< Texture<imp_float> >& bump_map)
-    : reflectance_texture(reflectance_texture),
-      slope_deviation_texture(slope_deviation_texture),
-      bump_map(bump_map)
-{}
+// MatteMaterial method definitions
 
 void MatteMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
                                  RegionAllocator& allocator,
@@ -41,13 +34,30 @@ void MatteMaterial::generateBSDF(SurfaceScatteringEvent* scattering_event,
     }
 }
 
-// MatteMaterial creation
+// MatteMaterial function definitions
 
 Material* createMatteMaterial(const TextureParameterSet& parameters)
 {
-    return new MatteMaterial(parameters.getSpectrumTexture("reflectance", ReflectionSpectrum(0.0f)),
-                             parameters.getFloatTexture("roughness", 0.0f),
-                             parameters.getFloatTexture("bump_map"));
+	const std::shared_ptr< Texture<ReflectionSpectrum> >& reflectance = parameters.getSpectrumTexture("reflectance", ReflectionSpectrum(0.5f));
+	const std::shared_ptr< Texture<imp_float> >& roughness = parameters.getFloatTexture("roughness", 0.0f);
+	const std::shared_ptr< Texture<imp_float> >& bump_map = parameters.getFloatTexture("bump_map");
+    
+	if (RIMP_OPTIONS.verbosity >= IMP_MATERIALS_VERBOSITY)
+	{
+		printInfoMessage("Material:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Type:", "Matte",
+						 "Reflectance:", reflectance->toString().c_str(),
+						 "Roughness:", roughness->toString().c_str(),
+						 "Bump map:", (bump_map)? bump_map->toString().c_str() : "none");
+	}
+
+    return new MatteMaterial(reflectance,
+                             roughness,
+                             bump_map);
 }
 
 } // RayImpact

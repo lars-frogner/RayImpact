@@ -1,19 +1,12 @@
 #include "StratifiedSampler.hpp"
 #include "sampling.hpp"
+#include "api.hpp"
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// StratifiedSampler method implementations
-
-StratifiedSampler::StratifiedSampler(unsigned int n_horizontal_samples_per_pixel,
-                                     unsigned int n_vertical_samples_per_pixel,
-                                     unsigned int n_sampled_dimensions)
-    : PixelSampler::PixelSampler(n_horizontal_samples_per_pixel*n_vertical_samples_per_pixel, n_sampled_dimensions),
-      n_horizontal_samples_per_pixel(n_horizontal_samples_per_pixel),
-      n_vertical_samples_per_pixel(n_vertical_samples_per_pixel)
-{}
+// StratifiedSampler method definitions
 
 void StratifiedSampler::setPixel(const Point2I& pixel)
 {
@@ -89,15 +82,30 @@ std::unique_ptr<Sampler> StratifiedSampler::cloned(unsigned int seed)
     return std::unique_ptr<Sampler>(sampler);
 }
 
-// StratifiedSampler creation
+// StratifiedSampler function definitions
 
 Sampler* createStratifiedSampler(const ParameterSet& parameters)
 {
-    unsigned int n_pix_samples_x = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples_x", 1));
-    unsigned int n_pix_samples_y = (unsigned int)std::abs(parameters.getSingleIntValue("n_pix_samples_y", 1));
-    unsigned int n_sample_dims = (unsigned int)std::abs(parameters.getSingleIntValue("n_sample_dims", 5));
+    unsigned int horizontal_samples = (unsigned int)std::abs(parameters.getSingleIntValue("horizontal_samples", 1));
+    unsigned int vertical_samples = (unsigned int)std::abs(parameters.getSingleIntValue("vertical_samples", 1));
+    unsigned int sample_dimensions = (unsigned int)std::abs(parameters.getSingleIntValue("sample_dimensions", 5));
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_CORE_VERBOSITY)
+	{
+		printInfoMessage("Sampler:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%u"
+						 "\n    %-20s%u"
+						 "\n    %-20s%u"
+						 "\n    %-20s%u",
+						 "Type:", "Stratified",
+						 "Samples per pixel:", horizontal_samples*vertical_samples,
+						 "Horizontal samples:", horizontal_samples,
+						 "Vertical samples:", vertical_samples,
+						 "Sample dimensions:", sample_dimensions);
+	}
 
-    return new StratifiedSampler(n_pix_samples_x, n_pix_samples_y, n_sample_dims);
+    return new StratifiedSampler(horizontal_samples, vertical_samples, sample_dimensions);
 }
 
 } // RayImpact

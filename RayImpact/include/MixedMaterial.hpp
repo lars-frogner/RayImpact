@@ -30,11 +30,21 @@ public:
                       bool allow_multiple_scattering_types) const;
 };
 
-// MixedMaterial creation
+// MixedMaterial function declarations
 
 Material* createMixedMaterial(const std::shared_ptr<Material>& material_1,
                               const std::shared_ptr<Material>& material_2,
                               const TextureParameterSet& parameters);
+
+// MixedMaterial inline method definitions
+
+inline MixedMaterial::MixedMaterial(const std::shared_ptr<Material>& material_1,
+									const std::shared_ptr<Material>& material_2,
+									const std::shared_ptr< Texture<Spectrum> >& mixing_ratio_texture)
+    : material_1(material_1),
+      material_2(material_2),
+      mixing_ratio_texture(mixing_ratio_texture)
+{}
 
 } // RayImpact
 } // Impact

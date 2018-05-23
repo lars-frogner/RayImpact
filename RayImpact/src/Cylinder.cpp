@@ -1,30 +1,14 @@
 #include "Cylinder.hpp"
-#include "error.hpp"
 #include "math.hpp"
 #include "ErrorFloat.hpp"
 #include "geometry.hpp"
+#include "api.hpp"
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// Cylinder method implementations
-
-Cylinder::Cylinder(const Transformation* object_to_world,
-                    const Transformation* world_to_object,
-                   bool has_reverse_orientation,
-                   imp_float radius,
-                   imp_float y_min, imp_float y_max,
-                   imp_float phi_max)
-    : Shape::Shape(object_to_world, world_to_object, has_reverse_orientation),
-      radius(radius),
-      y_min(y_min),
-      y_max(y_max),
-      phi_max(clamp(degreesToRadians(phi_max), 0.0f, IMP_TWO_PI))
-{
-    imp_assert(radius >= 0);
-    imp_assert(y_max >= y_min);
-}
+// Cylinder method definitions
 
 BoundingBoxF Cylinder::objectSpaceBoundingBox() const
 {
@@ -340,12 +324,7 @@ bool Cylinder::hasIntersection(const Ray& ray,
     return true;
 }
 
-imp_float Cylinder::surfaceArea() const
-{
-    return phi_max*radius*(y_max - y_min);
-}
-
-// Cylinder creation
+// Cylinder function definitions
 
 std::shared_ptr<Shape> createCylinder(const Transformation* object_to_world,
                                       const Transformation* world_to_object,
@@ -353,16 +332,37 @@ std::shared_ptr<Shape> createCylinder(const Transformation* object_to_world,
                                       const ParameterSet& parameters)
 {
     imp_float radius = parameters.getSingleFloatValue("radius", 1.0f);
-    imp_float y_min = parameters.getSingleFloatValue("y_min", 0.0f);
-    imp_float y_max = parameters.getSingleFloatValue("y_max", 1.0f);
-    imp_float phi_max = parameters.getSingleFloatValue("phi_max", 360.0f);
+    imp_float bottom = parameters.getSingleFloatValue("bottom", -1.0f);
+    imp_float top = parameters.getSingleFloatValue("top", 1.0f);
+    imp_float sweep_angle = parameters.getSingleFloatValue("sweep_angle", 360.0f);
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_SHAPES_VERBOSITY)
+	{
+		printInfoMessage("Shape:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g m"
+						 "\n    %-20s%g degrees"
+						 "\n    %-20s%s m"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Type:", "Cylinder",
+						 "Radius:", radius,
+						 "Bottom:", bottom,
+						 "Top:", top,
+						 "Sweep angle:", sweep_angle,
+						 "Center:", (*object_to_world)(Point3F(0, 0, 0)).toString().c_str(),
+						 "Up direction:", (*object_to_world)(Vector3F(0, 1, 0)).toString().c_str(),
+						 "Forward direction:", (*object_to_world)(Vector3F(0, 0, 1)).toString().c_str());
+	}
 
     return std::make_shared<Cylinder>(object_to_world,
                                       world_to_object,
                                       has_reverse_orientation,
                                       radius,
-                                      y_min, y_max,
-                                      phi_max);
+                                      bottom*radius, top*radius,
+                                      sweep_angle);
 }
 
 } // RayImpact

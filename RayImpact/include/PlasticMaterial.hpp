@@ -34,9 +34,23 @@ public:
                       bool allow_multiple_scattering_types) const;
 };
 
-// PlasticMaterial creation
+// PlasticMaterial function declarations
 
 Material* createPlasticMaterial(const TextureParameterSet& parameters);
+
+// PlasticMaterial inline method definitions
+
+inline PlasticMaterial::PlasticMaterial(const std::shared_ptr< Texture<ReflectionSpectrum> >& diffuse_reflectance_texture,
+										const std::shared_ptr< Texture<ReflectionSpectrum> >& glossy_reflectance_texture,
+										const std::shared_ptr< Texture<imp_float> >& roughness_texture,
+										const std::shared_ptr< Texture<imp_float> >& bump_map,
+										bool normalized_roughness)
+    : diffuse_reflectance_texture(diffuse_reflectance_texture),
+      glossy_reflectance_texture(glossy_reflectance_texture),
+      roughness_texture(roughness_texture),
+      bump_map(bump_map),
+      normalized_roughness(normalized_roughness)
+{}
 
 } // RayImpact
 } // Impact

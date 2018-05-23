@@ -30,9 +30,19 @@ public:
                       bool allow_multiple_scattering_types) const;
 };
 
-// MatteMaterial creation
+// MatteMaterial function declarations
 
 Material* createMatteMaterial(const TextureParameterSet& parameters);
+
+// MatteMaterial inline method definitions
+
+inline MatteMaterial::MatteMaterial(const std::shared_ptr< Texture<ReflectionSpectrum> >& reflectance_texture,
+									const std::shared_ptr< Texture<imp_float> >& slope_deviation_texture,
+									const std::shared_ptr< Texture<imp_float> >& bump_map)
+    : reflectance_texture(reflectance_texture),
+      slope_deviation_texture(slope_deviation_texture),
+      bump_map(bump_map)
+{}
 
 } // RayImpact
 } // Impact

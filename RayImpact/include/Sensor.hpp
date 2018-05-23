@@ -47,7 +47,7 @@ public:
 
     const Vector2I full_resolution; // Total number of pixels along each dimension of the sensor
     BoundingRectangleI raster_crop_window; // Bounds in raster space of the window of pixles to render
-    const imp_float diagonal_extent; // Physical length [m] of the sensor diagonal (given in mm to the constructor)
+    const imp_float diagonal_extent; // Physical length of the sensor diagonal
     std::unique_ptr<Filter> filter; // The filter to use for image reconstruction
     const std::string output_filename; // Filename to write the output image to
 
@@ -112,11 +112,30 @@ struct RawPixel
     imp_float sum_of_filter_weights = 0; // Sum of filter weights for samples contributing to the pixel
 };
 
-// Sensor creation
+// Sensor function declarations
 
 Sensor* createImageSensor(std::unique_ptr<Filter> filter,
                           const std::string& output_filename,
                           const ParameterSet& parameters);
+
+// SensorSection inline method definitions
+
+inline SensorRegion::SensorRegion(const BoundingRectangleI& pixel_bounds,
+								  const Vector2F& filter_radius,
+								  const unsigned int filter_table_width,
+								  const imp_float* filter_table)
+    : pixel_bounds(pixel_bounds),
+      filter_radius(filter_radius),
+      inverse_filter_radius(1.0f/filter_radius.x, 1.0f/filter_radius.y),
+      filter_table_width(filter_table_width),
+      filter_table(filter_table),
+      pixels(std::max(0, pixel_bounds.area()))
+{}
+
+inline const BoundingRectangleI& SensorRegion::pixelBounds() const
+{
+    return pixel_bounds;
+}
 
 } // RayImpact
 } // Impact

@@ -2,13 +2,15 @@
 #include "error.hpp"
 #include "memory.hpp"
 #include "image_util.hpp"
+#include "string_util.hpp"
+#include "api.hpp"
 #include <algorithm>
 #include <cmath>
 
 namespace Impact {
 namespace RayImpact {
 
-// Sensor method implementations
+// Sensor method definitions
 
 Sensor::Sensor(const Vector2I& resolution,
                const BoundingRectangleF& crop_window,
@@ -17,7 +19,7 @@ Sensor::Sensor(const Vector2I& resolution,
                const std::string& output_filename,
                imp_float final_image_scale /* = 1.0f */)
     : full_resolution(resolution),
-      diagonal_extent(diagonal_extent*0.001f),
+      diagonal_extent(diagonal_extent),
       filter(std::move(reconstruction_filter)),
       output_filename(output_filename),
       final_image_scale(final_image_scale)
@@ -210,32 +212,16 @@ void Sensor::writeImage(imp_float splat_scale /* = 1 */)
         pixel_rgb_values[3*pixel_idx + 1] += splat_rgb[1]*splat_scale;
         pixel_rgb_values[3*pixel_idx + 2] += splat_rgb[2]*splat_scale;
 
-        // Scale pixel by user supplied factor
-        pixel_rgb_values[3*pixel_idx    ] *= final_image_scale;
-        pixel_rgb_values[3*pixel_idx + 1] *= final_image_scale;
-        pixel_rgb_values[3*pixel_idx + 2] *= final_image_scale;
-
         pixel_idx++;
     }
 
     writePFM(output_filename, &pixel_rgb_values[0],
              raster_crop_window.upper_corner.x - raster_crop_window.lower_corner.x,
-             raster_crop_window.upper_corner.y - raster_crop_window.lower_corner.y);
+             raster_crop_window.upper_corner.y - raster_crop_window.lower_corner.y,
+			 final_image_scale);
 }
 
-// SensorSection method implementations
-
-SensorRegion::SensorRegion(const BoundingRectangleI& pixel_bounds,
-                           const Vector2F& filter_radius,
-                           const unsigned int filter_table_width,
-                           const imp_float* filter_table)
-    : pixel_bounds(pixel_bounds),
-      filter_radius(filter_radius),
-      inverse_filter_radius(1.0f/filter_radius.x, 1.0f/filter_radius.y),
-      filter_table_width(filter_table_width),
-      filter_table(filter_table),
-      pixels(std::max(0, pixel_bounds.area()))
-{}
+// SensorSection method definitions
 
 // Finds the pixels affected by the given sample and gives them their corresponding radiance contribution
 void SensorRegion::addSample(const Point2F& sample_position,
@@ -287,11 +273,6 @@ void SensorRegion::addSample(const Point2F& sample_position,
     }
 }
 
-const BoundingRectangleI& SensorRegion::pixelBounds() const
-{
-    return pixel_bounds;
-}
-
 const RawPixel& SensorRegion::rawPixel(const Point2I& pixel_position) const
 {
     int region_width = pixel_bounds.upper_corner.x - pixel_bounds.lower_corner.x;
@@ -312,7 +293,7 @@ RawPixel& SensorRegion::rawPixel(const Point2I& pixel_position)
     return pixels[region_pixel_idx];
 }
 
-// Sensor creation
+// Sensor function definitions
 
 Sensor* createImageSensor(std::unique_ptr<Filter> filter,
                           const std::string& output_filename,
@@ -329,8 +310,8 @@ Sensor* createImageSensor(std::unique_ptr<Filter> filter,
         resolution.x = 400;
         resolution.y = 400;
 
-        if (n_values != 2)
-            printErrorMessage("the sensor \"resolution\" parameter must consist of exactly two integers. Using default resolution.");
+        if (resolution_values)
+            printWarningMessage("the sensor \"resolution\" parameter must consist of exactly two integers. Using default resolution.");
     }
     else
     {
@@ -340,30 +321,45 @@ Sensor* createImageSensor(std::unique_ptr<Filter> filter,
 
     BoundingRectangleF crop_window;
 
-    const Point2F* crop_window_corners = parameters.getPoint2FValues("crop_window", &n_values);
+    const Vector2F* crop_window_corners = parameters.getPairValues("crop_window", &n_values);
 
     if (!crop_window_corners || n_values != 2)
     {
         crop_window.lower_corner = Point2F(0, 0);
         crop_window.upper_corner = Point2F(1, 1);
 
-        if (n_values != 2)
-            printErrorMessage("the sensor \"crop_window\" parameter must consist of exactly two point2f values. Using default crop window.");
+        if (crop_window_corners)
+            printWarningMessage("the sensor \"crop_window\" parameter must consist of exactly two point2f values. Using default crop window.");
     }
     else
     {
-        crop_window = crop_window.aroundPoints(crop_window_corners[0], crop_window_corners[1]);
+        crop_window = crop_window.aroundPoints(static_cast<Point2F>(crop_window_corners[0]), static_cast<Point2F>(crop_window_corners[1]));
     }
 
-    imp_float diagonal_extent = parameters.getSingleFloatValue("diagonal_extent", 0.05f);
-    imp_float final_image_scale = parameters.getSingleFloatValue("final_image_scale", 1.0f);
+    imp_float diagonal_size = parameters.getSingleFloatValue("diagonal_size", 50.0f);
+    imp_float pixel_scaling = parameters.getSingleFloatValue("pixel_scaling", 1.0f);
+	
+	if (RIMP_OPTIONS.verbosity >= IMP_CORE_VERBOSITY)
+	{
+		printInfoMessage("Camera sensor:"
+						 "\n    %-20s%d x %d px"
+						 "\n    %-20s%s"
+						 "\n    %-20s%g mm"
+						 "\n    %-20s%s"
+						 "\n    %-20s%s",
+						 "Resolution:", resolution.x, resolution.y,
+						 "Crop window:", crop_window.toString().c_str(),
+						 "Diagonal size:", diagonal_size,
+						 "Pixel scaling:", (pixel_scaling < 0)? "auto" : formatString("%g", pixel_scaling).c_str(),
+						 "Output file:", output_filename.c_str());
+	}
 
     return new Sensor(resolution,
                       crop_window,
                       std::move(filter),
-                      diagonal_extent,
+                      diagonal_size*1e-3f,
                       output_filename,
-                      final_image_scale);
+                      pixel_scaling);
 }
 
 } // RayImpact
