@@ -47,7 +47,7 @@ public:
     const T& operator()(unsigned int x, unsigned int y) const;
 };
 
-// BlockedArray method implementations
+// BlockedArray inline method definitions
 
 template <typename T, unsigned int log2_block_extent>
 inline BlockedArray<T, log2_block_extent>::BlockedArray(unsigned int width, unsigned int height,
