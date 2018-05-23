@@ -18,6 +18,7 @@ class Integrator {
 public:
 
     virtual void render(const Scene& scene) = 0;
+	virtual void renderSinglePixel(const Scene& scene, const Point2I& single_pixel) = 0;
 };
 
 // SampleIntegrator declarations
@@ -60,7 +61,19 @@ public:
                                                    unsigned int scattering_count) const;
 
     void render(const Scene& scene);
+
+	void renderSinglePixel(const Scene& scene, const Point2I& single_pixel);
 };
+
+// SampleIntegrator inline method definitions
+
+inline SampleIntegrator::SampleIntegrator(std::shared_ptr<const Camera> camera,
+										  std::shared_ptr<Sampler> sampler)
+    : camera(camera), sampler(sampler)
+{}
+
+inline void SampleIntegrator::preprocess(const Scene& scene, Sampler& sampler)
+{}
 
 } // RayImpact
 } // Impact
