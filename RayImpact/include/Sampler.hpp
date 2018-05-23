@@ -121,5 +121,22 @@ public:
     virtual imp_float valueOfGlobalSampleDimension(size_t global_sample_index, unsigned int dimension) = 0;
 };
 
+// Sampler inline method definitions
+
+inline Sampler::Sampler(unsigned int n_samples_per_pixel)
+    : n_samples_per_pixel(n_samples_per_pixel)
+{}
+
+inline unsigned int Sampler::roundedArraySize(unsigned int n_samples) const
+{
+    return n_samples;
+}
+
+// GlobalSampler inline method definitions
+
+inline GlobalSampler::GlobalSampler(unsigned int n_samples_per_pixel)
+    : Sampler::Sampler(n_samples_per_pixel)
+{}
+
 } // RayImpact
 } // Impact

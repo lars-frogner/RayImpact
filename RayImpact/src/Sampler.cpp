@@ -4,11 +4,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// Sampler method implementations
-
-Sampler::Sampler(unsigned int n_samples_per_pixel)
-    : n_samples_per_pixel(n_samples_per_pixel)
-{}
+// Sampler method definitions
 
 void Sampler::setPixel(const Point2I& pixel)
 {
@@ -50,11 +46,6 @@ CameraSample Sampler::generateCameraSample(const Point2I& pixel)
     return sample;
 }
 
-unsigned int Sampler::roundedArraySize(unsigned int n_samples) const
-{
-    return n_samples;
-}
-
 void Sampler::createArraysForNext1DSampleComponent(unsigned int n_values)
 {
     sizes_of_1D_component_arrays.push_back(n_values);
@@ -87,7 +78,7 @@ const Point2F* Sampler::arrayOfNext2DSampleComponent(unsigned int n_values)
     return &(sample_component_arrays_2D[current_2D_array_component++][current_pixel_sample_idx*n_values]);
 }
 
-// PixelSampler method implementations
+// PixelSampler method definitions
 
 PixelSampler::PixelSampler(unsigned int n_samples_per_pixel,
                            unsigned int n_sampled_dimensions)
@@ -151,11 +142,7 @@ Point2F PixelSampler::next2DSampleComponent()
     }
 }
 
-// GlobalSampler method implementations
-
-GlobalSampler::GlobalSampler(unsigned int n_samples_per_pixel)
-    : Sampler::Sampler(n_samples_per_pixel)
-{}
+// GlobalSampler method definitions
 
 void GlobalSampler::setPixel(const Point2I& pixel)
 {
