@@ -1,30 +1,10 @@
 #include "SpecularBSDF.hpp"
+#include "sampling.hpp"
 
 namespace Impact {
 namespace RayImpact {
 
-// SpecularBSDF method implementations
-
-SpecularBSDF::SpecularBSDF(const ReflectionSpectrum& reflectance,
-                           const TransmissionSpectrum& transmittance,
-                           imp_float refractive_index_outside,
-                           imp_float refractive_index_inside,
-                           TransportMode transport_mode)
-    : BXDF::BXDF(BXDFType(BSDF_REFLECTION | BSDF_TRANSMISSION | BSDF_SPECULAR)),
-      reflectance(reflectance),
-      transmittance(transmittance),
-      refractive_index_outside(refractive_index_outside),
-      refractive_index_inside(refractive_index_inside),
-      dielectric_reflector(refractive_index_outside,
-                           refractive_index_inside),
-      transport_mode(transport_mode)
-{}
-
-Spectrum SpecularBSDF::evaluate(const Vector3F& outgoing_direction,
-                                const Vector3F& incident_direction) const
-{
-    return Spectrum(0.0f);
-}
+// SpecularBSDF method definitions
 
 Spectrum SpecularBSDF::sample(const Vector3F& outgoing_direction,
                               Vector3F* incident_direction,
@@ -32,8 +12,65 @@ Spectrum SpecularBSDF::sample(const Vector3F& outgoing_direction,
                               imp_float* pdf_value,
                               BXDFType* sampled_type /* = nullptr */) const
 {
-    printSevereMessage("SpecularBSDF::sample is not implemented");
-    return Spectrum(0.0f);
+	imp_float fresnel_reflectance = fresnelReflectance(cosTheta(outgoing_direction),
+													   refractive_index_outside,
+													   refractive_index_inside);
+
+	if (uniform_sample.x < fresnel_reflectance)
+	{
+		*incident_direction = Vector3F(-outgoing_direction.x,
+									   -outgoing_direction.y,
+										outgoing_direction.z);
+
+		if (sampled_type)
+			*sampled_type = BXDFType(BSDF_SPECULAR | BSDF_REFLECTION);
+
+		*pdf_value = fresnel_reflectance;
+
+		return reflectance*fresnel_reflectance/absCosTheta(*incident_direction);
+	}
+	else
+	{
+		TransmissionSpectrum fresnel_transmittance = (1 - fresnel_reflectance)*transmittance;
+
+		if (cosTheta(outgoing_direction) > 0)
+		{
+			if (!refract(outgoing_direction,
+						 Normal3F(0, 0, 1),
+						 refractive_index_outside,
+						 refractive_index_inside,
+						 incident_direction))
+			{
+				return Spectrum(0.0f);
+			}
+
+			if (transport_mode == TransportMode::Radiance)
+				fresnel_transmittance *= refractive_index_outside*refractive_index_outside/
+										 (refractive_index_inside*refractive_index_inside);
+		}
+		else
+		{
+			if (!refract(outgoing_direction,
+						 Normal3F(0, 0, -1),
+						 refractive_index_inside,
+						 refractive_index_outside,
+						 incident_direction))
+			{
+				return Spectrum(0.0f);
+			}
+
+			if (transport_mode == TransportMode::Radiance)
+				fresnel_transmittance *= refractive_index_inside*refractive_index_inside/
+										 (refractive_index_outside*refractive_index_outside);
+		}
+
+		if (sampled_type)
+			*sampled_type = BXDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
+
+		*pdf_value = 1 - fresnel_reflectance;
+
+		return fresnel_transmittance/absCosTheta(*incident_direction);
+	}
 }
 
 } // RayImpact
