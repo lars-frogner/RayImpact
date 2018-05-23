@@ -33,5 +33,22 @@ public:
     bool hasIntersection(const Ray& ray) const;
 };
 
+// Scene inline method definitions
+
+inline const BoundingBoxF& Scene::worldSpaceBoundingBox() const
+{
+    return world_bounding_box;
+}
+
+inline bool Scene::intersect(const Ray& ray, SurfaceScatteringEvent* scattering_event) const
+{
+    return model_aggregate->intersect(ray, scattering_event);
+}
+
+inline bool Scene::hasIntersection(const Ray& ray) const
+{
+    return model_aggregate->hasIntersection(ray);
+}
+
 } // RayImpact
 } // Impact
