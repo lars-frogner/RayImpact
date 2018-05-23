@@ -3,26 +3,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// SpecularBTDF method implementations
-
-SpecularBTDF::SpecularBTDF(const TransmissionSpectrum& transmittance,
-                           imp_float refractive_index_outside,
-                           imp_float refractive_index_inside,
-                           TransportMode transport_mode)
-    : BXDF::BXDF(BXDFType(BSDF_TRANSMISSION | BSDF_SPECULAR)),
-      transmittance(transmittance),
-      refractive_index_outside(refractive_index_outside),
-      refractive_index_inside(refractive_index_inside),
-      dielectric_reflector(refractive_index_outside,
-                           refractive_index_inside),
-      transport_mode(transport_mode)
-{}
-
-Spectrum SpecularBTDF::evaluate(const Vector3F& outgoing_direction,
-                                const Vector3F& incident_direction) const
-{
-    return Spectrum(0.0f);
-}
+// SpecularBTDF method definitions
 
 Spectrum SpecularBTDF::sample(const Vector3F& outgoing_direction,
                               Vector3F* incident_direction,
@@ -45,10 +26,12 @@ Spectrum SpecularBTDF::sample(const Vector3F& outgoing_direction,
             return Spectrum(0.0f);
         }
 
-        result = transmittance*(Spectrum(1.0f) - dielectric_reflector.evaluate(cosTheta(*incident_direction)));
+        result = transmittance*(Spectrum(1.0f) - 
+								dielectric_reflector.evaluate(cosTheta(*incident_direction)));
 
         if (transport_mode == TransportMode::Radiance)
-            result *= refractive_index_outside*refractive_index_outside/(refractive_index_inside*refractive_index_inside);
+            result *= refractive_index_outside*refractive_index_outside/
+					  (refractive_index_inside*refractive_index_inside);
     }
     else
     {
@@ -61,10 +44,12 @@ Spectrum SpecularBTDF::sample(const Vector3F& outgoing_direction,
             return Spectrum(0.0f);
         }
 
-        result = transmittance*(Spectrum(1.0f) - dielectric_reflector.evaluate(cosTheta(*incident_direction)));
+        result = transmittance*(Spectrum(1.0f) - 
+								dielectric_reflector.evaluate(cosTheta(*incident_direction)));
 
         if (transport_mode == TransportMode::Radiance)
-            result *= refractive_index_inside*refractive_index_inside/(refractive_index_outside*refractive_index_outside);
+            result *= refractive_index_inside*refractive_index_inside/
+					  (refractive_index_outside*refractive_index_outside);
     }
 
     return result/absCosTheta(*incident_direction);

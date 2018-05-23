@@ -32,7 +32,37 @@ public:
                     const Point2F& uniform_sample,
                     imp_float* pdf_value,
                     BXDFType* sampled_type = nullptr) const;
+
+    imp_float pdf(const Vector3F& outgoing_direction,
+                  const Vector3F& incident_direction) const;
 };
+
+// SpecularBTDF inline method definitions
+
+inline SpecularBTDF::SpecularBTDF(const TransmissionSpectrum& transmittance,
+								  imp_float refractive_index_outside,
+								  imp_float refractive_index_inside,
+								  TransportMode transport_mode)
+    : BXDF::BXDF(BXDFType(BSDF_TRANSMISSION | BSDF_SPECULAR)),
+      transmittance(transmittance),
+      refractive_index_outside(refractive_index_outside),
+      refractive_index_inside(refractive_index_inside),
+      dielectric_reflector(refractive_index_outside,
+                           refractive_index_inside),
+      transport_mode(transport_mode)
+{}
+
+inline Spectrum SpecularBTDF::evaluate(const Vector3F& outgoing_direction,
+									   const Vector3F& incident_direction) const
+{
+    return Spectrum(0.0f);
+}
+
+inline imp_float SpecularBTDF::pdf(const Vector3F& outgoing_direction,
+								   const Vector3F& incident_direction) const
+{
+	return 0;
+}
 
 } // RayImpact
 } // Impact

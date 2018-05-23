@@ -27,7 +27,31 @@ public:
                     const Point2F& uniform_sample,
                     imp_float* pdf_value,
                     BXDFType* sampled_type = nullptr) const;
+
+    imp_float pdf(const Vector3F& outgoing_direction,
+                  const Vector3F& incident_direction) const;
 };
+
+// SpecularBRDF inline method definitions
+
+inline SpecularBRDF::SpecularBRDF(const ReflectionSpectrum& reflectance,
+								  FresnelReflector* fresnel_reflector)
+    : BXDF::BXDF(BXDFType(BSDF_REFLECTION | BSDF_SPECULAR)),
+      reflectance(reflectance),
+      fresnel_reflector(fresnel_reflector)
+{}
+
+inline Spectrum SpecularBRDF::evaluate(const Vector3F& outgoing_direction,
+									   const Vector3F& incident_direction) const
+{
+    return Spectrum(0.0f);
+}
+
+inline imp_float SpecularBRDF::pdf(const Vector3F& outgoing_direction,
+								   const Vector3F& incident_direction) const
+{
+	return 0;
+}
 
 } // RayImpact
 } // Impact

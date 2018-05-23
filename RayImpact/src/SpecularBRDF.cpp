@@ -3,20 +3,7 @@
 namespace Impact {
 namespace RayImpact {
 
-// SpecularBRDF method implementations
-
-SpecularBRDF::SpecularBRDF(const ReflectionSpectrum& reflectance,
-                           FresnelReflector* fresnel_reflector)
-    : BXDF::BXDF(BXDFType(BSDF_REFLECTION | BSDF_SPECULAR)),
-      reflectance(reflectance),
-      fresnel_reflector(fresnel_reflector)
-{}
-
-Spectrum SpecularBRDF::evaluate(const Vector3F& outgoing_direction,
-                                const Vector3F& incident_direction) const
-{
-    return Spectrum(0.0f);
-}
+// SpecularBRDF method definitions
 
 Spectrum SpecularBRDF::sample(const Vector3F& outgoing_direction,
                               Vector3F* incident_direction,
