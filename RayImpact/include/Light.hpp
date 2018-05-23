@@ -6,6 +6,8 @@
 #include "Spectrum.hpp"
 #include "ScatteringEvent.hpp"
 #include "Sampler.hpp"
+#include "error.hpp"
+#include <algorithm>
 
 namespace Impact {
 namespace RayImpact {
@@ -99,11 +101,71 @@ public:
                                              const Vector3F& outgoing_direction) const = 0;
 };
 
-// Light utility functions
+// Light inline function definitions
 
 inline bool lightIsDelta(LightFlags flags)
 {
     return (flags & LIGHT_POSITION_IS_DELTA) || (flags & LIGHT_DIRECTION_IS_DELTA);
+}
+
+// Light inline method definitions
+
+inline Light::Light(LightFlags flags,
+					const Transformation& light_to_world,
+					const MediumInterface& medium_interface,
+					unsigned int n_samples /* = 1 */)
+    : flags(flags),
+      light_to_world(light_to_world),
+      world_to_light(light_to_world.inverted()),
+      medium_interface(medium_interface),
+      n_samples(std::max(1u, n_samples))
+{
+    if (light_to_world.hasScaling())
+        printWarningMessage("light-to-world transformation with scaling detected");
+}
+
+inline void Light::preprocess(const Scene& scene)
+{}
+
+inline RadianceSpectrum Light::emittedRadianceFromDirection(const RayWithOffsets& ray) const
+{
+    return RadianceSpectrum(0.0f);
+}
+
+// AreaLight inline method definitions
+
+inline AreaLight::AreaLight(LightFlags flags,
+							const Transformation& light_to_world,
+							const MediumInterface& medium_interface,
+							unsigned int n_samples /* = 1 */)
+    : Light::Light(LightFlags(flags | LIGHT_HAS_AREA), light_to_world, medium_interface, n_samples)
+{}
+
+inline AreaLight::AreaLight(const Transformation& light_to_world,
+							const MediumInterface& medium_interface,
+							unsigned int n_samples /* = 1 */)
+    : Light::Light(LightFlags(LIGHT_HAS_AREA), light_to_world, medium_interface, n_samples)
+{}
+
+// VisibilityTester inline method definitions
+
+inline VisibilityTester::VisibilityTester()
+    : start_point(), end_point()
+{}
+
+inline VisibilityTester::VisibilityTester(const ScatteringEvent& start_point,
+										  const ScatteringEvent& end_point)
+    : start_point(start_point), end_point(end_point)
+{}
+
+inline const ScatteringEvent& VisibilityTester::startPoint() const
+{
+    return start_point;
+}
+
+inline const ScatteringEvent& VisibilityTester::endPoint() const
+{
+    return end_point;
 }
 
 } // RayImpact
