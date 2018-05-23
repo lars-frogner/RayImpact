@@ -1,18 +1,14 @@
 #include "WhittedIntegrator.hpp"
 #include "BSDF.hpp"
+#include "api.hpp"
 #include <cmath>
+
+#include <iostream>
 
 namespace Impact {
 namespace RayImpact {
 
-// WhittedIntegrator method implementations
-
-WhittedIntegrator::WhittedIntegrator(std::shared_ptr<const Camera> camera,
-                                     std::shared_ptr<Sampler> sampler,
-                                     unsigned int max_scattering_count)
-    : SampleIntegrator::SampleIntegrator(camera, sampler),
-      max_scattering_count(max_scattering_count)
-{}
+// WhittedIntegrator method definitions
 
 RadianceSpectrum WhittedIntegrator::incidentRadiance(const RayWithOffsets& outgoing_ray,
                                                      const Scene& scene,
@@ -68,15 +64,24 @@ RadianceSpectrum WhittedIntegrator::incidentRadiance(const RayWithOffsets& outgo
     return total_incident_radiance;
 }
 
-// WhittedIntegrator creation
+// WhittedIntegrator function definitions
 
 Integrator* createWhittedIntegrator(std::shared_ptr<const Camera> camera,
                                     std::shared_ptr<Sampler> sampler,
                                     const ParameterSet& parameters)
 {
-    unsigned int max_scattering_count = (unsigned int)std::abs(parameters.getSingleIntValue("max_scattering_count", 5));
+    unsigned int max_scatterings = (unsigned int)std::abs(parameters.getSingleIntValue("max_scatterings", 5));
 
-    return new WhittedIntegrator(camera, sampler, max_scattering_count);
+	if (RIMP_OPTIONS.verbosity >= IMP_CORE_VERBOSITY)
+	{
+		printInfoMessage("Integrator:"
+						 "\n    %-20s%s"
+						 "\n    %-20s%u",
+						 "Type:", "Whitted",
+						 "Max scatterings:", max_scatterings);
+	}
+
+    return new WhittedIntegrator(camera, sampler, max_scatterings);
 }
 
 } // RayImpact

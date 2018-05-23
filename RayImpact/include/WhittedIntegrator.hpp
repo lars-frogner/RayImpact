@@ -25,11 +25,20 @@ public:
                                       unsigned int scattering_count = 0) const;
 };
 
-// WhittedIntegrator creation
+// WhittedIntegrator function declarations
 
 Integrator* createWhittedIntegrator(std::shared_ptr<const Camera> camera,
                                     std::shared_ptr<Sampler> sampler,
                                     const ParameterSet& parameters);
+
+// WhittedIntegrator inline method definitions
+
+inline WhittedIntegrator::WhittedIntegrator(std::shared_ptr<const Camera> camera,
+											std::shared_ptr<Sampler> sampler,
+											unsigned int max_scattering_count)
+    : SampleIntegrator::SampleIntegrator(camera, sampler),
+      max_scattering_count(max_scattering_count)
+{}
 
 } // RayImpact
 } // Impact
