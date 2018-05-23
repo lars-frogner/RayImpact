@@ -32,7 +32,7 @@ public:
     std::function<void (uint32_t, uint32_t)> loop_body_2D; // Loop body function for 2D loops
     uint64_t max_loop_index; // One more than the largest loop index to execute
     uint64_t max_inner_loop_index; // One more than the largest inner loop index to execute
-    const unsigned int chunk_size; // Minimum number of contiguous loop iterations to perform at a time
+    const uint32_t chunk_size; // Minimum number of contiguous loop iterations to perform at a time
 
     uint64_t next_loop_index; // Next loop index to execute
     unsigned int number_of_active_workers; // Number of threads currently executing iterations of the loop
@@ -40,7 +40,7 @@ public:
 
     ParallelForLoop(const std::function<void (uint64_t)>& loop_body_1D,
                     uint64_t n_iterations,
-                    unsigned int chunk_size);
+                    uint32_t chunk_size);
 
     ParallelForLoop(const std::function<void (uint32_t, uint32_t)>& loop_body_2D,
                     uint32_t n_iterations_inner, uint32_t n_iterations_outer);
@@ -48,11 +48,11 @@ public:
     bool isFinished() const;
 };
 
-// ParallelForLoop method implementations
+// ParallelForLoop method definitions
 
 ParallelForLoop::ParallelForLoop(const std::function<void (uint64_t)>& loop_body_1D,
                                  uint64_t n_iterations,
-                                 unsigned int chunk_size)
+                                 uint32_t chunk_size)
     : loop_body_1D(loop_body_1D),
       max_loop_index(n_iterations),
       max_inner_loop_index(n_iterations),
@@ -79,7 +79,7 @@ bool ParallelForLoop::isFinished() const
     return next_loop_index >= max_loop_index && number_of_active_workers == 0;
 }
 
-// Functions for parallelism
+// Parallel function definitions
 
 static void threadExecutionFunction(unsigned int id)
 {
@@ -122,17 +122,16 @@ static void threadExecutionFunction(unsigned int id)
             lock.unlock();
 
             // Perform loop iterations
-            for (uint64_t i = start_index; i < end_index; i++)
+            if (loop.loop_body_1D)
             {
-                if (loop.loop_body_1D)
-                {
-                    loop.loop_body_1D(i);
-                }
-                else
-                {
-                    imp_check(loop.loop_body_2D);
-                    loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
-                }
+				for (uint64_t i = start_index; i < end_index; i++)
+					loop.loop_body_1D(i);
+            }
+            else
+            {
+				imp_check(loop.loop_body_2D);
+				for (uint64_t i = start_index; i < end_index; i++)
+					loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
             }
 
             // Wait here until ownership of the mutex lock can be reaquired
@@ -199,7 +198,7 @@ void cleanupParallel()
 // for the given number of iterations
 void parallelFor(const std::function<void (uint64_t)>& loop_body,
                  uint64_t n_iterations,
-                 unsigned int chunk_size /* = 1 */)
+                 uint32_t chunk_size /* = 1 */)
 {
     imp_check(!threads.empty() || IMP_N_THREADS == 1);
 
@@ -254,17 +253,16 @@ void parallelFor(const std::function<void (uint64_t)>& loop_body,
         lock.unlock();
 
         // Perform loop iterations
-        for (uint64_t i = start_index; i < end_index; i++)
+        if (loop.loop_body_1D)
         {
-            if (loop.loop_body_1D)
-            {
-                loop.loop_body_1D(i);
-            }
-            else
-            {
-                imp_check(loop.loop_body_2D);
-                loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
-            }
+			for (uint64_t i = start_index; i < end_index; i++)
+				loop.loop_body_1D(i);
+        }
+        else
+        {
+			imp_check(loop.loop_body_2D);
+			for (uint64_t i = start_index; i < end_index; i++)
+				loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
         }
 
         // Wait here until ownership of the mutex lock can be reaquired
@@ -334,17 +332,16 @@ void parallelFor2D(const std::function<void (uint32_t, uint32_t)>& loop_body,
         lock.unlock();
 
         // Perform loop iterations
-        for (uint64_t i = start_index; i < end_index; i++)
+        if (loop.loop_body_1D)
         {
-            if (loop.loop_body_1D)
-            {
-                loop.loop_body_1D(i);
-            }
-            else
-            {
-                imp_check(loop.loop_body_2D);
-                loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
-            }
+			for (uint64_t i = start_index; i < end_index; i++)
+				loop.loop_body_1D(i);
+        }
+        else
+        {
+			imp_check(loop.loop_body_2D);
+			for (uint64_t i = start_index; i < end_index; i++)
+				loop.loop_body_2D((uint32_t)(i % loop.max_inner_loop_index), (uint32_t)(i/loop.max_inner_loop_index));
         }
 
         // Wait here until ownership of the mutex lock can be reaquired
